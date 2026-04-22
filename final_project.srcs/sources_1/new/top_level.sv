@@ -1,9 +1,6 @@
 module top_level (
     input  logic clk_100MHz,
     input  logic reset_rtl_0,
-    // UART
-    input  logic uart_rtl_0_rxd,
-    output logic uart_rtl_0_txd,
     // HDMI
     output logic HDMI_0_tmds_clk_n,
     output logic HDMI_0_tmds_clk_p,
@@ -26,8 +23,6 @@ module top_level (
     mb_usb u_bd (
         .clk_100MHz(clk_100MHz),
         .reset_rtl_0(resetn),
-        .uart_rtl_0_rxd(uart_rtl_0_rxd),
-        .uart_rtl_0_txd(uart_rtl_0_txd),
         .HDMI_0_tmds_clk_n(HDMI_0_tmds_clk_n),
         .HDMI_0_tmds_clk_p(HDMI_0_tmds_clk_p),
         .HDMI_0_tmds_data_n(HDMI_0_tmds_data_n),
@@ -39,6 +34,7 @@ module top_level (
         .cam_href_0(cam_href_0),
         .cam_d_0(cam_d_0),
         .cam_pwdn_0(cam_pwdn_0),
+        .cam_reset_n_0(),          // unconnected output, driven high internally
         .clk_out2_0(clk_out2_0)
     );
 endmodule

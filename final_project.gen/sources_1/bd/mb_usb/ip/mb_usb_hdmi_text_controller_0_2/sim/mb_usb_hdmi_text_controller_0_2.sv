@@ -48,7 +48,7 @@
 
 
 // IP VLNV: xilinx.com:user:hdmi_text_controller:1.0
-// IP Revision: 29
+// IP Revision: 35
 
 `timescale 1ns/1ps
 
@@ -143,7 +143,7 @@ D_THREADS 1, NUM_WRITE_THREADS 1, RUSER_BITS_PER_BYTE 0, WUSER_BITS_PER_BYTE 0, 
 input wire axi_rready;
 input wire cam_pclk;
 input wire [16 : 0] cam_wr_addr;
-input wire [15 : 0] cam_wr_data;
+input wire [7 : 0] cam_wr_data;
 input wire cam_we;
 
   hdmi_text_controller_v1_0 #(

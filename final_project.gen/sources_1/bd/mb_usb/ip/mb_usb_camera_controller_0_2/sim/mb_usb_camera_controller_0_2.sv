@@ -48,7 +48,7 @@
 
 
 // IP VLNV: xilinx.com:user:camera_controller:1.0
-// IP Revision: 22
+// IP Revision: 25
 
 `timescale 1ns/1ps
 
@@ -145,7 +145,7 @@ output wire cam_pclk_out;
 output wire cam_pwdn;
 output wire cam_reset_n;
 output wire [16 : 0] bram_addr;
-output wire [15 : 0] bram_wrdata;
+output wire [7 : 0] bram_wrdata;
 output wire bram_we;
 
   camera_controller_v1_0 #(

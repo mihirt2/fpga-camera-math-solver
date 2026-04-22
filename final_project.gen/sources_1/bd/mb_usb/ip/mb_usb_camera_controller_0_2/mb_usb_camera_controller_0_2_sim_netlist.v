@@ -1,7 +1,7 @@
 // Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2022.2 (win64) Build 3671981 Fri Oct 14 05:00:03 MDT 2022
-// Date        : Tue Apr 21 16:06:28 2026
+// Date        : Tue Apr 21 20:04:39 2026
 // Host        : Levono_MihirT running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode funcsim
 //               c:/Users/ishur/final_project/final_project.gen/sources_1/bd/mb_usb/ip/mb_usb_camera_controller_0_2/mb_usb_camera_controller_0_2_sim_netlist.v
@@ -79,7 +79,7 @@ module mb_usb_camera_controller_0_2
   output cam_pwdn;
   output cam_reset_n;
   output [16:0]bram_addr;
-  output [15:0]bram_wrdata;
+  output [7:0]bram_wrdata;
   output bram_we;
 
   wire \<const0> ;
@@ -87,7 +87,7 @@ module mb_usb_camera_controller_0_2
   wire [16:0]bram_addr;
   wire \bram_addr[16]_INST_0_i_1_n_0 ;
   wire bram_we;
-  wire [15:0]bram_wrdata;
+  wire [7:0]bram_wrdata;
   wire [7:0]cam_d;
   wire cam_href;
   wire cam_pclk;
@@ -170,8 +170,8 @@ module mb_usb_camera_controller_0_2_OV7670_config_rom
     \FSM_onehot_curr_state_reg[1] ,
     Q,
     sda_drive_low_reg,
-    sda_drive_low_reg_0,
     write_byte_counter,
+    sda_drive_low_reg_0,
     sda_drive_low_i_2_0,
     sda_drive_low_reg_i_7_0,
     sda_drive_low_reg_i_7_1,
@@ -184,8 +184,8 @@ module mb_usb_camera_controller_0_2_OV7670_config_rom
   output \FSM_onehot_curr_state_reg[1] ;
   input [7:0]Q;
   input [1:0]sda_drive_low_reg;
-  input sda_drive_low_reg_0;
   input [1:0]write_byte_counter;
+  input sda_drive_low_reg_0;
   input sda_drive_low_i_2_0;
   input sda_drive_low_reg_i_7_0;
   input sda_drive_low_reg_i_7_1;
@@ -236,7 +236,7 @@ module mb_usb_camera_controller_0_2_OV7670_config_rom
   wire sda_drive_low_reg_2;
   wire sda_drive_low_reg_3;
   wire sda_drive_low_reg_4;
-  wire sda_drive_low_reg_i_6_n_0;
+  wire sda_drive_low_reg_i_5_n_0;
   wire sda_drive_low_reg_i_7_0;
   wire sda_drive_low_reg_i_7_1;
   wire sda_drive_low_reg_i_7_n_0;
@@ -536,13 +536,13 @@ module mb_usb_camera_controller_0_2_OV7670_config_rom
         .I5(\dout_reg_n_0_[4] ),
         .O(sda_drive_low_i_11_n_0));
   LUT6 #(
-    .INIT(64'h88888A8888AA8A88)) 
+    .INIT(64'hAAAA0020AAAA0A20)) 
     sda_drive_low_i_2
        (.I0(sda_drive_low_reg[1]),
-        .I1(sda_drive_low_reg_0),
-        .I2(sda_drive_low_reg_i_6_n_0),
-        .I3(write_byte_counter[0]),
-        .I4(write_byte_counter[1]),
+        .I1(sda_drive_low_reg_i_5_n_0),
+        .I2(write_byte_counter[0]),
+        .I3(write_byte_counter[1]),
+        .I4(sda_drive_low_reg_0),
         .I5(sda_drive_low_reg_i_7_n_0),
         .O(sda_drive_low_i_2_n_0));
   LUT6 #(
@@ -565,10 +565,10 @@ module mb_usb_camera_controller_0_2_OV7670_config_rom
         .I4(sda_drive_low_reg_i_7_1),
         .I5(reg_addr[4]),
         .O(sda_drive_low_i_9_n_0));
-  MUXF7 sda_drive_low_reg_i_6
+  MUXF7 sda_drive_low_reg_i_5
        (.I0(sda_drive_low_i_8_n_0),
         .I1(sda_drive_low_i_9_n_0),
-        .O(sda_drive_low_reg_i_6_n_0),
+        .O(sda_drive_low_reg_i_5_n_0),
         .S(sda_drive_low_i_2_0));
   MUXF7 sda_drive_low_reg_i_7
        (.I0(sda_drive_low_i_10_n_0),
@@ -680,7 +680,7 @@ module mb_usb_camera_controller_0_2_cam_init
   wire scl_i_6_n_0;
   wire sda_drive_low_i_3_n_0;
   wire sda_drive_low_i_4_n_0;
-  wire sda_drive_low_i_5_n_0;
+  wire sda_drive_low_i_6_n_0;
   wire sda_drive_low_reg_n_0;
   wire [2:0]sel0;
   wire \slv_reg0_reg[2] ;
@@ -888,7 +888,7 @@ module mb_usb_camera_controller_0_2_cam_init
         .s00_axi_aclk(s00_axi_aclk),
         .sda_drive_low_i_2_0(\write_bit_counter_reg_n_0_[2] ),
         .sda_drive_low_reg({\FSM_onehot_curr_state_reg_n_0_[2] ,\FSM_onehot_curr_state_reg_n_0_[1] }),
-        .sda_drive_low_reg_0(sda_drive_low_i_5_n_0),
+        .sda_drive_low_reg_0(sda_drive_low_i_6_n_0),
         .sda_drive_low_reg_1(sda_drive_low_i_3_n_0),
         .sda_drive_low_reg_2(scl_i_5_n_0),
         .sda_drive_low_reg_3(sda_drive_low_i_4_n_0),
@@ -1237,13 +1237,13 @@ module mb_usb_camera_controller_0_2_cam_init
         .O(sda_drive_low_i_4_n_0));
   LUT5 #(
     .INIT(32'h99099099)) 
-    sda_drive_low_i_5
+    sda_drive_low_i_6
        (.I0(write_byte_counter[0]),
         .I1(write_byte_counter[1]),
         .I2(\write_bit_counter_reg_n_0_[1] ),
         .I3(\write_bit_counter_reg_n_0_[0] ),
         .I4(\write_bit_counter_reg_n_0_[2] ),
-        .O(sda_drive_low_i_5_n_0));
+        .O(sda_drive_low_i_6_n_0));
   FDRE sda_drive_low_reg
        (.C(s00_axi_aclk),
         .CE(1'b1),
@@ -1424,8 +1424,8 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0
     s00_axi_wvalid,
     s00_axi_wdata,
     s00_axi_araddr,
-    cam_href,
     cam_vsync,
+    cam_href,
     s00_axi_wstrb,
     s00_axi_bready,
     s00_axi_rready);
@@ -1436,7 +1436,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0
   output cam_sda;
   output hw_reset;
   output we_next;
-  output [15:0]bram_wrdata;
+  output [7:0]bram_wrdata;
   output bram_we;
   output s00_axi_awready;
   output s00_axi_wready;
@@ -1454,15 +1454,15 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0
   input s00_axi_wvalid;
   input [31:0]s00_axi_wdata;
   input [2:0]s00_axi_araddr;
-  input cam_href;
   input cam_vsync;
+  input cam_href;
   input [3:0]s00_axi_wstrb;
   input s00_axi_bready;
   input s00_axi_rready;
 
   wire [16:0]bram_addr;
   wire bram_we;
-  wire [15:0]bram_wrdata;
+  wire [7:0]bram_wrdata;
   wire [7:0]cam_d;
   wire cam_href;
   wire cam_pclk;
@@ -1887,8 +1887,8 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
     s00_axi_awaddr,
     s00_axi_wdata,
     s00_axi_araddr,
-    cam_href,
     cam_vsync,
+    cam_href,
     s00_axi_wstrb);
   output [0:0]SS;
   output [0:0]E;
@@ -1902,7 +1902,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
   output s00_axi_rvalid;
   output [16:0]bram_addr;
   output cam_sda;
-  output [15:0]bram_wrdata;
+  output [7:0]bram_wrdata;
   output [31:0]s00_axi_rdata;
   input cam_pclk;
   input s00_axi_aclk;
@@ -1917,8 +1917,8 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
   input [2:0]s00_axi_awaddr;
   input [31:0]s00_axi_wdata;
   input [2:0]s00_axi_araddr;
-  input cam_href;
   input cam_vsync;
+  input cam_href;
   input [3:0]s00_axi_wstrb;
 
   wire [0:0]E;
@@ -1929,7 +1929,6 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
   wire auto_capture_en_i_3_n_0;
   wire auto_capture_en_i_4_n_0;
   wire auto_capture_en_i_5_n_0;
-  wire auto_capture_en_i_6_n_0;
   wire auto_init_start_i_2_n_0;
   wire auto_init_start_i_3_n_0;
   wire auto_init_start_i_4_n_0;
@@ -2035,7 +2034,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
   wire \boot_timer_reg[8]_i_1_n_7 ;
   wire [16:0]bram_addr;
   wire bram_we;
-  wire [15:0]bram_wrdata;
+  wire [7:0]bram_wrdata;
   wire [7:0]cam_d;
   wire cam_href;
   wire cam_pclk;
@@ -2086,9 +2085,9 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
   wire frame_done_sync1;
   wire hw_reset0;
   wire [31:7]p_0_in;
-  wire [18:0]pixel_addr_sync1;
+  wire [16:0]pixel_addr_sync1;
   wire \pixel_addr_sync1_reg[0]_0 ;
-  wire [18:0]pixel_addr_sync2;
+  wire [16:0]pixel_addr_sync2;
   wire [31:0]reg_data_out;
   wire s00_axi_aclk;
   wire [2:0]s00_axi_araddr;
@@ -2145,8 +2144,6 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
   wire soft_reset;
   wire u_cam_init_n_2;
   wire u_cam_init_n_4;
-  wire u_capture_n_4;
-  wire u_capture_n_5;
   wire [3:3]\NLW_boot_timer_reg[24]_i_1_CO_UNCONNECTED ;
   wire [3:3]\NLW_frame_count_reg[12]_i_1_CO_UNCONNECTED ;
 
@@ -2161,13 +2158,13 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I5(auto_capture_en),
         .O(auto_capture_en_i_1_n_0));
   LUT6 #(
-    .INIT(64'hABABABABAAAAAAAB)) 
+    .INIT(64'hBBBBBBBBABABAAAB)) 
     auto_capture_en_i_2
        (.I0(auto_capture_en_i_3_n_0),
-        .I1(boot_timer_reg[17]),
-        .I2(boot_timer_reg[19]),
-        .I3(\boot_timer[0]_i_6_n_0 ),
-        .I4(auto_capture_en_i_4_n_0),
+        .I1(auto_capture_en_i_4_n_0),
+        .I2(\boot_timer[0]_i_6_n_0 ),
+        .I3(boot_timer_reg[8]),
+        .I4(auto_init_start_i_4_n_0),
         .I5(auto_capture_en_i_5_n_0),
         .O(auto_capture_en_i_2_n_0));
   LUT5 #(
@@ -2179,17 +2176,13 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I3(boot_timer_reg[18]),
         .I4(boot_timer_reg[19]),
         .O(auto_capture_en_i_3_n_0));
-  LUT6 #(
-    .INIT(64'hAAAAAAAAAAAAAAA8)) 
+  LUT2 #(
+    .INIT(4'hE)) 
     auto_capture_en_i_4
-       (.I0(boot_timer_reg[8]),
-        .I1(auto_capture_en_i_6_n_0),
-        .I2(boot_timer_reg[7]),
-        .I3(boot_timer_reg[0]),
-        .I4(boot_timer_reg[5]),
-        .I5(boot_timer_reg[6]),
+       (.I0(boot_timer_reg[17]),
+        .I1(boot_timer_reg[19]),
         .O(auto_capture_en_i_4_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair41" *) 
+  (* SOFT_HLUTNM = "soft_lutpair40" *) 
   LUT4 #(
     .INIT(16'h7FFF)) 
     auto_capture_en_i_5
@@ -2198,15 +2191,6 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I2(boot_timer_reg[13]),
         .I3(boot_timer_reg[16]),
         .O(auto_capture_en_i_5_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair38" *) 
-  LUT4 #(
-    .INIT(16'hFFFE)) 
-    auto_capture_en_i_6
-       (.I0(boot_timer_reg[1]),
-        .I1(boot_timer_reg[2]),
-        .I2(boot_timer_reg[3]),
-        .I3(boot_timer_reg[4]),
-        .O(auto_capture_en_i_6_n_0));
   FDRE auto_capture_en_reg
        (.C(s00_axi_aclk),
         .CE(1'b1),
@@ -2214,66 +2198,65 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .Q(auto_capture_en),
         .R(SS));
   LUT6 #(
-    .INIT(64'hFFFEFFFFFFFFFFFF)) 
+    .INIT(64'hFFFFFFFFFFFFFFFD)) 
     auto_init_start_i_2
        (.I0(auto_init_start_i_4_n_0),
         .I1(auto_init_start_i_5_n_0),
         .I2(boot_timer_reg[9]),
         .I3(boot_timer_reg[12]),
-        .I4(boot_timer_reg[20]),
-        .I5(boot_timer_reg[24]),
+        .I4(boot_timer_reg[19]),
+        .I5(boot_timer_reg[18]),
         .O(auto_init_start_i_2_n_0));
   LUT6 #(
-    .INIT(64'h0000000000000004)) 
+    .INIT(64'h0000000000000001)) 
     auto_init_start_i_3
-       (.I0(auto_init_start_i_6_n_0),
-        .I1(auto_init_start_i_7_n_0),
-        .I2(auto_init_start_i_8_n_0),
-        .I3(boot_timer_reg[7]),
-        .I4(boot_timer_reg[6]),
-        .I5(boot_timer_reg[0]),
+       (.I0(boot_timer_reg[17]),
+        .I1(boot_timer_reg[27]),
+        .I2(boot_timer_reg[22]),
+        .I3(boot_timer_reg[26]),
+        .I4(auto_init_start_i_6_n_0),
+        .I5(auto_init_start_i_7_n_0),
         .O(auto_init_start_i_3_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair38" *) 
   LUT5 #(
-    .INIT(32'hFFFFFFFE)) 
+    .INIT(32'h00000001)) 
     auto_init_start_i_4
-       (.I0(boot_timer_reg[1]),
-        .I1(boot_timer_reg[2]),
-        .I2(boot_timer_reg[4]),
-        .I3(boot_timer_reg[3]),
-        .I4(boot_timer_reg[5]),
+       (.I0(boot_timer_reg[5]),
+        .I1(boot_timer_reg[3]),
+        .I2(boot_timer_reg[2]),
+        .I3(boot_timer_reg[4]),
+        .I4(auto_init_start_i_8_n_0),
         .O(auto_init_start_i_4_n_0));
   LUT4 #(
-    .INIT(16'hFFF7)) 
+    .INIT(16'h7FFF)) 
     auto_init_start_i_5
        (.I0(boot_timer_reg[13]),
         .I1(boot_timer_reg[16]),
-        .I2(boot_timer_reg[19]),
-        .I3(boot_timer_reg[18]),
+        .I2(boot_timer_reg[20]),
+        .I3(boot_timer_reg[24]),
         .O(auto_init_start_i_5_n_0));
   LUT4 #(
-    .INIT(16'hFFEF)) 
+    .INIT(16'hEFFF)) 
     auto_init_start_i_6
        (.I0(boot_timer_reg[14]),
         .I1(boot_timer_reg[15]),
         .I2(boot_timer_reg[21]),
-        .I3(boot_timer_reg[25]),
+        .I3(boot_timer_reg[11]),
         .O(auto_init_start_i_6_n_0));
   LUT4 #(
-    .INIT(16'h0080)) 
+    .INIT(16'hFFDF)) 
     auto_init_start_i_7
        (.I0(boot_timer_reg[8]),
-        .I1(boot_timer_reg[10]),
-        .I2(boot_timer_reg[11]),
-        .I3(boot_timer_reg[22]),
+        .I1(boot_timer_reg[23]),
+        .I2(boot_timer_reg[10]),
+        .I3(boot_timer_reg[25]),
         .O(auto_init_start_i_7_n_0));
   LUT4 #(
     .INIT(16'hFFFE)) 
     auto_init_start_i_8
-       (.I0(boot_timer_reg[27]),
-        .I1(boot_timer_reg[17]),
-        .I2(boot_timer_reg[26]),
-        .I3(boot_timer_reg[23]),
+       (.I0(boot_timer_reg[6]),
+        .I1(boot_timer_reg[0]),
+        .I2(boot_timer_reg[7]),
+        .I3(boot_timer_reg[1]),
         .O(auto_init_start_i_8_n_0));
   FDRE auto_init_start_reg
        (.C(s00_axi_aclk),
@@ -2323,7 +2306,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .D(\axi_araddr[4]_i_1_n_0 ),
         .Q(sel0[2]),
         .R(hw_reset0));
-  (* SOFT_HLUTNM = "soft_lutpair42" *) 
+  (* SOFT_HLUTNM = "soft_lutpair41" *) 
   LUT2 #(
     .INIT(4'h2)) 
     axi_arready_i_1
@@ -2354,7 +2337,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I3(axi_awready_reg_0),
         .I4(axi_awaddr[3]),
         .O(\axi_awaddr[3]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair39" *) 
+  (* SOFT_HLUTNM = "soft_lutpair38" *) 
   LUT5 #(
     .INIT(32'hFFBF0080)) 
     \axi_awaddr[4]_i_1 
@@ -2387,7 +2370,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
     axi_awready_i_1
        (.I0(s00_axi_aresetn),
         .O(hw_reset0));
-  (* SOFT_HLUTNM = "soft_lutpair39" *) 
+  (* SOFT_HLUTNM = "soft_lutpair38" *) 
   LUT3 #(
     .INIT(8'h08)) 
     axi_awready_i_2
@@ -2541,25 +2524,23 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I4(sel0[1]),
         .I5(slv_reg2[16]),
         .O(reg_data_out[16]));
-  LUT6 #(
-    .INIT(64'h03030B0800000B08)) 
+  LUT5 #(
+    .INIT(32'h000000E2)) 
     \axi_rdata[17]_i_1 
-       (.I0(pixel_addr_sync2[17]),
-        .I1(sel0[2]),
-        .I2(sel0[0]),
-        .I3(\slv_reg0_reg_n_0_[17] ),
-        .I4(sel0[1]),
-        .I5(slv_reg2[17]),
+       (.I0(\slv_reg0_reg_n_0_[17] ),
+        .I1(sel0[1]),
+        .I2(slv_reg2[17]),
+        .I3(sel0[0]),
+        .I4(sel0[2]),
         .O(reg_data_out[17]));
-  LUT6 #(
-    .INIT(64'h03030B0800000B08)) 
+  LUT5 #(
+    .INIT(32'h000000E2)) 
     \axi_rdata[18]_i_1 
-       (.I0(pixel_addr_sync2[18]),
-        .I1(sel0[2]),
-        .I2(sel0[0]),
-        .I3(\slv_reg0_reg_n_0_[18] ),
-        .I4(sel0[1]),
-        .I5(slv_reg2[18]),
+       (.I0(\slv_reg0_reg_n_0_[18] ),
+        .I1(sel0[1]),
+        .I2(slv_reg2[18]),
+        .I3(sel0[0]),
+        .I4(sel0[2]),
         .O(reg_data_out[18]));
   LUT5 #(
     .INIT(32'h000000E2)) 
@@ -2608,11 +2589,11 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I4(sel0[2]),
         .O(reg_data_out[21]));
   LUT5 #(
-    .INIT(32'h000000B8)) 
+    .INIT(32'h000000E2)) 
     \axi_rdata[22]_i_1 
-       (.I0(slv_reg2[22]),
+       (.I0(\slv_reg0_reg_n_0_[22] ),
         .I1(sel0[1]),
-        .I2(\slv_reg0_reg_n_0_[22] ),
+        .I2(slv_reg2[22]),
         .I3(sel0[0]),
         .I4(sel0[2]),
         .O(reg_data_out[22]));
@@ -2653,11 +2634,11 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I4(sel0[2]),
         .O(reg_data_out[26]));
   LUT5 #(
-    .INIT(32'h000000E2)) 
+    .INIT(32'h000000B8)) 
     \axi_rdata[27]_i_1 
-       (.I0(\slv_reg0_reg_n_0_[27] ),
+       (.I0(slv_reg2[27]),
         .I1(sel0[1]),
-        .I2(slv_reg2[27]),
+        .I2(\slv_reg0_reg_n_0_[27] ),
         .I3(sel0[0]),
         .I4(sel0[2]),
         .O(reg_data_out[27]));
@@ -3058,7 +3039,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .D(reg_data_out[9]),
         .Q(s00_axi_rdata[9]),
         .R(1'b0));
-  (* SOFT_HLUTNM = "soft_lutpair42" *) 
+  (* SOFT_HLUTNM = "soft_lutpair41" *) 
   LUT4 #(
     .INIT(16'h7444)) 
     axi_rvalid_i_1
@@ -3073,7 +3054,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .D(axi_rvalid_i_1_n_0),
         .Q(s00_axi_rvalid),
         .R(hw_reset0));
-  (* SOFT_HLUTNM = "soft_lutpair43" *) 
+  (* SOFT_HLUTNM = "soft_lutpair42" *) 
   LUT3 #(
     .INIT(8'h08)) 
     axi_wready_i_1
@@ -3133,7 +3114,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I2(boot_timer_reg[9]),
         .I3(boot_timer_reg[12]),
         .O(\boot_timer[0]_i_6_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair41" *) 
+  (* SOFT_HLUTNM = "soft_lutpair40" *) 
   LUT4 #(
     .INIT(16'h7FFF)) 
     \boot_timer[0]_i_7 
@@ -3366,7 +3347,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .D(\boot_timer_reg[8]_i_1_n_6 ),
         .Q(boot_timer_reg[9]),
         .R(SS));
-  (* SOFT_HLUTNM = "soft_lutpair40" *) 
+  (* SOFT_HLUTNM = "soft_lutpair39" *) 
   LUT4 #(
     .INIT(16'h4440)) 
     capture_en_sync1_i_1
@@ -3381,7 +3362,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .D(capture_en_sync1_i_1_n_0),
         .Q(capture_en_sync1),
         .R(1'b0));
-  (* SOFT_HLUTNM = "soft_lutpair40" *) 
+  (* SOFT_HLUTNM = "soft_lutpair39" *) 
   LUT3 #(
     .INIT(8'h40)) 
     capture_en_sync2_i_1
@@ -3600,18 +3581,6 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .D(bram_addr[16]),
         .Q(pixel_addr_sync1[16]),
         .R(SS));
-  FDRE \pixel_addr_sync1_reg[17] 
-       (.C(s00_axi_aclk),
-        .CE(1'b1),
-        .D(u_capture_n_5),
-        .Q(pixel_addr_sync1[17]),
-        .R(SS));
-  FDRE \pixel_addr_sync1_reg[18] 
-       (.C(s00_axi_aclk),
-        .CE(1'b1),
-        .D(u_capture_n_4),
-        .Q(pixel_addr_sync1[18]),
-        .R(SS));
   FDRE \pixel_addr_sync1_reg[1] 
        (.C(s00_axi_aclk),
         .CE(1'b1),
@@ -3714,18 +3683,6 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .D(pixel_addr_sync1[16]),
         .Q(pixel_addr_sync2[16]),
         .R(SS));
-  FDRE \pixel_addr_sync2_reg[17] 
-       (.C(s00_axi_aclk),
-        .CE(1'b1),
-        .D(pixel_addr_sync1[17]),
-        .Q(pixel_addr_sync2[17]),
-        .R(SS));
-  FDRE \pixel_addr_sync2_reg[18] 
-       (.C(s00_axi_aclk),
-        .CE(1'b1),
-        .D(pixel_addr_sync1[18]),
-        .Q(pixel_addr_sync2[18]),
-        .R(SS));
   FDRE \pixel_addr_sync2_reg[1] 
        (.C(s00_axi_aclk),
         .CE(1'b1),
@@ -3807,7 +3764,7 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .I3(axi_awaddr[2]),
         .I4(axi_awaddr[3]),
         .O(p_0_in[31]));
-  (* SOFT_HLUTNM = "soft_lutpair43" *) 
+  (* SOFT_HLUTNM = "soft_lutpair42" *) 
   LUT4 #(
     .INIT(16'h8000)) 
     \slv_reg0[31]_i_2 
@@ -4264,9 +4221,9 @@ module mb_usb_camera_controller_0_2_camera_controller_v1_0_S00_AXI
         .sel0(sel0),
         .\slv_reg0_reg[2] (u_cam_init_n_2));
   mb_usb_camera_controller_0_2_ov7670_capture u_capture
-       (.D({u_capture_n_4,u_capture_n_5,bram_addr}),
-        .E(E),
+       (.E(E),
         .Q(soft_reset),
+        .bram_addr(bram_addr),
         .bram_we(bram_we),
         .bram_wrdata(bram_wrdata),
         .cam_d(cam_d),
@@ -4286,42 +4243,40 @@ module mb_usb_camera_controller_0_2_ov7670_capture
     E,
     bram_we,
     frame_done,
-    D,
+    bram_addr,
     bram_wrdata,
     cam_pclk,
     \pixel_addr_sync1_reg[0] ,
     Q,
     s00_axi_aresetn,
     cam_d,
-    capture_en_sync2,
+    cam_vsync,
     cam_href,
-    cam_vsync);
+    capture_en_sync2);
   output \slv_reg0_reg[2] ;
   output [0:0]E;
   output bram_we;
   output frame_done;
-  output [18:0]D;
-  output [15:0]bram_wrdata;
+  output [16:0]bram_addr;
+  output [7:0]bram_wrdata;
   input cam_pclk;
   input \pixel_addr_sync1_reg[0] ;
   input [0:0]Q;
   input s00_axi_aresetn;
   input [7:0]cam_d;
-  input capture_en_sync2;
-  input cam_href;
   input cam_vsync;
+  input cam_href;
+  input capture_en_sync2;
 
-  wire [18:0]D;
   wire [0:0]E;
   wire [0:0]Q;
+  wire [16:0]bram_addr;
   wire bram_addr0_n_100;
   wire bram_addr0_n_101;
   wire bram_addr0_n_102;
   wire bram_addr0_n_103;
   wire bram_addr0_n_104;
   wire bram_addr0_n_105;
-  wire bram_addr0_n_87;
-  wire bram_addr0_n_88;
   wire bram_addr0_n_89;
   wire bram_addr0_n_90;
   wire bram_addr0_n_91;
@@ -4334,18 +4289,17 @@ module mb_usb_camera_controller_0_2_ov7670_capture
   wire bram_addr0_n_98;
   wire bram_addr0_n_99;
   wire bram_we;
-  wire [15:0]bram_wrdata;
-  wire \bram_wrdata[15]_i_2_n_0 ;
-  wire \bram_wrdata[15]_i_3_n_0 ;
+  wire [7:0]bram_wrdata;
+  wire \bram_wrdata[7]_i_2_n_0 ;
+  wire \bram_wrdata[7]_i_3_n_0 ;
   wire byte_toggle;
-  wire byte_toggle_next;
+  wire byte_toggle_i_1_n_0;
   wire [7:0]cam_d;
   wire cam_href;
   wire cam_pclk;
   wire cam_vsync;
   wire capture_en_sync2;
   wire [1:0]curr_state;
-  wire [7:0]first_byte;
   wire frame_done;
   wire frame_done_next;
   wire [1:0]next_state;
@@ -4353,27 +4307,16 @@ module mb_usb_camera_controller_0_2_ov7670_capture
   wire s00_axi_aresetn;
   wire \slv_reg0_reg[2] ;
   wire [9:0]x_coord;
-  wire \x_coord[2]_i_1_n_0 ;
-  wire \x_coord[3]_i_1_n_0 ;
-  wire \x_coord[4]_i_1_n_0 ;
-  wire \x_coord[5]_i_1_n_0 ;
+  wire \x_coord[0]_i_1_n_0 ;
   wire \x_coord[5]_i_2_n_0 ;
-  wire \x_coord[6]_i_1_n_0 ;
-  wire \x_coord[7]_i_1_n_0 ;
-  wire \x_coord[8]_i_1_n_0 ;
   wire \x_coord[9]_i_1_n_0 ;
   wire \x_coord[9]_i_3_n_0 ;
-  wire [9:0]x_coord_next;
+  wire [9:1]x_coord_next;
   wire [9:0]y_coord;
-  wire \y_coord[2]_i_1_n_0 ;
-  wire \y_coord[3]_i_1_n_0 ;
-  wire \y_coord[4]_i_1_n_0 ;
-  wire \y_coord[5]_i_1_n_0 ;
-  wire \y_coord[6]_i_1_n_0 ;
-  wire \y_coord[7]_i_1_n_0 ;
-  wire \y_coord[9]_i_1_n_0 ;
+  wire \y_coord[0]_i_1_n_0 ;
+  wire \y_coord[7]_i_2_n_0 ;
   wire \y_coord[9]_i_2_n_0 ;
-  wire [8:0]y_coord_next;
+  wire [9:1]y_coord_next;
   wire NLW_bram_addr0_CARRYCASCOUT_UNCONNECTED;
   wire NLW_bram_addr0_MULTSIGNOUT_UNCONNECTED;
   wire NLW_bram_addr0_OVERFLOW_UNCONNECTED;
@@ -4383,7 +4326,7 @@ module mb_usb_camera_controller_0_2_ov7670_capture
   wire [29:0]NLW_bram_addr0_ACOUT_UNCONNECTED;
   wire [17:0]NLW_bram_addr0_BCOUT_UNCONNECTED;
   wire [3:0]NLW_bram_addr0_CARRYOUT_UNCONNECTED;
-  wire [47:19]NLW_bram_addr0_P_UNCONNECTED;
+  wire [47:17]NLW_bram_addr0_P_UNCONNECTED;
   wire [47:0]NLW_bram_addr0_PCOUT_UNCONNECTED;
 
   (* METHODOLOGY_DRC_VIOS = "{SYNTH-12 {cell *THIS*}}" *) 
@@ -4418,7 +4361,7 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .ACIN({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
         .ACOUT(NLW_bram_addr0_ACOUT_UNCONNECTED[29:0]),
         .ALUMODE({1'b0,1'b0,1'b0,1'b0}),
-        .B({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1,1'b0,1'b1,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .B({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1,1'b0,1'b1,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
         .BCIN({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
         .BCOUT(NLW_bram_addr0_BCOUT_UNCONNECTED[17:0]),
         .C({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,x_coord}),
@@ -4447,7 +4390,7 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .MULTSIGNOUT(NLW_bram_addr0_MULTSIGNOUT_UNCONNECTED),
         .OPMODE({1'b0,1'b1,1'b1,1'b0,1'b1,1'b0,1'b1}),
         .OVERFLOW(NLW_bram_addr0_OVERFLOW_UNCONNECTED),
-        .P({NLW_bram_addr0_P_UNCONNECTED[47:19],bram_addr0_n_87,bram_addr0_n_88,bram_addr0_n_89,bram_addr0_n_90,bram_addr0_n_91,bram_addr0_n_92,bram_addr0_n_93,bram_addr0_n_94,bram_addr0_n_95,bram_addr0_n_96,bram_addr0_n_97,bram_addr0_n_98,bram_addr0_n_99,bram_addr0_n_100,bram_addr0_n_101,bram_addr0_n_102,bram_addr0_n_103,bram_addr0_n_104,bram_addr0_n_105}),
+        .P({NLW_bram_addr0_P_UNCONNECTED[47:17],bram_addr0_n_89,bram_addr0_n_90,bram_addr0_n_91,bram_addr0_n_92,bram_addr0_n_93,bram_addr0_n_94,bram_addr0_n_95,bram_addr0_n_96,bram_addr0_n_97,bram_addr0_n_98,bram_addr0_n_99,bram_addr0_n_100,bram_addr0_n_101,bram_addr0_n_102,bram_addr0_n_103,bram_addr0_n_104,bram_addr0_n_105}),
         .PATTERNBDETECT(NLW_bram_addr0_PATTERNBDETECT_UNCONNECTED),
         .PATTERNDETECT(NLW_bram_addr0_PATTERNDETECT_UNCONNECTED),
         .PCIN({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}),
@@ -4463,125 +4406,124 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .RSTM(1'b0),
         .RSTP(1'b0),
         .UNDERFLOW(NLW_bram_addr0_UNDERFLOW_UNCONNECTED));
-  (* SOFT_HLUTNM = "soft_lutpair29" *) 
+  (* SOFT_HLUTNM = "soft_lutpair30" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[0]_INST_0 
        (.I0(bram_addr0_n_105),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[0]));
-  (* SOFT_HLUTNM = "soft_lutpair34" *) 
+        .O(bram_addr[0]));
+  (* SOFT_HLUTNM = "soft_lutpair35" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[10]_INST_0 
        (.I0(bram_addr0_n_95),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[10]));
-  (* SOFT_HLUTNM = "soft_lutpair34" *) 
+        .O(bram_addr[10]));
+  (* SOFT_HLUTNM = "soft_lutpair35" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[11]_INST_0 
        (.I0(bram_addr0_n_94),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[11]));
-  (* SOFT_HLUTNM = "soft_lutpair35" *) 
+        .O(bram_addr[11]));
+  (* SOFT_HLUTNM = "soft_lutpair36" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[12]_INST_0 
        (.I0(bram_addr0_n_93),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[12]));
-  (* SOFT_HLUTNM = "soft_lutpair35" *) 
+        .O(bram_addr[12]));
+  (* SOFT_HLUTNM = "soft_lutpair36" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[13]_INST_0 
        (.I0(bram_addr0_n_92),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[13]));
-  (* SOFT_HLUTNM = "soft_lutpair36" *) 
+        .O(bram_addr[13]));
+  (* SOFT_HLUTNM = "soft_lutpair37" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[14]_INST_0 
        (.I0(bram_addr0_n_91),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[14]));
-  (* SOFT_HLUTNM = "soft_lutpair36" *) 
+        .O(bram_addr[14]));
+  (* SOFT_HLUTNM = "soft_lutpair37" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[15]_INST_0 
        (.I0(bram_addr0_n_90),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[15]));
-  (* SOFT_HLUTNM = "soft_lutpair37" *) 
+        .O(bram_addr[15]));
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[16]_INST_0 
        (.I0(bram_addr0_n_89),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[16]));
-  (* SOFT_HLUTNM = "soft_lutpair29" *) 
+        .O(bram_addr[16]));
+  (* SOFT_HLUTNM = "soft_lutpair30" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[1]_INST_0 
        (.I0(bram_addr0_n_104),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[1]));
-  (* SOFT_HLUTNM = "soft_lutpair30" *) 
+        .O(bram_addr[1]));
+  (* SOFT_HLUTNM = "soft_lutpair31" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[2]_INST_0 
        (.I0(bram_addr0_n_103),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[2]));
-  (* SOFT_HLUTNM = "soft_lutpair30" *) 
+        .O(bram_addr[2]));
+  (* SOFT_HLUTNM = "soft_lutpair31" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[3]_INST_0 
        (.I0(bram_addr0_n_102),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[3]));
-  (* SOFT_HLUTNM = "soft_lutpair31" *) 
+        .O(bram_addr[3]));
+  (* SOFT_HLUTNM = "soft_lutpair32" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[4]_INST_0 
        (.I0(bram_addr0_n_101),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[4]));
-  (* SOFT_HLUTNM = "soft_lutpair31" *) 
+        .O(bram_addr[4]));
+  (* SOFT_HLUTNM = "soft_lutpair32" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[5]_INST_0 
        (.I0(bram_addr0_n_100),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[5]));
-  (* SOFT_HLUTNM = "soft_lutpair32" *) 
+        .O(bram_addr[5]));
+  (* SOFT_HLUTNM = "soft_lutpair33" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[6]_INST_0 
        (.I0(bram_addr0_n_99),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[6]));
-  (* SOFT_HLUTNM = "soft_lutpair32" *) 
+        .O(bram_addr[6]));
+  (* SOFT_HLUTNM = "soft_lutpair33" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[7]_INST_0 
        (.I0(bram_addr0_n_98),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[7]));
-  (* SOFT_HLUTNM = "soft_lutpair33" *) 
+        .O(bram_addr[7]));
+  (* SOFT_HLUTNM = "soft_lutpair34" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[8]_INST_0 
        (.I0(bram_addr0_n_97),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[8]));
-  (* SOFT_HLUTNM = "soft_lutpair33" *) 
+        .O(bram_addr[8]));
+  (* SOFT_HLUTNM = "soft_lutpair34" *) 
   LUT2 #(
     .INIT(4'h8)) 
     \bram_addr[9]_INST_0 
        (.I0(bram_addr0_n_96),
         .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[9]));
+        .O(bram_addr[9]));
   FDCE bram_we_reg
        (.C(cam_pclk),
         .CE(1'b1),
@@ -4589,73 +4531,39 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .D(E),
         .Q(bram_we));
   LUT5 #(
-    .INIT(32'h00001115)) 
-    \bram_wrdata[15]_i_1 
-       (.I0(\bram_wrdata[15]_i_2_n_0 ),
-        .I1(x_coord[9]),
+    .INIT(32'h1F000000)) 
+    \bram_wrdata[7]_i_1 
+       (.I0(x_coord[7]),
+        .I1(x_coord[6]),
         .I2(x_coord[8]),
-        .I3(x_coord[7]),
-        .I4(\bram_wrdata[15]_i_3_n_0 ),
+        .I3(\bram_wrdata[7]_i_2_n_0 ),
+        .I4(\bram_wrdata[7]_i_3_n_0 ),
         .O(E));
-  (* SOFT_HLUTNM = "soft_lutpair25" *) 
+  (* SOFT_HLUTNM = "soft_lutpair21" *) 
   LUT4 #(
-    .INIT(16'hFFDF)) 
-    \bram_wrdata[15]_i_2 
-       (.I0(curr_state[0]),
-        .I1(curr_state[1]),
-        .I2(byte_toggle),
-        .I3(y_coord[9]),
-        .O(\bram_wrdata[15]_i_2_n_0 ));
-  LUT4 #(
-    .INIT(16'h8000)) 
-    \bram_wrdata[15]_i_3 
+    .INIT(16'h7FFF)) 
+    \bram_wrdata[7]_i_2 
        (.I0(y_coord[6]),
-        .I1(y_coord[8]),
+        .I1(y_coord[4]),
         .I2(y_coord[5]),
         .I3(y_coord[7]),
-        .O(\bram_wrdata[15]_i_3_n_0 ));
+        .O(\bram_wrdata[7]_i_2_n_0 ));
+  LUT6 #(
+    .INIT(64'h0000000000000002)) 
+    \bram_wrdata[7]_i_3 
+       (.I0(curr_state[0]),
+        .I1(y_coord[9]),
+        .I2(x_coord[9]),
+        .I3(y_coord[8]),
+        .I4(byte_toggle),
+        .I5(curr_state[1]),
+        .O(\bram_wrdata[7]_i_3_n_0 ));
   FDCE \bram_wrdata_reg[0] 
        (.C(cam_pclk),
         .CE(E),
         .CLR(\slv_reg0_reg[2] ),
         .D(cam_d[0]),
         .Q(bram_wrdata[0]));
-  FDCE \bram_wrdata_reg[10] 
-       (.C(cam_pclk),
-        .CE(E),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(first_byte[2]),
-        .Q(bram_wrdata[10]));
-  FDCE \bram_wrdata_reg[11] 
-       (.C(cam_pclk),
-        .CE(E),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(first_byte[3]),
-        .Q(bram_wrdata[11]));
-  FDCE \bram_wrdata_reg[12] 
-       (.C(cam_pclk),
-        .CE(E),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(first_byte[4]),
-        .Q(bram_wrdata[12]));
-  FDCE \bram_wrdata_reg[13] 
-       (.C(cam_pclk),
-        .CE(E),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(first_byte[5]),
-        .Q(bram_wrdata[13]));
-  FDCE \bram_wrdata_reg[14] 
-       (.C(cam_pclk),
-        .CE(E),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(first_byte[6]),
-        .Q(bram_wrdata[14]));
-  FDCE \bram_wrdata_reg[15] 
-       (.C(cam_pclk),
-        .CE(E),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(first_byte[7]),
-        .Q(bram_wrdata[15]));
   FDCE \bram_wrdata_reg[1] 
        (.C(cam_pclk),
         .CE(E),
@@ -4698,48 +4606,37 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .CLR(\slv_reg0_reg[2] ),
         .D(cam_d[7]),
         .Q(bram_wrdata[7]));
-  FDCE \bram_wrdata_reg[8] 
-       (.C(cam_pclk),
-        .CE(E),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(first_byte[0]),
-        .Q(bram_wrdata[8]));
-  FDCE \bram_wrdata_reg[9] 
-       (.C(cam_pclk),
-        .CE(E),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(first_byte[1]),
-        .Q(bram_wrdata[9]));
+  (* SOFT_HLUTNM = "soft_lutpair27" *) 
   LUT3 #(
-    .INIT(8'h04)) 
+    .INIT(8'h10)) 
     byte_toggle_i_1
        (.I0(byte_toggle),
-        .I1(curr_state[0]),
-        .I2(curr_state[1]),
-        .O(byte_toggle_next));
+        .I1(curr_state[1]),
+        .I2(curr_state[0]),
+        .O(byte_toggle_i_1_n_0));
   FDCE byte_toggle_reg
        (.C(cam_pclk),
         .CE(1'b1),
         .CLR(\slv_reg0_reg[2] ),
-        .D(byte_toggle_next),
+        .D(byte_toggle_i_1_n_0),
         .Q(byte_toggle));
-  (* SOFT_HLUTNM = "soft_lutpair23" *) 
+  (* SOFT_HLUTNM = "soft_lutpair19" *) 
   LUT5 #(
-    .INIT(32'h55F5FAE0)) 
+    .INIT(32'h55EECCEA)) 
     \curr_state[0]_i_1 
-       (.I0(curr_state[1]),
-        .I1(capture_en_sync2),
-        .I2(cam_href),
-        .I3(curr_state[0]),
-        .I4(cam_vsync),
-        .O(next_state[0]));
-  (* SOFT_HLUTNM = "soft_lutpair23" *) 
-  LUT4 #(
-    .INIT(16'h0B0A)) 
-    \curr_state[1]_i_1 
        (.I0(cam_vsync),
         .I1(cam_href),
-        .I2(curr_state[1]),
+        .I2(capture_en_sync2),
+        .I3(curr_state[1]),
+        .I4(curr_state[0]),
+        .O(next_state[0]));
+  (* SOFT_HLUTNM = "soft_lutpair19" *) 
+  LUT4 #(
+    .INIT(16'h2322)) 
+    \curr_state[1]_i_1 
+       (.I0(cam_vsync),
+        .I1(curr_state[1]),
+        .I2(cam_href),
         .I3(curr_state[0]),
         .O(next_state[1]));
   FDCE \curr_state_reg[0] 
@@ -4754,60 +4651,12 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .CLR(\slv_reg0_reg[2] ),
         .D(next_state[1]),
         .Q(curr_state[1]));
-  FDCE \first_byte_reg[0] 
-       (.C(cam_pclk),
-        .CE(byte_toggle_next),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(cam_d[0]),
-        .Q(first_byte[0]));
-  FDCE \first_byte_reg[1] 
-       (.C(cam_pclk),
-        .CE(byte_toggle_next),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(cam_d[1]),
-        .Q(first_byte[1]));
-  FDCE \first_byte_reg[2] 
-       (.C(cam_pclk),
-        .CE(byte_toggle_next),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(cam_d[2]),
-        .Q(first_byte[2]));
-  FDCE \first_byte_reg[3] 
-       (.C(cam_pclk),
-        .CE(byte_toggle_next),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(cam_d[3]),
-        .Q(first_byte[3]));
-  FDCE \first_byte_reg[4] 
-       (.C(cam_pclk),
-        .CE(byte_toggle_next),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(cam_d[4]),
-        .Q(first_byte[4]));
-  FDCE \first_byte_reg[5] 
-       (.C(cam_pclk),
-        .CE(byte_toggle_next),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(cam_d[5]),
-        .Q(first_byte[5]));
-  FDCE \first_byte_reg[6] 
-       (.C(cam_pclk),
-        .CE(byte_toggle_next),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(cam_d[6]),
-        .Q(first_byte[6]));
-  FDCE \first_byte_reg[7] 
-       (.C(cam_pclk),
-        .CE(byte_toggle_next),
-        .CLR(\slv_reg0_reg[2] ),
-        .D(cam_d[7]),
-        .Q(first_byte[7]));
-  (* SOFT_HLUTNM = "soft_lutpair25" *) 
+  (* SOFT_HLUTNM = "soft_lutpair27" *) 
   LUT2 #(
     .INIT(4'h8)) 
     frame_done_i_1
-       (.I0(curr_state[1]),
-        .I1(curr_state[0]),
+       (.I0(curr_state[0]),
+        .I1(curr_state[1]),
         .O(frame_done_next));
   FDCE frame_done_reg
        (.C(cam_pclk),
@@ -4815,19 +4664,6 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .CLR(\slv_reg0_reg[2] ),
         .D(frame_done_next),
         .Q(frame_done));
-  (* SOFT_HLUTNM = "soft_lutpair37" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \pixel_addr_sync1[17]_i_1 
-       (.I0(bram_addr0_n_88),
-        .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[17]));
-  LUT2 #(
-    .INIT(4'h8)) 
-    \pixel_addr_sync1[18]_i_1 
-       (.I0(bram_addr0_n_87),
-        .I1(\pixel_addr_sync1_reg[0] ),
-        .O(D[18]));
   LUT2 #(
     .INIT(4'hB)) 
     scl_i_1
@@ -4838,54 +4674,54 @@ module mb_usb_camera_controller_0_2_ov7670_capture
   LUT2 #(
     .INIT(4'h1)) 
     \x_coord[0]_i_1 
-       (.I0(curr_state[1]),
-        .I1(x_coord[0]),
-        .O(x_coord_next[0]));
-  (* SOFT_HLUTNM = "soft_lutpair28" *) 
+       (.I0(x_coord[0]),
+        .I1(curr_state[1]),
+        .O(\x_coord[0]_i_1_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair29" *) 
   LUT3 #(
     .INIT(8'h06)) 
     \x_coord[1]_i_1 
-       (.I0(x_coord[1]),
-        .I1(x_coord[0]),
+       (.I0(x_coord[0]),
+        .I1(x_coord[1]),
         .I2(curr_state[1]),
         .O(x_coord_next[1]));
-  (* SOFT_HLUTNM = "soft_lutpair21" *) 
+  (* SOFT_HLUTNM = "soft_lutpair23" *) 
   LUT4 #(
-    .INIT(16'h1540)) 
+    .INIT(16'h0078)) 
     \x_coord[2]_i_1 
-       (.I0(curr_state[1]),
+       (.I0(x_coord[0]),
+        .I1(x_coord[1]),
+        .I2(x_coord[2]),
+        .I3(curr_state[1]),
+        .O(x_coord_next[2]));
+  (* SOFT_HLUTNM = "soft_lutpair23" *) 
+  LUT5 #(
+    .INIT(32'h00007F80)) 
+    \x_coord[3]_i_1 
+       (.I0(x_coord[1]),
+        .I1(x_coord[0]),
+        .I2(x_coord[2]),
+        .I3(x_coord[3]),
+        .I4(curr_state[1]),
+        .O(x_coord_next[3]));
+  LUT6 #(
+    .INIT(64'h000000007FFF8000)) 
+    \x_coord[4]_i_1 
+       (.I0(x_coord[2]),
         .I1(x_coord[0]),
         .I2(x_coord[1]),
-        .I3(x_coord[2]),
-        .O(\x_coord[2]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair21" *) 
-  LUT5 #(
-    .INIT(32'h15554000)) 
-    \x_coord[3]_i_1 
-       (.I0(curr_state[1]),
-        .I1(x_coord[1]),
-        .I2(x_coord[0]),
-        .I3(x_coord[2]),
-        .I4(x_coord[3]),
-        .O(\x_coord[3]_i_1_n_0 ));
-  LUT6 #(
-    .INIT(64'h1555555540000000)) 
-    \x_coord[4]_i_1 
-       (.I0(curr_state[1]),
-        .I1(x_coord[2]),
-        .I2(x_coord[0]),
-        .I3(x_coord[1]),
-        .I4(x_coord[3]),
-        .I5(x_coord[4]),
-        .O(\x_coord[4]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair26" *) 
+        .I3(x_coord[3]),
+        .I4(x_coord[4]),
+        .I5(curr_state[1]),
+        .O(x_coord_next[4]));
+  (* SOFT_HLUTNM = "soft_lutpair28" *) 
   LUT3 #(
-    .INIT(8'h41)) 
+    .INIT(8'h09)) 
     \x_coord[5]_i_1 
-       (.I0(curr_state[1]),
-        .I1(\x_coord[5]_i_2_n_0 ),
-        .I2(x_coord[5]),
-        .O(\x_coord[5]_i_1_n_0 ));
+       (.I0(\x_coord[5]_i_2_n_0 ),
+        .I1(x_coord[5]),
+        .I2(curr_state[1]),
+        .O(x_coord_next[5]));
   LUT5 #(
     .INIT(32'h7FFFFFFF)) 
     \x_coord[5]_i_2 
@@ -4895,46 +4731,46 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .I3(x_coord[2]),
         .I4(x_coord[4]),
         .O(\x_coord[5]_i_2_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair26" *) 
+  (* SOFT_HLUTNM = "soft_lutpair29" *) 
   LUT3 #(
-    .INIT(8'h41)) 
+    .INIT(8'h09)) 
     \x_coord[6]_i_1 
-       (.I0(curr_state[1]),
-        .I1(\x_coord[9]_i_3_n_0 ),
-        .I2(x_coord[6]),
-        .O(\x_coord[6]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair22" *) 
+       (.I0(\x_coord[9]_i_3_n_0 ),
+        .I1(x_coord[6]),
+        .I2(curr_state[1]),
+        .O(x_coord_next[6]));
+  (* SOFT_HLUTNM = "soft_lutpair24" *) 
   LUT4 #(
-    .INIT(16'h4510)) 
+    .INIT(16'h00B4)) 
     \x_coord[7]_i_1 
-       (.I0(curr_state[1]),
-        .I1(\x_coord[9]_i_3_n_0 ),
-        .I2(x_coord[6]),
-        .I3(x_coord[7]),
-        .O(\x_coord[7]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair22" *) 
-  LUT5 #(
-    .INIT(32'h55150040)) 
-    \x_coord[8]_i_1 
-       (.I0(curr_state[1]),
-        .I1(x_coord[7]),
-        .I2(x_coord[6]),
-        .I3(\x_coord[9]_i_3_n_0 ),
-        .I4(x_coord[8]),
-        .O(\x_coord[8]_i_1_n_0 ));
-  LUT3 #(
-    .INIT(8'hEA)) 
-    \x_coord[9]_i_1 
-       (.I0(curr_state[1]),
-        .I1(byte_toggle),
-        .I2(curr_state[0]),
-        .O(\x_coord[9]_i_1_n_0 ));
-  LUT6 #(
-    .INIT(64'h00000000BFFF4000)) 
-    \x_coord[9]_i_2 
        (.I0(\x_coord[9]_i_3_n_0 ),
         .I1(x_coord[6]),
         .I2(x_coord[7]),
+        .I3(curr_state[1]),
+        .O(x_coord_next[7]));
+  (* SOFT_HLUTNM = "soft_lutpair24" *) 
+  LUT5 #(
+    .INIT(32'h0000DF20)) 
+    \x_coord[8]_i_1 
+       (.I0(x_coord[6]),
+        .I1(\x_coord[9]_i_3_n_0 ),
+        .I2(x_coord[7]),
+        .I3(x_coord[8]),
+        .I4(curr_state[1]),
+        .O(x_coord_next[8]));
+  LUT3 #(
+    .INIT(8'hF4)) 
+    \x_coord[9]_i_1 
+       (.I0(byte_toggle),
+        .I1(curr_state[0]),
+        .I2(curr_state[1]),
+        .O(\x_coord[9]_i_1_n_0 ));
+  LUT6 #(
+    .INIT(64'h00000000DFFF2000)) 
+    \x_coord[9]_i_2 
+       (.I0(x_coord[7]),
+        .I1(\x_coord[9]_i_3_n_0 ),
+        .I2(x_coord[6]),
         .I3(x_coord[8]),
         .I4(x_coord[9]),
         .I5(curr_state[1]),
@@ -4953,7 +4789,7 @@ module mb_usb_camera_controller_0_2_ov7670_capture
        (.C(cam_pclk),
         .CE(\x_coord[9]_i_1_n_0 ),
         .CLR(\slv_reg0_reg[2] ),
-        .D(x_coord_next[0]),
+        .D(\x_coord[0]_i_1_n_0 ),
         .Q(x_coord[0]));
   FDCE \x_coord_reg[1] 
        (.C(cam_pclk),
@@ -4965,43 +4801,43 @@ module mb_usb_camera_controller_0_2_ov7670_capture
        (.C(cam_pclk),
         .CE(\x_coord[9]_i_1_n_0 ),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\x_coord[2]_i_1_n_0 ),
+        .D(x_coord_next[2]),
         .Q(x_coord[2]));
   FDCE \x_coord_reg[3] 
        (.C(cam_pclk),
         .CE(\x_coord[9]_i_1_n_0 ),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\x_coord[3]_i_1_n_0 ),
+        .D(x_coord_next[3]),
         .Q(x_coord[3]));
   FDCE \x_coord_reg[4] 
        (.C(cam_pclk),
         .CE(\x_coord[9]_i_1_n_0 ),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\x_coord[4]_i_1_n_0 ),
+        .D(x_coord_next[4]),
         .Q(x_coord[4]));
   FDCE \x_coord_reg[5] 
        (.C(cam_pclk),
         .CE(\x_coord[9]_i_1_n_0 ),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\x_coord[5]_i_1_n_0 ),
+        .D(x_coord_next[5]),
         .Q(x_coord[5]));
   FDCE \x_coord_reg[6] 
        (.C(cam_pclk),
         .CE(\x_coord[9]_i_1_n_0 ),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\x_coord[6]_i_1_n_0 ),
+        .D(x_coord_next[6]),
         .Q(x_coord[6]));
   FDCE \x_coord_reg[7] 
        (.C(cam_pclk),
         .CE(\x_coord[9]_i_1_n_0 ),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\x_coord[7]_i_1_n_0 ),
+        .D(x_coord_next[7]),
         .Q(x_coord[7]));
   FDCE \x_coord_reg[8] 
        (.C(cam_pclk),
         .CE(\x_coord[9]_i_1_n_0 ),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\x_coord[8]_i_1_n_0 ),
+        .D(x_coord_next[8]),
         .Q(x_coord[8]));
   FDCE \x_coord_reg[9] 
        (.C(cam_pclk),
@@ -5009,110 +4845,119 @@ module mb_usb_camera_controller_0_2_ov7670_capture
         .CLR(\slv_reg0_reg[2] ),
         .D(x_coord_next[9]),
         .Q(x_coord[9]));
-  (* SOFT_HLUTNM = "soft_lutpair27" *) 
   LUT2 #(
     .INIT(4'h1)) 
     \y_coord[0]_i_1 
-       (.I0(curr_state[0]),
-        .I1(y_coord[0]),
-        .O(y_coord_next[0]));
-  (* SOFT_HLUTNM = "soft_lutpair27" *) 
+       (.I0(y_coord[0]),
+        .I1(curr_state[0]),
+        .O(\y_coord[0]_i_1_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair26" *) 
   LUT3 #(
     .INIT(8'h06)) 
     \y_coord[1]_i_1 
-       (.I0(y_coord[1]),
-        .I1(y_coord[0]),
+       (.I0(y_coord[0]),
+        .I1(y_coord[1]),
         .I2(curr_state[0]),
         .O(y_coord_next[1]));
-  (* SOFT_HLUTNM = "soft_lutpair19" *) 
+  (* SOFT_HLUTNM = "soft_lutpair26" *) 
   LUT4 #(
-    .INIT(16'h1540)) 
+    .INIT(16'h0078)) 
     \y_coord[2]_i_1 
-       (.I0(curr_state[0]),
+       (.I0(y_coord[0]),
+        .I1(y_coord[1]),
+        .I2(y_coord[2]),
+        .I3(curr_state[0]),
+        .O(y_coord_next[2]));
+  (* SOFT_HLUTNM = "soft_lutpair22" *) 
+  LUT5 #(
+    .INIT(32'h00007F80)) 
+    \y_coord[3]_i_1 
+       (.I0(y_coord[1]),
+        .I1(y_coord[0]),
+        .I2(y_coord[2]),
+        .I3(y_coord[3]),
+        .I4(curr_state[0]),
+        .O(y_coord_next[3]));
+  LUT6 #(
+    .INIT(64'h000000007FFF8000)) 
+    \y_coord[4]_i_1 
+       (.I0(y_coord[2]),
         .I1(y_coord[0]),
         .I2(y_coord[1]),
-        .I3(y_coord[2]),
-        .O(\y_coord[2]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair19" *) 
-  LUT5 #(
-    .INIT(32'h15554000)) 
-    \y_coord[3]_i_1 
-       (.I0(curr_state[0]),
-        .I1(y_coord[1]),
-        .I2(y_coord[0]),
-        .I3(y_coord[2]),
-        .I4(y_coord[3]),
-        .O(\y_coord[3]_i_1_n_0 ));
-  LUT6 #(
-    .INIT(64'h1555555540000000)) 
-    \y_coord[4]_i_1 
-       (.I0(curr_state[0]),
-        .I1(y_coord[2]),
-        .I2(y_coord[0]),
-        .I3(y_coord[1]),
-        .I4(y_coord[3]),
-        .I5(y_coord[4]),
-        .O(\y_coord[4]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair24" *) 
-  LUT3 #(
-    .INIT(8'h41)) 
-    \y_coord[5]_i_1 
-       (.I0(curr_state[0]),
-        .I1(\y_coord[9]_i_2_n_0 ),
-        .I2(y_coord[5]),
-        .O(\y_coord[5]_i_1_n_0 ));
+        .I3(y_coord[3]),
+        .I4(y_coord[4]),
+        .I5(curr_state[0]),
+        .O(y_coord_next[4]));
   (* SOFT_HLUTNM = "soft_lutpair20" *) 
   LUT4 #(
-    .INIT(16'h4510)) 
-    \y_coord[6]_i_1 
-       (.I0(curr_state[0]),
-        .I1(\y_coord[9]_i_2_n_0 ),
+    .INIT(16'h00B4)) 
+    \y_coord[5]_i_1 
+       (.I0(\y_coord[7]_i_2_n_0 ),
+        .I1(y_coord[4]),
         .I2(y_coord[5]),
-        .I3(y_coord[6]),
-        .O(\y_coord[6]_i_1_n_0 ));
+        .I3(curr_state[0]),
+        .O(y_coord_next[5]));
   (* SOFT_HLUTNM = "soft_lutpair20" *) 
   LUT5 #(
-    .INIT(32'h55150040)) 
-    \y_coord[7]_i_1 
-       (.I0(curr_state[0]),
-        .I1(y_coord[6]),
-        .I2(y_coord[5]),
-        .I3(\y_coord[9]_i_2_n_0 ),
-        .I4(y_coord[7]),
-        .O(\y_coord[7]_i_1_n_0 ));
+    .INIT(32'h0000BF40)) 
+    \y_coord[6]_i_1 
+       (.I0(\y_coord[7]_i_2_n_0 ),
+        .I1(y_coord[5]),
+        .I2(y_coord[4]),
+        .I3(y_coord[6]),
+        .I4(curr_state[0]),
+        .O(y_coord_next[6]));
   LUT6 #(
-    .INIT(64'h00000000BFFF4000)) 
+    .INIT(64'h00000000FF7F0080)) 
+    \y_coord[7]_i_1 
+       (.I0(y_coord[6]),
+        .I1(y_coord[4]),
+        .I2(y_coord[5]),
+        .I3(\y_coord[7]_i_2_n_0 ),
+        .I4(y_coord[7]),
+        .I5(curr_state[0]),
+        .O(y_coord_next[7]));
+  (* SOFT_HLUTNM = "soft_lutpair22" *) 
+  LUT4 #(
+    .INIT(16'h7FFF)) 
+    \y_coord[7]_i_2 
+       (.I0(y_coord[2]),
+        .I1(y_coord[0]),
+        .I2(y_coord[1]),
+        .I3(y_coord[3]),
+        .O(\y_coord[7]_i_2_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair25" *) 
+  LUT3 #(
+    .INIT(8'h09)) 
     \y_coord[8]_i_1 
        (.I0(\y_coord[9]_i_2_n_0 ),
-        .I1(y_coord[5]),
-        .I2(y_coord[6]),
-        .I3(y_coord[7]),
-        .I4(y_coord[8]),
-        .I5(curr_state[0]),
+        .I1(y_coord[8]),
+        .I2(curr_state[0]),
         .O(y_coord_next[8]));
-  (* SOFT_HLUTNM = "soft_lutpair24" *) 
+  (* SOFT_HLUTNM = "soft_lutpair25" *) 
   LUT4 #(
-    .INIT(16'h4510)) 
+    .INIT(16'h00B4)) 
     \y_coord[9]_i_1 
-       (.I0(curr_state[0]),
-        .I1(\y_coord[9]_i_2_n_0 ),
-        .I2(\bram_wrdata[15]_i_3_n_0 ),
-        .I3(y_coord[9]),
-        .O(\y_coord[9]_i_1_n_0 ));
+       (.I0(\y_coord[9]_i_2_n_0 ),
+        .I1(y_coord[8]),
+        .I2(y_coord[9]),
+        .I3(curr_state[0]),
+        .O(y_coord_next[9]));
+  (* SOFT_HLUTNM = "soft_lutpair21" *) 
   LUT5 #(
-    .INIT(32'h7FFFFFFF)) 
+    .INIT(32'hFFFF7FFF)) 
     \y_coord[9]_i_2 
-       (.I0(y_coord[3]),
-        .I1(y_coord[1]),
-        .I2(y_coord[0]),
-        .I3(y_coord[2]),
-        .I4(y_coord[4]),
+       (.I0(y_coord[7]),
+        .I1(y_coord[5]),
+        .I2(y_coord[4]),
+        .I3(y_coord[6]),
+        .I4(\y_coord[7]_i_2_n_0 ),
         .O(\y_coord[9]_i_2_n_0 ));
   FDCE \y_coord_reg[0] 
        (.C(cam_pclk),
         .CE(curr_state[1]),
         .CLR(\slv_reg0_reg[2] ),
-        .D(y_coord_next[0]),
+        .D(\y_coord[0]_i_1_n_0 ),
         .Q(y_coord[0]));
   FDCE \y_coord_reg[1] 
        (.C(cam_pclk),
@@ -5124,37 +4969,37 @@ module mb_usb_camera_controller_0_2_ov7670_capture
        (.C(cam_pclk),
         .CE(curr_state[1]),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\y_coord[2]_i_1_n_0 ),
+        .D(y_coord_next[2]),
         .Q(y_coord[2]));
   FDCE \y_coord_reg[3] 
        (.C(cam_pclk),
         .CE(curr_state[1]),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\y_coord[3]_i_1_n_0 ),
+        .D(y_coord_next[3]),
         .Q(y_coord[3]));
   FDCE \y_coord_reg[4] 
        (.C(cam_pclk),
         .CE(curr_state[1]),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\y_coord[4]_i_1_n_0 ),
+        .D(y_coord_next[4]),
         .Q(y_coord[4]));
   FDCE \y_coord_reg[5] 
        (.C(cam_pclk),
         .CE(curr_state[1]),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\y_coord[5]_i_1_n_0 ),
+        .D(y_coord_next[5]),
         .Q(y_coord[5]));
   FDCE \y_coord_reg[6] 
        (.C(cam_pclk),
         .CE(curr_state[1]),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\y_coord[6]_i_1_n_0 ),
+        .D(y_coord_next[6]),
         .Q(y_coord[6]));
   FDCE \y_coord_reg[7] 
        (.C(cam_pclk),
         .CE(curr_state[1]),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\y_coord[7]_i_1_n_0 ),
+        .D(y_coord_next[7]),
         .Q(y_coord[7]));
   FDCE \y_coord_reg[8] 
        (.C(cam_pclk),
@@ -5166,7 +5011,7 @@ module mb_usb_camera_controller_0_2_ov7670_capture
        (.C(cam_pclk),
         .CE(curr_state[1]),
         .CLR(\slv_reg0_reg[2] ),
-        .D(\y_coord[9]_i_1_n_0 ),
+        .D(y_coord_next[9]),
         .Q(y_coord[9]));
 endmodule
 `ifndef GLBL

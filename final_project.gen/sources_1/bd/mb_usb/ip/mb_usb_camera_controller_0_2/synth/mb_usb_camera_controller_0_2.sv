@@ -48,11 +48,11 @@
 
 
 // IP VLNV: xilinx.com:user:camera_controller:1.0
-// IP Revision: 22
+// IP Revision: 25
 
 (* X_CORE_INFO = "camera_controller_v1_0,Vivado 2022.2" *)
 (* CHECK_LICENSE_TYPE = "mb_usb_camera_controller_0_2,camera_controller_v1_0,{}" *)
-(* CORE_GENERATION_INFO = "mb_usb_camera_controller_0_2,camera_controller_v1_0,{x_ipProduct=Vivado 2022.2,x_ipVendor=xilinx.com,x_ipLibrary=user,x_ipName=camera_controller,x_ipVersion=1.0,x_ipCoreRevision=22,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_S00_AXI_DATA_WIDTH=32,C_S00_AXI_ADDR_WIDTH=5}" *)
+(* CORE_GENERATION_INFO = "mb_usb_camera_controller_0_2,camera_controller_v1_0,{x_ipProduct=Vivado 2022.2,x_ipVendor=xilinx.com,x_ipLibrary=user,x_ipName=camera_controller,x_ipVersion=1.0,x_ipCoreRevision=25,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_S00_AXI_DATA_WIDTH=32,C_S00_AXI_ADDR_WIDTH=5}" *)
 (* DowngradeIPIdentifiedWarnings = "yes" *)
 module mb_usb_camera_controller_0_2 (
   s00_axi_aclk,
@@ -146,7 +146,7 @@ output wire cam_pclk_out;
 output wire cam_pwdn;
 output wire cam_reset_n;
 output wire [16 : 0] bram_addr;
-output wire [15 : 0] bram_wrdata;
+output wire [7 : 0] bram_wrdata;
 output wire bram_we;
 
   camera_controller_v1_0 #(

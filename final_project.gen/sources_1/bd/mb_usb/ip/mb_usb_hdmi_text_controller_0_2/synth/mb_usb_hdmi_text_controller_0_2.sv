@@ -48,11 +48,11 @@
 
 
 // IP VLNV: xilinx.com:user:hdmi_text_controller:1.0
-// IP Revision: 29
+// IP Revision: 35
 
 (* X_CORE_INFO = "hdmi_text_controller_v1_0,Vivado 2022.2" *)
 (* CHECK_LICENSE_TYPE = "mb_usb_hdmi_text_controller_0_2,hdmi_text_controller_v1_0,{}" *)
-(* CORE_GENERATION_INFO = "mb_usb_hdmi_text_controller_0_2,hdmi_text_controller_v1_0,{x_ipProduct=Vivado 2022.2,x_ipVendor=xilinx.com,x_ipLibrary=user,x_ipName=hdmi_text_controller,x_ipVersion=1.0,x_ipCoreRevision=29,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_AXI_DATA_WIDTH=32,C_AXI_ADDR_WIDTH=16}" *)
+(* CORE_GENERATION_INFO = "mb_usb_hdmi_text_controller_0_2,hdmi_text_controller_v1_0,{x_ipProduct=Vivado 2022.2,x_ipVendor=xilinx.com,x_ipLibrary=user,x_ipName=hdmi_text_controller,x_ipVersion=1.0,x_ipCoreRevision=35,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_AXI_DATA_WIDTH=32,C_AXI_ADDR_WIDTH=16}" *)
 (* DowngradeIPIdentifiedWarnings = "yes" *)
 module mb_usb_hdmi_text_controller_0_2 (
   hdmi_clk_n,
@@ -144,7 +144,7 @@ D_THREADS 1, NUM_WRITE_THREADS 1, RUSER_BITS_PER_BYTE 0, WUSER_BITS_PER_BYTE 0, 
 input wire axi_rready;
 input wire cam_pclk;
 input wire [16 : 0] cam_wr_addr;
-input wire [15 : 0] cam_wr_data;
+input wire [7 : 0] cam_wr_data;
 input wire cam_we;
 
   hdmi_text_controller_v1_0 #(

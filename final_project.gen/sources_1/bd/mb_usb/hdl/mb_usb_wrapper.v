@@ -1,7 +1,7 @@
 //Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2022.2 (win64) Build 3671981 Fri Oct 14 05:00:03 MDT 2022
-//Date        : Tue Apr 21 16:04:14 2026
+//Date        : Tue Apr 21 21:31:55 2026
 //Host        : Levono_MihirT running 64-bit major release  (build 9200)
 //Command     : generate_target mb_usb_wrapper.bd
 //Design      : mb_usb_wrapper
@@ -24,9 +24,7 @@ module mb_usb_wrapper
     cam_vsync_0,
     clk_100MHz,
     clk_out2_0,
-    reset_rtl_0,
-    uart_rtl_0_rxd,
-    uart_rtl_0_txd);
+    reset_rtl_0);
   output HDMI_0_tmds_clk_n;
   output HDMI_0_tmds_clk_p;
   output [2:0]HDMI_0_tmds_data_n;
@@ -42,8 +40,6 @@ module mb_usb_wrapper
   input clk_100MHz;
   output clk_out2_0;
   input reset_rtl_0;
-  input uart_rtl_0_rxd;
-  output uart_rtl_0_txd;
 
   wire HDMI_0_tmds_clk_n;
   wire HDMI_0_tmds_clk_p;
@@ -60,8 +56,6 @@ module mb_usb_wrapper
   wire clk_100MHz;
   wire clk_out2_0;
   wire reset_rtl_0;
-  wire uart_rtl_0_rxd;
-  wire uart_rtl_0_txd;
 
   mb_usb mb_usb_i
        (.HDMI_0_tmds_clk_n(HDMI_0_tmds_clk_n),
@@ -78,7 +72,5 @@ module mb_usb_wrapper
         .cam_vsync_0(cam_vsync_0),
         .clk_100MHz(clk_100MHz),
         .clk_out2_0(clk_out2_0),
-        .reset_rtl_0(reset_rtl_0),
-        .uart_rtl_0_rxd(uart_rtl_0_rxd),
-        .uart_rtl_0_txd(uart_rtl_0_txd));
+        .reset_rtl_0(reset_rtl_0));
 endmodule

@@ -2,10 +2,10 @@
 <Root MajorVersion="0" MinorVersion="40">
   <CompositeFile CompositeFileTopName="mb_usb" CanBeSetAsTop="false" CanDisplayChildGraph="true">
     <Description>Composite Fileset</Description>
-    <Generation Name="SYNTHESIS" State="GENERATED" Timestamp="1776805455"/>
-    <Generation Name="IMPLEMENTATION" State="GENERATED" Timestamp="1776805455"/>
-    <Generation Name="SIMULATION" State="GENERATED" Timestamp="1776805455"/>
-    <Generation Name="HW_HANDOFF" State="GENERATED" Timestamp="1776805455"/>
+    <Generation Name="SYNTHESIS" State="GENERATED" Timestamp="1776825116"/>
+    <Generation Name="IMPLEMENTATION" State="GENERATED" Timestamp="1776825116"/>
+    <Generation Name="SIMULATION" State="GENERATED" Timestamp="1776825116"/>
+    <Generation Name="HW_HANDOFF" State="GENERATED" Timestamp="1776825116"/>
     <FileCollection Name="SOURCES" Type="SOURCES">
       <File Name="synth\mb_usb.v" Type="Verilog">
         <Properties IsEditable="false" IsVisible="true" IsNetlistSimulation="false" Timestamp="0" IsTrackable="false" IsStatusTracked="false"/>
@@ -17,13 +17,6 @@
       <File Name="sim\mb_usb.v" Type="Verilog">
         <Properties IsEditable="false" IsVisible="true" IsNetlistSimulation="false" Timestamp="0" IsTrackable="false" IsStatusTracked="false"/>
         <Library Name="xil_defaultlib"/>
-        <UsedIn Val="SIMULATION"/>
-        <ProcessingOrder Val="NORMAL"/>
-      </File>
-      <File Name="mb_usb.bmm" Type="BMM">
-        <Properties IsEditable="false" IsVisible="true" IsNetlistSimulation="false" Timestamp="0" IsTrackable="false" IsStatusTracked="false"/>
-        <Library Name="xil_defaultlib"/>
-        <UsedIn Val="IMPLEMENTATION"/>
         <UsedIn Val="SIMULATION"/>
         <ProcessingOrder Val="NORMAL"/>
       </File>

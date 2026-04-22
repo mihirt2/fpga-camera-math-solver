@@ -1,7 +1,7 @@
 // Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2022.2 (win64) Build 3671981 Fri Oct 14 05:00:03 MDT 2022
-// Date        : Tue Apr 21 15:57:16 2026
+// Date        : Tue Apr 21 20:36:46 2026
 // Host        : Levono_MihirT running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode funcsim
 //               c:/Users/ishur/final_project/final_project.gen/sources_1/bd/mb_usb/ip/mb_usb_hdmi_text_controller_0_2/mb_usb_hdmi_text_controller_0_2_sim_netlist.v
@@ -71,7 +71,7 @@ module mb_usb_hdmi_text_controller_0_2
   (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 AXI RREADY" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME AXI, WIZ_DATA_WIDTH 32, WIZ_NUM_REG 4, SUPPORTS_NARROW_BURST 0, DATA_WIDTH 32, PROTOCOL AXI4LITE, FREQ_HZ 100000000, ID_WIDTH 0, ADDR_WIDTH 16, AWUSER_WIDTH 0, ARUSER_WIDTH 0, WUSER_WIDTH 0, RUSER_WIDTH 0, BUSER_WIDTH 0, READ_WRITE_MODE READ_WRITE, HAS_BURST 0, HAS_LOCK 0, HAS_PROT 1, HAS_CACHE 0, HAS_QOS 0, HAS_REGION 0, HAS_WSTRB 1, HAS_BRESP 1, HAS_RRESP 1, NUM_READ_OUTSTANDING 2, NUM_WRITE_OUTSTANDING 2, MAX_BURST_LENGTH 1, PHASE 0.0, CLK_DOMAIN /clk_wiz_1_clk_out1, NUM_READ_THREADS 1, NUM_WRITE_THREADS 1, RUSER_BITS_PER_BYTE 0, WUSER_BITS_PER_BYTE 0, INSERT_VIP 0" *) input axi_rready;
   input cam_pclk;
   input [16:0]cam_wr_addr;
-  input [15:0]cam_wr_data;
+  input [7:0]cam_wr_data;
   input cam_we;
 
   wire \<const0> ;
@@ -95,7 +95,7 @@ module mb_usb_hdmi_text_controller_0_2
   wire cam_pclk;
   wire cam_we;
   wire [16:0]cam_wr_addr;
-  wire [15:0]cam_wr_data;
+  wire [7:0]cam_wr_data;
   (* IOSTANDARD = "TMDS_33" *) (* SLEW = "SLOW" *) wire hdmi_clk_n;
   (* IOSTANDARD = "TMDS_33" *) (* SLEW = "SLOW" *) wire hdmi_clk_p;
   (* IOSTANDARD = "TMDS_33" *) (* SLEW = "SLOW" *) wire [2:0]hdmi_tx_n;
@@ -128,7 +128,7 @@ module mb_usb_hdmi_text_controller_0_2
         .cam_pclk(cam_pclk),
         .cam_we(cam_we),
         .cam_wr_addr(cam_wr_addr),
-        .cam_wr_data(cam_wr_data[15:12]),
+        .cam_wr_data(cam_wr_data),
         .hdmi_clk_n(hdmi_clk_n),
         .hdmi_clk_p(hdmi_clk_p),
         .hdmi_tx_n(hdmi_tx_n),
@@ -4312,51 +4312,51 @@ endmodule
 
 (* ORIG_REF_NAME = "hdmi_text_controller_v1_0" *) 
 module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
-   (hdmi_clk_p,
+   (axi_awready,
+    axi_wready,
+    hdmi_clk_p,
     hdmi_clk_n,
     hdmi_tx_p,
     hdmi_tx_n,
-    axi_wready,
-    axi_awready,
     axi_arready,
     axi_rdata,
     axi_rvalid,
     axi_bvalid,
-    cam_we,
+    axi_wvalid,
+    axi_awvalid,
     cam_wr_addr,
+    axi_wstrb,
+    cam_we,
     axi_aclk,
     cam_pclk,
     cam_wr_data,
     axi_awaddr,
     axi_wdata,
-    axi_wstrb,
-    axi_wvalid,
-    axi_awvalid,
     axi_araddr,
     axi_arvalid,
     axi_aresetn,
     axi_bready,
     axi_rready);
+  output axi_awready;
+  output axi_wready;
   output hdmi_clk_p;
   output hdmi_clk_n;
   output [2:0]hdmi_tx_p;
   output [2:0]hdmi_tx_n;
-  output axi_wready;
-  output axi_awready;
   output axi_arready;
   output [31:0]axi_rdata;
   output axi_rvalid;
   output axi_bvalid;
-  input cam_we;
-  input [16:0]cam_wr_addr;
-  input axi_aclk;
-  input cam_pclk;
-  input [3:0]cam_wr_data;
-  input [9:0]axi_awaddr;
-  input [31:0]axi_wdata;
-  input [3:0]axi_wstrb;
   input axi_wvalid;
   input axi_awvalid;
+  input [16:0]cam_wr_addr;
+  input [3:0]axi_wstrb;
+  input cam_we;
+  input axi_aclk;
+  input cam_pclk;
+  input [7:0]cam_wr_data;
+  input [9:0]axi_awaddr;
+  input [31:0]axi_wdata;
   input [9:0]axi_araddr;
   input axi_arvalid;
   input axi_aresetn;
@@ -4380,19 +4380,30 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire axi_wready;
   wire [3:0]axi_wstrb;
   wire axi_wvalid;
-  wire cam_fb_mux_sel_b_pos_0__4_i_4_n_0;
-  wire cam_fb_mux_sel_b_pos_0__4_i_5_n_0;
-  wire cam_fb_mux_sel_b_pos_0__4_i_6_n_0;
-  wire cam_fb_mux_sel_b_pos_0__4_i_7_n_0;
-  wire cam_fb_mux_sel_b_pos_0__4_i_8_n_0;
-  wire cam_fb_reg_0_4_i_10_n_0;
-  wire cam_fb_reg_0_4_i_11_n_0;
-  wire cam_fb_reg_0_4_i_12_n_0;
+  wire [7:0]blue;
+  wire [1:0]byte_index_r;
+  wire cam_fb_mux_sel_b_pos_0_i_7_n_0;
+  wire cam_fb_reg_0_0_i_10_n_0;
+  wire cam_fb_reg_0_0_i_11_n_0;
+  wire cam_fb_reg_0_0_i_12_n_0;
+  wire cam_fb_reg_0_0_i_13_n_0;
+  wire cam_fb_reg_0_0_i_1_n_0;
+  wire cam_fb_reg_0_0_i_5_n_0;
+  wire cam_fb_reg_0_0_i_7_n_0;
+  wire cam_fb_reg_0_0_i_8_n_0;
+  wire cam_fb_reg_0_0_i_9_n_0;
+  wire cam_fb_reg_0_0_n_0;
+  wire cam_fb_reg_0_0_n_1;
+  wire cam_fb_reg_0_1_i_1_n_0;
+  wire cam_fb_reg_0_1_n_0;
+  wire cam_fb_reg_0_1_n_1;
+  wire cam_fb_reg_0_2_i_1_n_0;
+  wire cam_fb_reg_0_2_n_0;
+  wire cam_fb_reg_0_2_n_1;
+  wire cam_fb_reg_0_3_i_1_n_0;
+  wire cam_fb_reg_0_3_n_0;
+  wire cam_fb_reg_0_3_n_1;
   wire cam_fb_reg_0_4_i_1_n_0;
-  wire cam_fb_reg_0_4_i_5_n_0;
-  wire cam_fb_reg_0_4_i_7_n_0;
-  wire cam_fb_reg_0_4_i_8_n_0;
-  wire cam_fb_reg_0_4_i_9_n_0;
   wire cam_fb_reg_0_4_n_0;
   wire cam_fb_reg_0_4_n_1;
   wire cam_fb_reg_0_5_i_1_n_0;
@@ -4404,103 +4415,65 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire cam_fb_reg_0_7_i_1_n_0;
   wire cam_fb_reg_0_7_n_0;
   wire cam_fb_reg_0_7_n_1;
+  wire cam_fb_reg_1_0__0_i_1_n_0;
+  wire cam_fb_reg_1_0__0_i_2_n_0;
+  wire cam_fb_reg_1_0__0_i_3_n_0;
+  wire cam_fb_reg_1_0__0_n_35;
+  wire cam_fb_reg_1_0__0_n_67;
+  wire cam_fb_reg_1_0_i_1_n_0;
+  wire cam_fb_reg_1_0_n_67;
+  wire cam_fb_reg_1_1__0_i_1_n_0;
+  wire cam_fb_reg_1_1__0_n_35;
+  wire cam_fb_reg_1_1__0_n_67;
+  wire cam_fb_reg_1_1_i_1_n_0;
+  wire cam_fb_reg_1_1_n_67;
+  wire cam_fb_reg_1_2__0_i_1_n_0;
+  wire cam_fb_reg_1_2__0_n_35;
+  wire cam_fb_reg_1_2__0_n_67;
+  wire cam_fb_reg_1_2_i_1_n_0;
+  wire cam_fb_reg_1_2_n_67;
+  wire cam_fb_reg_1_3__0_i_1_n_0;
+  wire cam_fb_reg_1_3__0_n_35;
+  wire cam_fb_reg_1_3__0_n_67;
+  wire cam_fb_reg_1_3_i_1_n_0;
+  wire cam_fb_reg_1_3_n_67;
+  wire cam_fb_reg_1_4__0_i_1_n_0;
+  wire cam_fb_reg_1_4__0_n_35;
+  wire cam_fb_reg_1_4__0_n_67;
   wire cam_fb_reg_1_4_i_1_n_0;
-  wire cam_fb_reg_1_4_n_35;
   wire cam_fb_reg_1_4_n_67;
+  wire cam_fb_reg_1_5__0_i_1_n_0;
+  wire cam_fb_reg_1_5__0_n_35;
+  wire cam_fb_reg_1_5__0_n_67;
   wire cam_fb_reg_1_5_i_1_n_0;
-  wire cam_fb_reg_1_5_n_35;
   wire cam_fb_reg_1_5_n_67;
+  wire cam_fb_reg_1_6__0_i_1_n_0;
+  wire cam_fb_reg_1_6__0_n_35;
+  wire cam_fb_reg_1_6__0_n_67;
   wire cam_fb_reg_1_6_i_1_n_0;
-  wire cam_fb_reg_1_6_n_35;
   wire cam_fb_reg_1_6_n_67;
+  wire cam_fb_reg_1_7__0_i_1_n_0;
+  wire cam_fb_reg_1_7__0_n_35;
+  wire cam_fb_reg_1_7__0_n_67;
   wire cam_fb_reg_1_7_i_1_n_0;
-  wire cam_fb_reg_1_7_n_35;
   wire cam_fb_reg_1_7_n_67;
-  wire cam_fb_reg_2_4_i_2_n_0;
-  wire cam_fb_reg_2_4_n_0;
-  wire cam_fb_reg_2_4_n_1;
-  wire cam_fb_reg_2_5_i_1_n_0;
-  wire cam_fb_reg_2_5_n_0;
-  wire cam_fb_reg_2_5_n_1;
-  wire cam_fb_reg_2_6_i_1_n_0;
-  wire cam_fb_reg_2_6_n_0;
-  wire cam_fb_reg_2_6_n_1;
-  wire cam_fb_reg_2_7_i_1_n_0;
-  wire cam_fb_reg_2_7_n_0;
-  wire cam_fb_reg_2_7_n_1;
-  wire cam_fb_reg_3_4_i_1_n_0;
-  wire cam_fb_reg_3_4_n_35;
-  wire cam_fb_reg_3_4_n_67;
-  wire cam_fb_reg_3_5_i_1_n_0;
-  wire cam_fb_reg_3_5_n_35;
-  wire cam_fb_reg_3_5_n_67;
-  wire cam_fb_reg_3_6_i_1_n_0;
-  wire cam_fb_reg_3_6_n_35;
-  wire cam_fb_reg_3_6_n_67;
-  wire cam_fb_reg_3_7_i_1_n_0;
-  wire cam_fb_reg_3_7_n_35;
-  wire cam_fb_reg_3_7_n_67;
-  wire cam_fb_reg_4_4_n_0;
-  wire cam_fb_reg_4_4_n_1;
-  wire cam_fb_reg_4_5_n_0;
-  wire cam_fb_reg_4_5_n_1;
-  wire cam_fb_reg_4_6_n_0;
-  wire cam_fb_reg_4_6_n_1;
-  wire cam_fb_reg_4_7_n_0;
-  wire cam_fb_reg_4_7_n_1;
-  wire cam_fb_reg_5_4_n_35;
-  wire cam_fb_reg_5_4_n_67;
-  wire cam_fb_reg_5_5_n_35;
-  wire cam_fb_reg_5_5_n_67;
-  wire cam_fb_reg_5_6_n_35;
-  wire cam_fb_reg_5_6_n_67;
-  wire cam_fb_reg_5_7_n_35;
-  wire cam_fb_reg_5_7_n_67;
-  wire cam_fb_reg_6_4_n_0;
-  wire cam_fb_reg_6_4_n_1;
-  wire cam_fb_reg_6_5_n_0;
-  wire cam_fb_reg_6_5_n_1;
-  wire cam_fb_reg_6_6_n_0;
-  wire cam_fb_reg_6_6_n_1;
-  wire cam_fb_reg_6_7_n_0;
-  wire cam_fb_reg_6_7_n_1;
-  wire cam_fb_reg_7_4_n_35;
-  wire cam_fb_reg_7_4_n_67;
-  wire cam_fb_reg_7_5_n_35;
-  wire cam_fb_reg_7_5_n_67;
-  wire cam_fb_reg_7_6_n_35;
-  wire cam_fb_reg_7_6_n_67;
-  wire cam_fb_reg_7_7_n_35;
-  wire cam_fb_reg_7_7_n_67;
-  wire cam_fb_reg_8_4_i_1_n_0;
-  wire cam_fb_reg_8_4_n_0;
-  wire cam_fb_reg_8_4_n_1;
-  wire cam_fb_reg_8_5_n_0;
-  wire cam_fb_reg_8_5_n_1;
-  wire cam_fb_reg_8_6_n_0;
-  wire cam_fb_reg_8_6_n_1;
-  wire cam_fb_reg_8_7_n_0;
-  wire cam_fb_reg_8_7_n_1;
-  wire cam_fb_reg_9_4_n_35;
-  wire cam_fb_reg_9_4_n_67;
-  wire cam_fb_reg_9_5_n_35;
-  wire cam_fb_reg_9_5_n_67;
-  wire cam_fb_reg_9_6_n_35;
-  wire cam_fb_reg_9_6_n_67;
-  wire cam_fb_reg_9_7_n_35;
-  wire cam_fb_reg_9_7_n_67;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_n_0;
-  wire cam_fb_reg_mux_sel_b_pos_1__4_n_0;
-  wire cam_fb_reg_mux_sel_b_pos_2__4_n_0;
+  wire cam_fb_reg_mux_sel_b_pos_0_n_0;
+  wire cam_fb_reg_mux_sel_b_pos_1_n_0;
   wire cam_pclk;
-  wire [18:7]cam_rd_addr;
+  wire [16:6]cam_rd_addr;
   wire cam_we;
   wire [16:0]cam_wr_addr;
-  wire [3:0]cam_wr_data;
+  wire [7:0]cam_wr_data;
+  wire [6:5]char_index0;
+  wire [6:0]char_x;
   wire clk_125MHz;
   wire clk_25MHz;
   wire [9:0]color_reg;
-  wire [9:1]drawX;
+  wire data0;
+  wire data4;
+  wire data5;
+  wire [2:0]font_col_r;
+  wire frame_counter0;
   wire \frame_counter[0]_i_3_n_0 ;
   wire [31:0]frame_counter_meta;
   wire [31:0]frame_counter_reg;
@@ -4568,55 +4541,521 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire \frame_counter_reg[8]_i_1_n_6 ;
   wire \frame_counter_reg[8]_i_1_n_7 ;
   wire [31:0]frame_counter_sync;
+  wire g0_b0_n_0;
+  wire g0_b1_n_0;
+  wire g0_b2_n_0;
+  wire g0_b3_n_0;
+  wire g0_b4_n_0;
+  wire g0_b5_n_0;
+  wire g0_b6_n_0;
+  wire g0_b7_n_0;
+  wire g10_b1_n_0;
+  wire g10_b2_n_0;
+  wire g10_b3_n_0;
+  wire g10_b4_n_0;
+  wire g10_b5_n_0;
+  wire g10_b7_n_0;
+  wire g11_b1_n_0;
+  wire g11_b2_n_0;
+  wire g11_b3_n_0;
+  wire g11_b4_n_0;
+  wire g11_b5_n_0;
+  wire g11_b6_n_0;
+  wire g11_b7_n_0;
+  wire g12_b1_n_0;
+  wire g12_b2_n_0;
+  wire g12_b3_n_0;
+  wire g12_b4_n_0;
+  wire g12_b5_n_0;
+  wire g12_b6_n_0;
+  wire g12_b7_n_0;
+  wire g13_b1_n_0;
+  wire g13_b2_n_0;
+  wire g13_b3_n_0;
+  wire g13_b4_n_0;
+  wire g13_b5_n_0;
+  wire g13_b6_n_0;
+  wire g13_b7_n_0;
+  wire g14_b1_n_0;
+  wire g14_b2_n_0;
+  wire g14_b3_n_0;
+  wire g14_b4_n_0;
+  wire g14_b5_n_0;
+  wire g14_b6_n_0;
+  wire g14_b7_n_0;
+  wire g15_b1_n_0;
+  wire g15_b2_n_0;
+  wire g15_b3_n_0;
+  wire g15_b4_n_0;
+  wire g15_b5_n_0;
+  wire g15_b6_n_0;
+  wire g15_b7_n_0;
+  wire g16_b1_n_0;
+  wire g16_b2_n_0;
+  wire g16_b3_n_0;
+  wire g16_b4_n_0;
+  wire g16_b5_n_0;
+  wire g16_b6_n_0;
+  wire g16_b7_n_0;
+  wire g17_b1_n_0;
+  wire g17_b2_n_0;
+  wire g17_b3_n_0;
+  wire g17_b4_n_0;
+  wire g17_b5_n_0;
+  wire g17_b6_n_0;
+  wire g17_b7_n_0;
+  wire g18_b1_n_0;
+  wire g18_b2_n_0;
+  wire g18_b3_n_0;
+  wire g18_b4_n_0;
+  wire g18_b5_n_0;
+  wire g18_b6_n_0;
+  wire g18_b7_n_0;
+  wire g19_b0_n_0;
+  wire g19_b1_n_0;
+  wire g19_b2_n_0;
+  wire g19_b3_n_0;
+  wire g19_b4_n_0;
+  wire g19_b5_n_0;
+  wire g19_b6_n_0;
+  wire g19_b7_n_0;
+  wire g1_b0_n_0;
+  wire g1_b1_n_0;
+  wire g1_b2_n_0;
+  wire g1_b3_n_0;
+  wire g1_b4_n_0;
+  wire g1_b5_n_0;
+  wire g1_b6_n_0;
+  wire g1_b7_n_0;
+  wire g20_b1_n_0;
+  wire g20_b2_n_0;
+  wire g20_b3_n_0;
+  wire g20_b4_n_0;
+  wire g20_b5_n_0;
+  wire g20_b6_n_0;
+  wire g20_b7_n_0;
+  wire g21_b0_n_0;
+  wire g21_b1_n_0;
+  wire g21_b2_n_0;
+  wire g21_b3_n_0;
+  wire g21_b5_n_0;
+  wire g21_b6_n_0;
+  wire g21_b7_n_0;
+  wire g22_b0_n_0;
+  wire g22_b1_n_0;
+  wire g22_b2_n_0;
+  wire g22_b3_n_0;
+  wire g22_b4_n_0;
+  wire g22_b5_n_0;
+  wire g22_b6_n_0;
+  wire g22_b7_n_0;
+  wire g23_b0_n_0;
+  wire g23_b1_n_0;
+  wire g23_b2_n_0;
+  wire g23_b3_n_0;
+  wire g23_b4_n_0;
+  wire g23_b5_n_0;
+  wire g23_b6_n_0;
+  wire g23_b7_n_0;
+  wire g24_b1_n_0;
+  wire g24_b2_n_0;
+  wire g24_b3_n_0;
+  wire g24_b4_n_0;
+  wire g24_b5_n_0;
+  wire g24_b6_n_0;
+  wire g24_b7_n_0;
+  wire g25_b1_n_0;
+  wire g25_b2_n_0;
+  wire g25_b3_n_0;
+  wire g25_b4_n_0;
+  wire g25_b5_n_0;
+  wire g25_b6_n_0;
+  wire g25_b7_n_0;
+  wire g26_b1_n_0;
+  wire g26_b2_n_0;
+  wire g26_b3_n_0;
+  wire g26_b4_n_0;
+  wire g26_b5_n_0;
+  wire g26_b6_n_0;
+  wire g26_b7_n_0;
+  wire g27_b0_n_0;
+  wire g27_b1_n_0;
+  wire g27_b2_n_0;
+  wire g27_b3_n_0;
+  wire g27_b5_n_0;
+  wire g27_b6_n_0;
+  wire g27_b7_n_0;
+  wire g28_b1_n_0;
+  wire g28_b2_n_0;
+  wire g28_b3_n_0;
+  wire g28_b4_n_0;
+  wire g28_b5_n_0;
+  wire g28_b6_n_0;
+  wire g28_b7_n_0;
+  wire g29_b0_n_0;
+  wire g29_b1_n_0;
+  wire g29_b2_n_0;
+  wire g29_b3_n_0;
+  wire g29_b4_n_0;
+  wire g29_b5_n_0;
+  wire g29_b6_n_0;
+  wire g29_b7_n_0;
+  wire g2_b0_n_0;
+  wire g2_b1_n_0;
+  wire g2_b2_n_0;
+  wire g2_b3_n_0;
+  wire g2_b4_n_0;
+  wire g2_b5_n_0;
+  wire g2_b6_n_0;
+  wire g2_b7_n_0;
+  wire g30_b0_n_0;
+  wire g30_b1_n_0;
+  wire g30_b2_n_0;
+  wire g30_b3_n_0;
+  wire g30_b4_n_0;
+  wire g30_b5_n_0;
+  wire g30_b6_n_0;
+  wire g30_b7_n_0;
+  wire g31_b1_n_0;
+  wire g31_b2_n_0;
+  wire g31_b3_n_0;
+  wire g31_b4_n_0;
+  wire g31_b5_n_0;
+  wire g31_b6_n_0;
+  wire g31_b7_n_0;
+  wire g3_b0_n_0;
+  wire g3_b1_n_0;
+  wire g3_b2_n_0;
+  wire g3_b3_n_0;
+  wire g3_b4_n_0;
+  wire g3_b5_n_0;
+  wire g3_b6_n_0;
+  wire g3_b7_n_0;
+  wire g4_b1_n_0;
+  wire g4_b2_n_0;
+  wire g4_b3_n_0;
+  wire g4_b4_n_0;
+  wire g4_b5_n_0;
+  wire g4_b6_n_0;
+  wire g4_b7_n_0;
+  wire g5_b0_n_0;
+  wire g5_b1_n_0;
+  wire g5_b2_n_0;
+  wire g5_b3_n_0;
+  wire g5_b4_n_0;
+  wire g5_b5_n_0;
+  wire g5_b6_n_0;
+  wire g5_b7_n_0;
+  wire g6_b1_n_0;
+  wire g6_b2_n_0;
+  wire g6_b3_n_0;
+  wire g6_b4_n_0;
+  wire g6_b5_n_0;
+  wire g6_b6_n_0;
+  wire g6_b7_n_0;
+  wire g7_b0_n_0;
+  wire g7_b1_n_0;
+  wire g7_b2_n_0;
+  wire g7_b3_n_0;
+  wire g7_b4_n_0;
+  wire g7_b5_n_0;
+  wire g7_b6_n_0;
+  wire g7_b7_n_0;
+  wire g8_b1_n_0;
+  wire g8_b2_n_0;
+  wire g8_b3_n_0;
+  wire g8_b4_n_0;
+  wire g8_b6_n_0;
+  wire g8_b7_n_0;
+  wire g9_b1_n_0;
+  wire g9_b2_n_0;
+  wire g9_b3_n_0;
+  wire g9_b4_n_0;
+  wire g9_b5_n_0;
+  wire g9_b6_n_0;
+  wire g9_b7_n_0;
+  wire [7:0]green;
   wire hdmi_clk_n;
   wire hdmi_clk_p;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_17;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_18;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_29;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_30;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_31;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_32;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_33;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_34;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_35;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_36;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_37;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_38;
-  wire hdmi_text_controller_v1_0_AXI_inst_n_39;
+  wire hdmi_text_controller_v1_0_AXI_inst_n_54;
+  wire hdmi_text_controller_v1_0_AXI_inst_n_55;
   wire [2:0]hdmi_tx_n;
   wire [2:0]hdmi_tx_p;
   wire hsync;
+  wire in_cam_region;
+  wire in_cam_region_r;
   wire locked;
-  wire [9:0]p_0_in;
-  wire [3:0]red;
+  wire [5:0]p_0_in;
+  wire [24:0]p_0_in0_out;
+  wire [7:0]red;
   wire [9:0]reg_data_out;
   wire reset_ah;
+  wire [10:0]sel;
   wire vde;
   wire vde_r;
-  wire vga_n_15;
-  wire vga_n_16;
-  wire vga_n_17;
-  wire vga_n_18;
-  wire vga_n_19;
   wire vga_n_2;
-  wire vga_n_40;
+  wire vga_n_32;
+  wire vga_n_33;
+  wire vga_n_34;
   wire vga_n_41;
   wire vga_n_42;
   wire vga_n_43;
-  wire vga_n_44;
-  wire vga_n_45;
-  wire vga_n_46;
-  wire vga_n_47;
-  wire vga_n_58;
-  wire vga_to_hdmi_i_10_n_0;
-  wire vga_to_hdmi_i_7_n_0;
-  wire vga_to_hdmi_i_8_n_0;
-  wire vga_to_hdmi_i_9_n_0;
+  wire vga_to_hdmi_i_100_n_0;
+  wire vga_to_hdmi_i_101_n_0;
+  wire vga_to_hdmi_i_102_n_0;
+  wire vga_to_hdmi_i_103_n_0;
+  wire vga_to_hdmi_i_104_n_0;
+  wire vga_to_hdmi_i_105_n_0;
+  wire vga_to_hdmi_i_106_n_0;
+  wire vga_to_hdmi_i_107_n_0;
+  wire vga_to_hdmi_i_108_n_0;
+  wire vga_to_hdmi_i_109_n_0;
+  wire vga_to_hdmi_i_110_n_0;
+  wire vga_to_hdmi_i_111_n_0;
+  wire vga_to_hdmi_i_112_n_0;
+  wire vga_to_hdmi_i_113_n_0;
+  wire vga_to_hdmi_i_114_n_0;
+  wire vga_to_hdmi_i_115_n_0;
+  wire vga_to_hdmi_i_116_n_0;
+  wire vga_to_hdmi_i_117_n_0;
+  wire vga_to_hdmi_i_118_n_0;
+  wire vga_to_hdmi_i_119_n_0;
+  wire vga_to_hdmi_i_120_n_0;
+  wire vga_to_hdmi_i_121_n_0;
+  wire vga_to_hdmi_i_122_n_0;
+  wire vga_to_hdmi_i_123_n_0;
+  wire vga_to_hdmi_i_124_n_0;
+  wire vga_to_hdmi_i_125_n_0;
+  wire vga_to_hdmi_i_126_n_0;
+  wire vga_to_hdmi_i_127_n_0;
+  wire vga_to_hdmi_i_128_n_0;
+  wire vga_to_hdmi_i_129_n_0;
+  wire vga_to_hdmi_i_130_n_0;
+  wire vga_to_hdmi_i_131_n_0;
+  wire vga_to_hdmi_i_132_n_0;
+  wire vga_to_hdmi_i_133_n_0;
+  wire vga_to_hdmi_i_134_n_0;
+  wire vga_to_hdmi_i_135_n_0;
+  wire vga_to_hdmi_i_136_n_0;
+  wire vga_to_hdmi_i_137_n_0;
+  wire vga_to_hdmi_i_138_n_0;
+  wire vga_to_hdmi_i_139_n_0;
+  wire vga_to_hdmi_i_140_n_0;
+  wire vga_to_hdmi_i_141_n_0;
+  wire vga_to_hdmi_i_142_n_0;
+  wire vga_to_hdmi_i_143_n_0;
+  wire vga_to_hdmi_i_144_n_0;
+  wire vga_to_hdmi_i_145_n_0;
+  wire vga_to_hdmi_i_146_n_0;
+  wire vga_to_hdmi_i_147_n_0;
+  wire vga_to_hdmi_i_148_n_0;
+  wire vga_to_hdmi_i_149_n_0;
+  wire vga_to_hdmi_i_150_n_0;
+  wire vga_to_hdmi_i_151_n_0;
+  wire vga_to_hdmi_i_152_n_0;
+  wire vga_to_hdmi_i_153_n_0;
+  wire vga_to_hdmi_i_154_n_0;
+  wire vga_to_hdmi_i_155_n_0;
+  wire vga_to_hdmi_i_156_n_0;
+  wire vga_to_hdmi_i_157_n_0;
+  wire vga_to_hdmi_i_158_n_0;
+  wire vga_to_hdmi_i_159_n_0;
+  wire vga_to_hdmi_i_160_n_0;
+  wire vga_to_hdmi_i_161_n_0;
+  wire vga_to_hdmi_i_162_n_0;
+  wire vga_to_hdmi_i_163_n_0;
+  wire vga_to_hdmi_i_164_n_0;
+  wire vga_to_hdmi_i_165_n_0;
+  wire vga_to_hdmi_i_166_n_0;
+  wire vga_to_hdmi_i_167_n_0;
+  wire vga_to_hdmi_i_168_n_0;
+  wire vga_to_hdmi_i_169_n_0;
+  wire vga_to_hdmi_i_170_n_0;
+  wire vga_to_hdmi_i_171_n_0;
+  wire vga_to_hdmi_i_172_n_0;
+  wire vga_to_hdmi_i_173_n_0;
+  wire vga_to_hdmi_i_174_n_0;
+  wire vga_to_hdmi_i_175_n_0;
+  wire vga_to_hdmi_i_176_n_0;
+  wire vga_to_hdmi_i_177_n_0;
+  wire vga_to_hdmi_i_178_n_0;
+  wire vga_to_hdmi_i_179_n_0;
+  wire vga_to_hdmi_i_180_n_0;
+  wire vga_to_hdmi_i_181_n_0;
+  wire vga_to_hdmi_i_182_n_0;
+  wire vga_to_hdmi_i_183_n_0;
+  wire vga_to_hdmi_i_184_n_0;
+  wire vga_to_hdmi_i_185_n_0;
+  wire vga_to_hdmi_i_186_n_0;
+  wire vga_to_hdmi_i_187_n_0;
+  wire vga_to_hdmi_i_188_n_0;
+  wire vga_to_hdmi_i_189_n_0;
+  wire vga_to_hdmi_i_190_n_0;
+  wire vga_to_hdmi_i_191_n_0;
+  wire vga_to_hdmi_i_192_n_0;
+  wire vga_to_hdmi_i_193_n_0;
+  wire vga_to_hdmi_i_27_n_0;
+  wire vga_to_hdmi_i_28_n_0;
+  wire vga_to_hdmi_i_29_n_0;
+  wire vga_to_hdmi_i_30_n_0;
+  wire vga_to_hdmi_i_31_n_0;
+  wire vga_to_hdmi_i_32_n_0;
+  wire vga_to_hdmi_i_33_n_0;
+  wire vga_to_hdmi_i_34_n_0;
+  wire vga_to_hdmi_i_35_n_0;
+  wire vga_to_hdmi_i_37_n_0;
+  wire vga_to_hdmi_i_38_n_0;
+  wire vga_to_hdmi_i_39_n_0;
+  wire vga_to_hdmi_i_40_n_0;
+  wire vga_to_hdmi_i_41_n_0;
+  wire vga_to_hdmi_i_42_n_0;
+  wire vga_to_hdmi_i_43_n_0;
+  wire vga_to_hdmi_i_45_n_0;
+  wire vga_to_hdmi_i_47_n_0;
+  wire vga_to_hdmi_i_48_n_0;
+  wire vga_to_hdmi_i_50_n_0;
+  wire vga_to_hdmi_i_51_n_0;
+  wire vga_to_hdmi_i_53_n_0;
+  wire vga_to_hdmi_i_54_n_0;
+  wire vga_to_hdmi_i_55_n_0;
+  wire vga_to_hdmi_i_56_n_0;
+  wire vga_to_hdmi_i_57_n_0;
+  wire vga_to_hdmi_i_59_n_0;
+  wire vga_to_hdmi_i_61_n_0;
+  wire vga_to_hdmi_i_62_n_0;
+  wire vga_to_hdmi_i_63_n_0;
+  wire vga_to_hdmi_i_64_n_0;
+  wire vga_to_hdmi_i_65_n_0;
+  wire vga_to_hdmi_i_66_n_0;
+  wire vga_to_hdmi_i_67_n_0;
+  wire vga_to_hdmi_i_68_n_0;
+  wire vga_to_hdmi_i_69_n_0;
+  wire vga_to_hdmi_i_70_n_0;
+  wire vga_to_hdmi_i_71_n_0;
+  wire vga_to_hdmi_i_72_n_0;
+  wire vga_to_hdmi_i_73_n_0;
+  wire vga_to_hdmi_i_74_n_0;
+  wire vga_to_hdmi_i_75_n_0;
+  wire vga_to_hdmi_i_76_n_0;
+  wire vga_to_hdmi_i_77_n_0;
+  wire vga_to_hdmi_i_78_n_0;
+  wire vga_to_hdmi_i_79_n_0;
+  wire vga_to_hdmi_i_80_n_0;
+  wire vga_to_hdmi_i_81_n_0;
+  wire vga_to_hdmi_i_82_n_0;
+  wire vga_to_hdmi_i_83_n_0;
+  wire vga_to_hdmi_i_84_n_0;
+  wire vga_to_hdmi_i_85_n_0;
+  wire vga_to_hdmi_i_86_n_0;
+  wire vga_to_hdmi_i_87_n_0;
+  wire vga_to_hdmi_i_88_n_0;
+  wire vga_to_hdmi_i_89_n_0;
+  wire vga_to_hdmi_i_90_n_0;
+  wire vga_to_hdmi_i_91_n_0;
+  wire vga_to_hdmi_i_92_n_0;
+  wire vga_to_hdmi_i_93_n_0;
+  wire vga_to_hdmi_i_94_n_0;
+  wire vga_to_hdmi_i_95_n_0;
+  wire vga_to_hdmi_i_96_n_0;
+  wire vga_to_hdmi_i_97_n_0;
+  wire vga_to_hdmi_i_98_n_0;
+  wire vga_to_hdmi_i_99_n_0;
   wire [9:0]vram_addr;
   wire [31:0]vram_rdata;
-  wire vram_we;
+  wire vram_reg_i_13_n_0;
+  wire vram_reg_i_14_n_0;
+  wire vram_reg_i_15_n_0;
+  wire vram_reg_i_16_n_0;
+  wire vram_reg_i_17_n_0;
+  wire vram_reg_i_18_n_0;
+  wire vram_reg_i_19_n_0;
+  wire vram_reg_i_20_n_0;
+  wire vram_reg_i_28_n_0;
+  wire vram_reg_i_29_n_0;
+  wire vram_reg_i_30_n_0;
+  wire vram_reg_n_36;
+  wire vram_reg_n_37;
+  wire vram_reg_n_38;
+  wire vram_reg_n_39;
+  wire vram_reg_n_40;
+  wire vram_reg_n_41;
+  wire vram_reg_n_42;
+  wire vram_reg_n_43;
+  wire vram_reg_n_44;
+  wire vram_reg_n_45;
+  wire vram_reg_n_46;
+  wire vram_reg_n_47;
+  wire vram_reg_n_48;
+  wire vram_reg_n_49;
+  wire vram_reg_n_50;
+  wire vram_reg_n_51;
+  wire vram_reg_n_52;
+  wire vram_reg_n_53;
+  wire vram_reg_n_54;
+  wire vram_reg_n_55;
+  wire vram_reg_n_56;
+  wire vram_reg_n_57;
+  wire vram_reg_n_58;
+  wire vram_reg_n_59;
+  wire vram_reg_n_60;
+  wire vram_reg_n_61;
+  wire vram_reg_n_62;
+  wire vram_reg_n_63;
+  wire vram_reg_n_64;
+  wire vram_reg_n_65;
+  wire vram_reg_n_66;
+  wire vram_reg_n_67;
   wire vsync;
   wire vsync_p;
+  wire [9:2]word_index;
+  wire NLW_cam_fb_reg_0_0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_0_SBITERR_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_0_0_DIPADIP_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_0_0_DIPBDIP_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_0_0_DOADO_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_0_0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_0_0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_0_0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_0_0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_0_0_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_1_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_1_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_1_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_1_SBITERR_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_0_1_DIPADIP_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_0_1_DIPBDIP_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_0_1_DOADO_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_0_1_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_0_1_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_0_1_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_0_1_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_0_1_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_2_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_2_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_2_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_2_SBITERR_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_0_2_DIPADIP_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_0_2_DIPBDIP_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_0_2_DOADO_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_0_2_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_0_2_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_0_2_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_0_2_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_0_2_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_3_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_3_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_3_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_0_3_SBITERR_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_0_3_DIPADIP_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_0_3_DIPBDIP_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_0_3_DOADO_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_0_3_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_0_3_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_0_3_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_0_3_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_0_3_RDADDRECC_UNCONNECTED;
   wire NLW_cam_fb_reg_0_4_DBITERR_UNCONNECTED;
   wire NLW_cam_fb_reg_0_4_INJECTDBITERR_UNCONNECTED;
   wire NLW_cam_fb_reg_0_4_INJECTSBITERR_UNCONNECTED;
@@ -4665,6 +5104,110 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire [3:0]NLW_cam_fb_reg_0_7_DOPBDOP_UNCONNECTED;
   wire [7:0]NLW_cam_fb_reg_0_7_ECCPARITY_UNCONNECTED;
   wire [8:0]NLW_cam_fb_reg_0_7_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0_SBITERR_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_1_0_DIPADIP_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_1_0_DIPBDIP_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_1_0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_0_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0__0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0__0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0__0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0__0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0__0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_0__0_SBITERR_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_0__0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_0__0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_0__0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_0__0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_0__0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_0__0_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1_SBITERR_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_1_1_DIPADIP_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_1_1_DIPBDIP_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_1_1_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_1_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_1_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_1_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_1_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_1_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1__0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1__0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1__0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1__0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1__0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_1__0_SBITERR_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_1__0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_1__0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_1__0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_1__0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_1__0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_1__0_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2_SBITERR_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_1_2_DIPADIP_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_1_2_DIPBDIP_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_1_2_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_2_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_2_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_2_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_2_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_2_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2__0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2__0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2__0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2__0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2__0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_2__0_SBITERR_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_2__0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_2__0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_2__0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_2__0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_2__0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_2__0_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3_SBITERR_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_1_3_DIPADIP_UNCONNECTED;
+  wire [0:0]NLW_cam_fb_reg_1_3_DIPBDIP_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_1_3_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_3_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_3_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_3_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_3_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_3_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3__0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3__0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3__0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3__0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3__0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_3__0_SBITERR_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_3__0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_3__0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_3__0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_3__0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_3__0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_3__0_RDADDRECC_UNCONNECTED;
   wire NLW_cam_fb_reg_1_4_CASCADEOUTA_UNCONNECTED;
   wire NLW_cam_fb_reg_1_4_CASCADEOUTB_UNCONNECTED;
   wire NLW_cam_fb_reg_1_4_DBITERR_UNCONNECTED;
@@ -4673,12 +5216,24 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire NLW_cam_fb_reg_1_4_SBITERR_UNCONNECTED;
   wire [0:0]NLW_cam_fb_reg_1_4_DIPADIP_UNCONNECTED;
   wire [0:0]NLW_cam_fb_reg_1_4_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_1_4_DOADO_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_1_4_DOADO_UNCONNECTED;
   wire [31:1]NLW_cam_fb_reg_1_4_DOBDO_UNCONNECTED;
   wire [3:0]NLW_cam_fb_reg_1_4_DOPADOP_UNCONNECTED;
   wire [3:0]NLW_cam_fb_reg_1_4_DOPBDOP_UNCONNECTED;
   wire [7:0]NLW_cam_fb_reg_1_4_ECCPARITY_UNCONNECTED;
   wire [8:0]NLW_cam_fb_reg_1_4_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_4__0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_4__0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_4__0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_4__0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_4__0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_4__0_SBITERR_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_4__0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_4__0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_4__0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_4__0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_4__0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_4__0_RDADDRECC_UNCONNECTED;
   wire NLW_cam_fb_reg_1_5_CASCADEOUTA_UNCONNECTED;
   wire NLW_cam_fb_reg_1_5_CASCADEOUTB_UNCONNECTED;
   wire NLW_cam_fb_reg_1_5_DBITERR_UNCONNECTED;
@@ -4687,12 +5242,24 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire NLW_cam_fb_reg_1_5_SBITERR_UNCONNECTED;
   wire [0:0]NLW_cam_fb_reg_1_5_DIPADIP_UNCONNECTED;
   wire [0:0]NLW_cam_fb_reg_1_5_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_1_5_DOADO_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_1_5_DOADO_UNCONNECTED;
   wire [31:1]NLW_cam_fb_reg_1_5_DOBDO_UNCONNECTED;
   wire [3:0]NLW_cam_fb_reg_1_5_DOPADOP_UNCONNECTED;
   wire [3:0]NLW_cam_fb_reg_1_5_DOPBDOP_UNCONNECTED;
   wire [7:0]NLW_cam_fb_reg_1_5_ECCPARITY_UNCONNECTED;
   wire [8:0]NLW_cam_fb_reg_1_5_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_5__0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_5__0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_5__0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_5__0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_5__0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_5__0_SBITERR_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_5__0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_5__0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_5__0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_5__0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_5__0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_5__0_RDADDRECC_UNCONNECTED;
   wire NLW_cam_fb_reg_1_6_CASCADEOUTA_UNCONNECTED;
   wire NLW_cam_fb_reg_1_6_CASCADEOUTB_UNCONNECTED;
   wire NLW_cam_fb_reg_1_6_DBITERR_UNCONNECTED;
@@ -4701,12 +5268,24 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire NLW_cam_fb_reg_1_6_SBITERR_UNCONNECTED;
   wire [0:0]NLW_cam_fb_reg_1_6_DIPADIP_UNCONNECTED;
   wire [0:0]NLW_cam_fb_reg_1_6_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_1_6_DOADO_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_1_6_DOADO_UNCONNECTED;
   wire [31:1]NLW_cam_fb_reg_1_6_DOBDO_UNCONNECTED;
   wire [3:0]NLW_cam_fb_reg_1_6_DOPADOP_UNCONNECTED;
   wire [3:0]NLW_cam_fb_reg_1_6_DOPBDOP_UNCONNECTED;
   wire [7:0]NLW_cam_fb_reg_1_6_ECCPARITY_UNCONNECTED;
   wire [8:0]NLW_cam_fb_reg_1_6_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_6__0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_6__0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_6__0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_6__0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_6__0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_6__0_SBITERR_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_6__0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_6__0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_6__0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_6__0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_6__0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_6__0_RDADDRECC_UNCONNECTED;
   wire NLW_cam_fb_reg_1_7_CASCADEOUTA_UNCONNECTED;
   wire NLW_cam_fb_reg_1_7_CASCADEOUTB_UNCONNECTED;
   wire NLW_cam_fb_reg_1_7_DBITERR_UNCONNECTED;
@@ -4715,428 +5294,24 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire NLW_cam_fb_reg_1_7_SBITERR_UNCONNECTED;
   wire [0:0]NLW_cam_fb_reg_1_7_DIPADIP_UNCONNECTED;
   wire [0:0]NLW_cam_fb_reg_1_7_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_1_7_DOADO_UNCONNECTED;
+  wire [31:0]NLW_cam_fb_reg_1_7_DOADO_UNCONNECTED;
   wire [31:1]NLW_cam_fb_reg_1_7_DOBDO_UNCONNECTED;
   wire [3:0]NLW_cam_fb_reg_1_7_DOPADOP_UNCONNECTED;
   wire [3:0]NLW_cam_fb_reg_1_7_DOPBDOP_UNCONNECTED;
   wire [7:0]NLW_cam_fb_reg_1_7_ECCPARITY_UNCONNECTED;
   wire [8:0]NLW_cam_fb_reg_1_7_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_4_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_4_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_4_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_4_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_2_4_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_2_4_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_2_4_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_2_4_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_2_4_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_2_4_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_2_4_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_2_4_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_5_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_5_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_5_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_5_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_2_5_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_2_5_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_2_5_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_2_5_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_2_5_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_2_5_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_2_5_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_2_5_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_6_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_6_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_6_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_6_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_2_6_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_2_6_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_2_6_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_2_6_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_2_6_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_2_6_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_2_6_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_2_6_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_7_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_7_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_7_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_2_7_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_2_7_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_2_7_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_2_7_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_2_7_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_2_7_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_2_7_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_2_7_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_2_7_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_4_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_4_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_4_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_4_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_4_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_4_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_3_4_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_3_4_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_3_4_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_3_4_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_3_4_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_3_4_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_3_4_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_3_4_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_5_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_5_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_5_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_5_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_5_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_5_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_3_5_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_3_5_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_3_5_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_3_5_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_3_5_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_3_5_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_3_5_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_3_5_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_6_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_6_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_6_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_6_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_6_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_6_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_3_6_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_3_6_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_3_6_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_3_6_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_3_6_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_3_6_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_3_6_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_3_6_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_7_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_7_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_7_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_7_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_7_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_3_7_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_3_7_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_3_7_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_3_7_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_3_7_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_3_7_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_3_7_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_3_7_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_3_7_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_4_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_4_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_4_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_4_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_4_4_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_4_4_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_4_4_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_4_4_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_4_4_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_4_4_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_4_4_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_4_4_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_5_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_5_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_5_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_5_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_4_5_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_4_5_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_4_5_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_4_5_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_4_5_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_4_5_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_4_5_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_4_5_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_6_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_6_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_6_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_6_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_4_6_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_4_6_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_4_6_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_4_6_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_4_6_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_4_6_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_4_6_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_4_6_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_7_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_7_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_7_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_4_7_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_4_7_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_4_7_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_4_7_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_4_7_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_4_7_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_4_7_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_4_7_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_4_7_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_4_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_4_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_4_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_4_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_4_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_4_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_5_4_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_5_4_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_5_4_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_5_4_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_5_4_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_5_4_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_5_4_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_5_4_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_5_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_5_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_5_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_5_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_5_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_5_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_5_5_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_5_5_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_5_5_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_5_5_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_5_5_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_5_5_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_5_5_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_5_5_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_6_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_6_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_6_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_6_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_6_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_6_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_5_6_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_5_6_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_5_6_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_5_6_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_5_6_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_5_6_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_5_6_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_5_6_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_7_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_7_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_7_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_7_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_7_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_5_7_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_5_7_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_5_7_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_5_7_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_5_7_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_5_7_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_5_7_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_5_7_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_5_7_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_4_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_4_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_4_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_4_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_6_4_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_6_4_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_6_4_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_6_4_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_6_4_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_6_4_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_6_4_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_6_4_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_5_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_5_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_5_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_5_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_6_5_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_6_5_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_6_5_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_6_5_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_6_5_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_6_5_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_6_5_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_6_5_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_6_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_6_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_6_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_6_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_6_6_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_6_6_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_6_6_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_6_6_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_6_6_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_6_6_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_6_6_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_6_6_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_7_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_7_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_7_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_6_7_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_6_7_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_6_7_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_6_7_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_6_7_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_6_7_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_6_7_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_6_7_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_6_7_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_4_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_4_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_4_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_4_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_4_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_4_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_7_4_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_7_4_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_7_4_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_7_4_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_7_4_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_7_4_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_7_4_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_7_4_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_5_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_5_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_5_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_5_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_5_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_5_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_7_5_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_7_5_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_7_5_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_7_5_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_7_5_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_7_5_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_7_5_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_7_5_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_6_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_6_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_6_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_6_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_6_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_6_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_7_6_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_7_6_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_7_6_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_7_6_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_7_6_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_7_6_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_7_6_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_7_6_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_7_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_7_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_7_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_7_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_7_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_7_7_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_7_7_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_7_7_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_7_7_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_7_7_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_7_7_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_7_7_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_7_7_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_7_7_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_4_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_4_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_4_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_4_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_8_4_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_8_4_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_8_4_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_8_4_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_8_4_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_8_4_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_8_4_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_8_4_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_5_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_5_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_5_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_5_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_8_5_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_8_5_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_8_5_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_8_5_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_8_5_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_8_5_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_8_5_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_8_5_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_6_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_6_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_6_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_6_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_8_6_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_8_6_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_8_6_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_8_6_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_8_6_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_8_6_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_8_6_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_8_6_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_7_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_7_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_7_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_8_7_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_8_7_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_8_7_DIPBDIP_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_8_7_DOADO_UNCONNECTED;
-  wire [31:0]NLW_cam_fb_reg_8_7_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_8_7_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_8_7_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_8_7_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_8_7_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_4_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_4_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_4_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_4_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_4_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_4_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_9_4_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_9_4_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_9_4_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_9_4_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_9_4_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_9_4_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_9_4_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_9_4_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_5_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_5_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_5_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_5_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_5_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_5_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_9_5_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_9_5_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_9_5_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_9_5_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_9_5_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_9_5_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_9_5_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_9_5_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_6_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_6_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_6_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_6_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_6_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_6_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_9_6_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_9_6_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_9_6_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_9_6_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_9_6_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_9_6_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_9_6_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_9_6_RDADDRECC_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_7_CASCADEOUTA_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_7_CASCADEOUTB_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_7_DBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_7_INJECTDBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_7_INJECTSBITERR_UNCONNECTED;
-  wire NLW_cam_fb_reg_9_7_SBITERR_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_9_7_DIPADIP_UNCONNECTED;
-  wire [0:0]NLW_cam_fb_reg_9_7_DIPBDIP_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_9_7_DOADO_UNCONNECTED;
-  wire [31:1]NLW_cam_fb_reg_9_7_DOBDO_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_9_7_DOPADOP_UNCONNECTED;
-  wire [3:0]NLW_cam_fb_reg_9_7_DOPBDOP_UNCONNECTED;
-  wire [7:0]NLW_cam_fb_reg_9_7_ECCPARITY_UNCONNECTED;
-  wire [8:0]NLW_cam_fb_reg_9_7_RDADDRECC_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_7__0_CASCADEOUTA_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_7__0_CASCADEOUTB_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_7__0_DBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_7__0_INJECTDBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_7__0_INJECTSBITERR_UNCONNECTED;
+  wire NLW_cam_fb_reg_1_7__0_SBITERR_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_7__0_DOADO_UNCONNECTED;
+  wire [31:1]NLW_cam_fb_reg_1_7__0_DOBDO_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_7__0_DOPADOP_UNCONNECTED;
+  wire [3:0]NLW_cam_fb_reg_1_7__0_DOPBDOP_UNCONNECTED;
+  wire [7:0]NLW_cam_fb_reg_1_7__0_ECCPARITY_UNCONNECTED;
+  wire [8:0]NLW_cam_fb_reg_1_7__0_RDADDRECC_UNCONNECTED;
   wire [3:3]\NLW_frame_counter_reg[28]_i_1_CO_UNCONNECTED ;
   wire NLW_vram_reg_CASCADEOUTA_UNCONNECTED;
   wire NLW_vram_reg_CASCADEOUTB_UNCONNECTED;
@@ -5144,46 +5319,372 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   wire NLW_vram_reg_INJECTDBITERR_UNCONNECTED;
   wire NLW_vram_reg_INJECTSBITERR_UNCONNECTED;
   wire NLW_vram_reg_SBITERR_UNCONNECTED;
-  wire [31:0]NLW_vram_reg_DOADO_UNCONNECTED;
   wire [3:0]NLW_vram_reg_DOPADOP_UNCONNECTED;
   wire [3:0]NLW_vram_reg_DOPBDOP_UNCONNECTED;
   wire [7:0]NLW_vram_reg_ECCPARITY_UNCONNECTED;
   wire [8:0]NLW_vram_reg_RDADDRECC_UNCONNECTED;
 
+  FDRE \byte_index_r_reg[0] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(char_x[0]),
+        .Q(byte_index_r[0]),
+        .R(1'b0));
+  FDRE \byte_index_r_reg[1] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(char_x[1]),
+        .Q(byte_index_r[1]),
+        .R(1'b0));
   LUT2 #(
     .INIT(4'h6)) 
-    cam_fb_mux_sel_b_pos_0__4_i_4
-       (.I0(p_0_in[7]),
-        .I1(p_0_in[9]),
-        .O(cam_fb_mux_sel_b_pos_0__4_i_4_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_mux_sel_b_pos_0__4_i_5
-       (.I0(p_0_in[6]),
-        .I1(p_0_in[8]),
-        .O(cam_fb_mux_sel_b_pos_0__4_i_5_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_mux_sel_b_pos_0__4_i_6
-       (.I0(p_0_in[5]),
-        .I1(p_0_in[7]),
-        .O(cam_fb_mux_sel_b_pos_0__4_i_6_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_mux_sel_b_pos_0__4_i_7
-       (.I0(p_0_in[4]),
-        .I1(p_0_in[6]),
-        .O(cam_fb_mux_sel_b_pos_0__4_i_7_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_mux_sel_b_pos_0__4_i_8
+    cam_fb_mux_sel_b_pos_0_i_7
        (.I0(p_0_in[3]),
         .I1(p_0_in[5]),
-        .O(cam_fb_mux_sel_b_pos_0__4_i_8_n_0));
+        .O(cam_fb_mux_sel_b_pos_0_i_7_n_0));
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_0_0" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "0" *) 
+  (* ram_addr_end = "32767" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "0" *) 
+  (* ram_slice_end = "0" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("LOWER"),
+    .RAM_EXTENSION_B("LOWER"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_0_0
+       (.ADDRARDADDR(cam_wr_addr[15:0]),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(cam_fb_reg_0_0_n_0),
+        .CASCADEOUTB(cam_fb_reg_0_0_n_1),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_0_0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_0_DIPADIP_UNCONNECTED[0]}),
+        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_0_DIPBDIP_UNCONNECTED[0]}),
+        .DOADO(NLW_cam_fb_reg_0_0_DOADO_UNCONNECTED[31:0]),
+        .DOBDO(NLW_cam_fb_reg_0_0_DOBDO_UNCONNECTED[31:0]),
+        .DOPADOP(NLW_cam_fb_reg_0_0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_0_0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_0_0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
+        .ENBWREN(vga_n_2),
+        .INJECTDBITERR(NLW_cam_fb_reg_0_0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_0_0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_0_0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_0_0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_0_0_i_5_n_0,cam_fb_reg_0_0_i_5_n_0,cam_fb_reg_0_0_i_5_n_0,cam_fb_reg_0_0_i_5_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT1 #(
+    .INIT(2'h1)) 
+    cam_fb_reg_0_0_i_1
+       (.I0(cam_wr_addr[16]),
+        .O(cam_fb_reg_0_0_i_1_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_reg_0_0_i_10
+       (.I0(p_0_in[0]),
+        .I1(char_x[3]),
+        .O(cam_fb_reg_0_0_i_10_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_reg_0_0_i_11
+       (.I0(p_0_in[2]),
+        .I1(p_0_in[4]),
+        .O(cam_fb_reg_0_0_i_11_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_reg_0_0_i_12
+       (.I0(p_0_in[1]),
+        .I1(p_0_in[3]),
+        .O(cam_fb_reg_0_0_i_12_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_reg_0_0_i_13
+       (.I0(p_0_in[0]),
+        .I1(p_0_in[2]),
+        .O(cam_fb_reg_0_0_i_13_n_0));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_0_0_i_5
+       (.I0(cam_we),
+        .I1(cam_wr_addr[16]),
+        .O(cam_fb_reg_0_0_i_5_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_reg_0_0_i_7
+       (.I0(vga_n_32),
+        .I1(char_x[6]),
+        .O(cam_fb_reg_0_0_i_7_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_reg_0_0_i_8
+       (.I0(vga_n_33),
+        .I1(char_x[5]),
+        .O(cam_fb_reg_0_0_i_8_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_reg_0_0_i_9
+       (.I0(vga_n_34),
+        .I1(char_x[4]),
+        .O(cam_fb_reg_0_0_i_9_n_0));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_0_1" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "0" *) 
+  (* ram_addr_end = "32767" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "1" *) 
+  (* ram_slice_end = "1" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("LOWER"),
+    .RAM_EXTENSION_B("LOWER"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_0_1
+       (.ADDRARDADDR(cam_wr_addr[15:0]),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(cam_fb_reg_0_1_n_0),
+        .CASCADEOUTB(cam_fb_reg_0_1_n_1),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_0_1_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_1_DIPADIP_UNCONNECTED[0]}),
+        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_1_DIPBDIP_UNCONNECTED[0]}),
+        .DOADO(NLW_cam_fb_reg_0_1_DOADO_UNCONNECTED[31:0]),
+        .DOBDO(NLW_cam_fb_reg_0_1_DOBDO_UNCONNECTED[31:0]),
+        .DOPADOP(NLW_cam_fb_reg_0_1_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_0_1_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_0_1_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
+        .ENBWREN(vga_n_2),
+        .INJECTDBITERR(NLW_cam_fb_reg_0_1_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_0_1_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_0_1_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_0_1_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_0_1_i_1_n_0,cam_fb_reg_0_1_i_1_n_0,cam_fb_reg_0_1_i_1_n_0,cam_fb_reg_0_1_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_0_1_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[16]),
+        .O(cam_fb_reg_0_1_i_1_n_0));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_0_2" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "0" *) 
+  (* ram_addr_end = "32767" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "2" *) 
+  (* ram_slice_end = "2" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("LOWER"),
+    .RAM_EXTENSION_B("LOWER"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_0_2
+       (.ADDRARDADDR(cam_wr_addr[15:0]),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(cam_fb_reg_0_2_n_0),
+        .CASCADEOUTB(cam_fb_reg_0_2_n_1),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_0_2_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_2_DIPADIP_UNCONNECTED[0]}),
+        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_2_DIPBDIP_UNCONNECTED[0]}),
+        .DOADO(NLW_cam_fb_reg_0_2_DOADO_UNCONNECTED[31:0]),
+        .DOBDO(NLW_cam_fb_reg_0_2_DOBDO_UNCONNECTED[31:0]),
+        .DOPADOP(NLW_cam_fb_reg_0_2_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_0_2_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_0_2_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
+        .ENBWREN(vga_n_2),
+        .INJECTDBITERR(NLW_cam_fb_reg_0_2_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_0_2_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_0_2_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_0_2_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_0_2_i_1_n_0,cam_fb_reg_0_2_i_1_n_0,cam_fb_reg_0_2_i_1_n_0,cam_fb_reg_0_2_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_0_2_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[16]),
+        .O(cam_fb_reg_0_2_i_1_n_0));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_0_3" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "0" *) 
+  (* ram_addr_end = "32767" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "3" *) 
+  (* ram_slice_end = "3" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("LOWER"),
+    .RAM_EXTENSION_B("LOWER"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_0_3
+       (.ADDRARDADDR(cam_wr_addr[15:0]),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(cam_fb_reg_0_3_n_0),
+        .CASCADEOUTB(cam_fb_reg_0_3_n_1),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_0_3_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_3_DIPADIP_UNCONNECTED[0]}),
+        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_3_DIPBDIP_UNCONNECTED[0]}),
+        .DOADO(NLW_cam_fb_reg_0_3_DOADO_UNCONNECTED[31:0]),
+        .DOBDO(NLW_cam_fb_reg_0_3_DOBDO_UNCONNECTED[31:0]),
+        .DOPADOP(NLW_cam_fb_reg_0_3_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_0_3_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_0_3_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
+        .ENBWREN(vga_n_2),
+        .INJECTDBITERR(NLW_cam_fb_reg_0_3_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_0_3_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_0_3_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_0_3_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_0_3_i_1_n_0,cam_fb_reg_0_3_i_1_n_0,cam_fb_reg_0_3_i_1_n_0,cam_fb_reg_0_3_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_0_3_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[16]),
+        .O(cam_fb_reg_0_3_i_1_n_0));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "" *) 
+  (* RTL_RAM_BITS = "614400" *) 
   (* RTL_RAM_NAME = "inst/cam_fb_reg_0_4" *) 
   (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "0" *) 
@@ -5216,7 +5717,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(1)) 
     cam_fb_reg_0_4
        (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
         .CASCADEINA(1'b1),
         .CASCADEINB(1'b1),
         .CASCADEOUTA(cam_fb_reg_0_4_n_0),
@@ -5224,7 +5725,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLKARDCLK(cam_pclk),
         .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_cam_fb_reg_0_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[4]}),
         .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_4_DIPADIP_UNCONNECTED[0]}),
         .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_4_DIPBDIP_UNCONNECTED[0]}),
@@ -5233,7 +5734,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .DOPADOP(NLW_cam_fb_reg_0_4_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_cam_fb_reg_0_4_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_cam_fb_reg_0_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_fb_reg_0_4_i_1_n_0),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
         .ENBWREN(vga_n_2),
         .INJECTDBITERR(NLW_cam_fb_reg_0_4_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_cam_fb_reg_0_4_INJECTSBITERR_UNCONNECTED),
@@ -5245,59 +5746,18 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .RSTREGARSTREG(1'b0),
         .RSTREGB(1'b0),
         .SBITERR(NLW_cam_fb_reg_0_4_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_0_4_i_5_n_0,cam_fb_reg_0_4_i_5_n_0,cam_fb_reg_0_4_i_5_n_0,cam_fb_reg_0_4_i_5_n_0}),
+        .WEA({cam_fb_reg_0_4_i_1_n_0,cam_fb_reg_0_4_i_1_n_0,cam_fb_reg_0_4_i_1_n_0,cam_fb_reg_0_4_i_1_n_0}),
         .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT1 #(
-    .INIT(2'h1)) 
-    cam_fb_reg_0_4_i_1
-       (.I0(cam_wr_addr[16]),
-        .O(cam_fb_reg_0_4_i_1_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_reg_0_4_i_10
-       (.I0(p_0_in[2]),
-        .I1(p_0_in[4]),
-        .O(cam_fb_reg_0_4_i_10_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_reg_0_4_i_11
-       (.I0(p_0_in[1]),
-        .I1(p_0_in[3]),
-        .O(cam_fb_reg_0_4_i_11_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_reg_0_4_i_12
-       (.I0(p_0_in[0]),
-        .I1(p_0_in[2]),
-        .O(cam_fb_reg_0_4_i_12_n_0));
   LUT2 #(
     .INIT(4'h2)) 
-    cam_fb_reg_0_4_i_5
+    cam_fb_reg_0_4_i_1
        (.I0(cam_we),
         .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_0_4_i_5_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_reg_0_4_i_7
-       (.I0(vga_n_18),
-        .I1(drawX[9]),
-        .O(cam_fb_reg_0_4_i_7_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_reg_0_4_i_8
-       (.I0(vga_n_19),
-        .I1(drawX[8]),
-        .O(cam_fb_reg_0_4_i_8_n_0));
-  LUT2 #(
-    .INIT(4'h6)) 
-    cam_fb_reg_0_4_i_9
-       (.I0(p_0_in[0]),
-        .I1(drawX[7]),
-        .O(cam_fb_reg_0_4_i_9_n_0));
+        .O(cam_fb_reg_0_4_i_1_n_0));
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
+  (* RTL_RAM_BITS = "614400" *) 
   (* RTL_RAM_NAME = "inst/cam_fb_reg_0_5" *) 
   (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "0" *) 
@@ -5330,7 +5790,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(1)) 
     cam_fb_reg_0_5
        (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
         .CASCADEINA(1'b1),
         .CASCADEINB(1'b1),
         .CASCADEOUTA(cam_fb_reg_0_5_n_0),
@@ -5338,7 +5798,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLKARDCLK(cam_pclk),
         .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_cam_fb_reg_0_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[5]}),
         .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_5_DIPADIP_UNCONNECTED[0]}),
         .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_5_DIPBDIP_UNCONNECTED[0]}),
@@ -5347,7 +5807,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .DOPADOP(NLW_cam_fb_reg_0_5_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_cam_fb_reg_0_5_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_cam_fb_reg_0_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_fb_reg_0_4_i_1_n_0),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
         .ENBWREN(vga_n_2),
         .INJECTDBITERR(NLW_cam_fb_reg_0_5_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_cam_fb_reg_0_5_INJECTSBITERR_UNCONNECTED),
@@ -5370,7 +5830,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
+  (* RTL_RAM_BITS = "614400" *) 
   (* RTL_RAM_NAME = "inst/cam_fb_reg_0_6" *) 
   (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "0" *) 
@@ -5403,7 +5863,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(1)) 
     cam_fb_reg_0_6
        (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
         .CASCADEINA(1'b1),
         .CASCADEINB(1'b1),
         .CASCADEOUTA(cam_fb_reg_0_6_n_0),
@@ -5411,7 +5871,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLKARDCLK(cam_pclk),
         .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_cam_fb_reg_0_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[6]}),
         .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_6_DIPADIP_UNCONNECTED[0]}),
         .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_6_DIPBDIP_UNCONNECTED[0]}),
@@ -5420,7 +5880,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .DOPADOP(NLW_cam_fb_reg_0_6_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_cam_fb_reg_0_6_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_cam_fb_reg_0_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_fb_reg_0_4_i_1_n_0),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
         .ENBWREN(vga_n_2),
         .INJECTDBITERR(NLW_cam_fb_reg_0_6_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_cam_fb_reg_0_6_INJECTSBITERR_UNCONNECTED),
@@ -5443,7 +5903,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
+  (* RTL_RAM_BITS = "614400" *) 
   (* RTL_RAM_NAME = "inst/cam_fb_reg_0_7" *) 
   (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "0" *) 
@@ -5476,7 +5936,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(1)) 
     cam_fb_reg_0_7
        (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
         .CASCADEINA(1'b1),
         .CASCADEINB(1'b1),
         .CASCADEOUTA(cam_fb_reg_0_7_n_0),
@@ -5484,7 +5944,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLKARDCLK(cam_pclk),
         .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_cam_fb_reg_0_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[7]}),
         .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_7_DIPADIP_UNCONNECTED[0]}),
         .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_0_7_DIPBDIP_UNCONNECTED[0]}),
@@ -5493,7 +5953,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .DOPADOP(NLW_cam_fb_reg_0_7_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_cam_fb_reg_0_7_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_cam_fb_reg_0_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_fb_reg_0_4_i_1_n_0),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
         .ENBWREN(vga_n_2),
         .INJECTDBITERR(NLW_cam_fb_reg_0_7_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_cam_fb_reg_0_7_INJECTSBITERR_UNCONNECTED),
@@ -5516,7 +5976,607 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_0" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "0" *) 
+  (* ram_slice_end = "0" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("UPPER"),
+    .RAM_EXTENSION_B("UPPER"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_0
+       (.ADDRARDADDR(cam_wr_addr[15:0]),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(cam_fb_reg_0_0_n_0),
+        .CASCADEINB(cam_fb_reg_0_0_n_1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_0_DIPADIP_UNCONNECTED[0]}),
+        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_0_DIPBDIP_UNCONNECTED[0]}),
+        .DOADO(NLW_cam_fb_reg_1_0_DOADO_UNCONNECTED[31:0]),
+        .DOBDO({NLW_cam_fb_reg_1_0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
+        .ENBWREN(vga_n_2),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_0_i_1_n_0,cam_fb_reg_1_0_i_1_n_0,cam_fb_reg_1_0_i_1_n_0,cam_fb_reg_1_0_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_0" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "0" *) 
+  (* ram_slice_end = "0" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("NONE"),
+    .RAM_EXTENSION_B("NONE"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_0__0
+       (.ADDRARDADDR({1'b1,cam_wr_addr[14:0]}),
+        .ADDRBWRADDR({1'b1,cam_rd_addr[14:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_0__0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_0__0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_0__0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
+        .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
+        .DOADO({NLW_cam_fb_reg_1_0__0_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_0__0_n_35}),
+        .DOBDO({NLW_cam_fb_reg_1_0__0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_0__0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_0__0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_0__0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_0__0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_1_0__0_i_1_n_0),
+        .ENBWREN(cam_fb_reg_1_0__0_i_2_n_0),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_0__0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_0__0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_0__0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_0__0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_0__0_i_3_n_0,cam_fb_reg_1_0__0_i_3_n_0,cam_fb_reg_1_0__0_i_3_n_0,cam_fb_reg_1_0__0_i_3_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_1_0__0_i_1
+       (.I0(cam_wr_addr[16]),
+        .I1(cam_wr_addr[15]),
+        .O(cam_fb_reg_1_0__0_i_1_n_0));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_1_0__0_i_2
+       (.I0(cam_rd_addr[16]),
+        .I1(cam_rd_addr[15]),
+        .O(cam_fb_reg_1_0__0_i_2_n_0));
+  LUT3 #(
+    .INIT(8'h20)) 
+    cam_fb_reg_1_0__0_i_3
+       (.I0(cam_we),
+        .I1(cam_wr_addr[15]),
+        .I2(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_0__0_i_3_n_0));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_1_0_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_0_i_1_n_0));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_1" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "1" *) 
+  (* ram_slice_end = "1" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("UPPER"),
+    .RAM_EXTENSION_B("UPPER"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_1
+       (.ADDRARDADDR(cam_wr_addr[15:0]),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(cam_fb_reg_0_1_n_0),
+        .CASCADEINB(cam_fb_reg_0_1_n_1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_1_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_1_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_1_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_1_DIPADIP_UNCONNECTED[0]}),
+        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_1_DIPBDIP_UNCONNECTED[0]}),
+        .DOADO(NLW_cam_fb_reg_1_1_DOADO_UNCONNECTED[31:0]),
+        .DOBDO({NLW_cam_fb_reg_1_1_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_1_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_1_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_1_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_1_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
+        .ENBWREN(vga_n_2),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_1_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_1_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_1_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_1_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_1_i_1_n_0,cam_fb_reg_1_1_i_1_n_0,cam_fb_reg_1_1_i_1_n_0,cam_fb_reg_1_1_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_1" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "1" *) 
+  (* ram_slice_end = "1" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("NONE"),
+    .RAM_EXTENSION_B("NONE"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_1__0
+       (.ADDRARDADDR({1'b1,cam_wr_addr[14:0]}),
+        .ADDRBWRADDR({1'b1,cam_rd_addr[14:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_1__0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_1__0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_1__0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
+        .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
+        .DOADO({NLW_cam_fb_reg_1_1__0_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_1__0_n_35}),
+        .DOBDO({NLW_cam_fb_reg_1_1__0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_1__0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_1__0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_1__0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_1__0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_1_0__0_i_1_n_0),
+        .ENBWREN(cam_fb_reg_1_0__0_i_2_n_0),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_1__0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_1__0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_1__0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_1__0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_1__0_i_1_n_0,cam_fb_reg_1_1__0_i_1_n_0,cam_fb_reg_1_1__0_i_1_n_0,cam_fb_reg_1_1__0_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT3 #(
+    .INIT(8'h20)) 
+    cam_fb_reg_1_1__0_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[15]),
+        .I2(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_1__0_i_1_n_0));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_1_1_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_1_i_1_n_0));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_2" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "2" *) 
+  (* ram_slice_end = "2" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("UPPER"),
+    .RAM_EXTENSION_B("UPPER"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_2
+       (.ADDRARDADDR(cam_wr_addr[15:0]),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(cam_fb_reg_0_2_n_0),
+        .CASCADEINB(cam_fb_reg_0_2_n_1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_2_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_2_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_2_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_2_DIPADIP_UNCONNECTED[0]}),
+        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_2_DIPBDIP_UNCONNECTED[0]}),
+        .DOADO(NLW_cam_fb_reg_1_2_DOADO_UNCONNECTED[31:0]),
+        .DOBDO({NLW_cam_fb_reg_1_2_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_2_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_2_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_2_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_2_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
+        .ENBWREN(vga_n_2),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_2_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_2_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_2_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_2_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_2_i_1_n_0,cam_fb_reg_1_2_i_1_n_0,cam_fb_reg_1_2_i_1_n_0,cam_fb_reg_1_2_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_2" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "2" *) 
+  (* ram_slice_end = "2" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("NONE"),
+    .RAM_EXTENSION_B("NONE"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_2__0
+       (.ADDRARDADDR({1'b1,cam_wr_addr[14:0]}),
+        .ADDRBWRADDR({1'b1,cam_rd_addr[14:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_2__0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_2__0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_2__0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
+        .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
+        .DOADO({NLW_cam_fb_reg_1_2__0_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_2__0_n_35}),
+        .DOBDO({NLW_cam_fb_reg_1_2__0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_2__0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_2__0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_2__0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_2__0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_1_0__0_i_1_n_0),
+        .ENBWREN(cam_fb_reg_1_0__0_i_2_n_0),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_2__0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_2__0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_2__0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_2__0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_2__0_i_1_n_0,cam_fb_reg_1_2__0_i_1_n_0,cam_fb_reg_1_2__0_i_1_n_0,cam_fb_reg_1_2__0_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT3 #(
+    .INIT(8'h20)) 
+    cam_fb_reg_1_2__0_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[15]),
+        .I2(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_2__0_i_1_n_0));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_1_2_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_2_i_1_n_0));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_3" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "3" *) 
+  (* ram_slice_end = "3" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("UPPER"),
+    .RAM_EXTENSION_B("UPPER"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_3
+       (.ADDRARDADDR(cam_wr_addr[15:0]),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(cam_fb_reg_0_3_n_0),
+        .CASCADEINB(cam_fb_reg_0_3_n_1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_3_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_3_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_3_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_3_DIPADIP_UNCONNECTED[0]}),
+        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_3_DIPBDIP_UNCONNECTED[0]}),
+        .DOADO(NLW_cam_fb_reg_1_3_DOADO_UNCONNECTED[31:0]),
+        .DOBDO({NLW_cam_fb_reg_1_3_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_3_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_3_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_3_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_3_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
+        .ENBWREN(vga_n_2),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_3_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_3_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_3_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_3_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_3_i_1_n_0,cam_fb_reg_1_3_i_1_n_0,cam_fb_reg_1_3_i_1_n_0,cam_fb_reg_1_3_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_3" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "3" *) 
+  (* ram_slice_end = "3" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("NONE"),
+    .RAM_EXTENSION_B("NONE"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_3__0
+       (.ADDRARDADDR({1'b1,cam_wr_addr[14:0]}),
+        .ADDRBWRADDR({1'b1,cam_rd_addr[14:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_3__0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_3__0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_3__0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
+        .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
+        .DOADO({NLW_cam_fb_reg_1_3__0_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_3__0_n_35}),
+        .DOBDO({NLW_cam_fb_reg_1_3__0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_3__0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_3__0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_3__0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_3__0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_1_0__0_i_1_n_0),
+        .ENBWREN(cam_fb_reg_1_0__0_i_2_n_0),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_3__0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_3__0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_3__0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_3__0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_3__0_i_1_n_0,cam_fb_reg_1_3__0_i_1_n_0,cam_fb_reg_1_3__0_i_1_n_0,cam_fb_reg_1_3__0_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT3 #(
+    .INIT(8'h20)) 
+    cam_fb_reg_1_3__0_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[15]),
+        .I2(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_3__0_i_1_n_0));
+  LUT2 #(
+    .INIT(4'h2)) 
+    cam_fb_reg_1_3_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_3_i_1_n_0));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
   (* RTL_RAM_NAME = "inst/cam_fb_reg_1_4" *) 
   (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "32768" *) 
@@ -5549,7 +6609,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(1)) 
     cam_fb_reg_1_4
        (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
         .CASCADEINA(cam_fb_reg_0_4_n_0),
         .CASCADEINB(cam_fb_reg_0_4_n_1),
         .CASCADEOUTA(NLW_cam_fb_reg_1_4_CASCADEOUTA_UNCONNECTED),
@@ -5557,16 +6617,16 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLKARDCLK(cam_pclk),
         .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_cam_fb_reg_1_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[4]}),
         .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_4_DIPADIP_UNCONNECTED[0]}),
         .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_1_4_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_4_n_35}),
+        .DOADO(NLW_cam_fb_reg_1_4_DOADO_UNCONNECTED[31:0]),
         .DOBDO({NLW_cam_fb_reg_1_4_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_4_n_67}),
         .DOPADOP(NLW_cam_fb_reg_1_4_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_cam_fb_reg_1_4_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_cam_fb_reg_1_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_fb_reg_0_4_i_1_n_0),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
         .ENBWREN(vga_n_2),
         .INJECTDBITERR(NLW_cam_fb_reg_1_4_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_cam_fb_reg_1_4_INJECTSBITERR_UNCONNECTED),
@@ -5580,6 +6640,80 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .SBITERR(NLW_cam_fb_reg_1_4_SBITERR_UNCONNECTED),
         .WEA({cam_fb_reg_1_4_i_1_n_0,cam_fb_reg_1_4_i_1_n_0,cam_fb_reg_1_4_i_1_n_0,cam_fb_reg_1_4_i_1_n_0}),
         .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_4" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "4" *) 
+  (* ram_slice_end = "4" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("NONE"),
+    .RAM_EXTENSION_B("NONE"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_4__0
+       (.ADDRARDADDR({1'b1,cam_wr_addr[14:0]}),
+        .ADDRBWRADDR({1'b1,cam_rd_addr[14:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_4__0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_4__0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_4__0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[4]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
+        .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
+        .DOADO({NLW_cam_fb_reg_1_4__0_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_4__0_n_35}),
+        .DOBDO({NLW_cam_fb_reg_1_4__0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_4__0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_4__0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_4__0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_4__0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_1_0__0_i_1_n_0),
+        .ENBWREN(cam_fb_reg_1_0__0_i_2_n_0),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_4__0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_4__0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_4__0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_4__0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_4__0_i_1_n_0,cam_fb_reg_1_4__0_i_1_n_0,cam_fb_reg_1_4__0_i_1_n_0,cam_fb_reg_1_4__0_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT3 #(
+    .INIT(8'h20)) 
+    cam_fb_reg_1_4__0_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[15]),
+        .I2(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_4__0_i_1_n_0));
   LUT2 #(
     .INIT(4'h2)) 
     cam_fb_reg_1_4_i_1
@@ -5589,7 +6723,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
+  (* RTL_RAM_BITS = "614400" *) 
   (* RTL_RAM_NAME = "inst/cam_fb_reg_1_5" *) 
   (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "32768" *) 
@@ -5622,7 +6756,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(1)) 
     cam_fb_reg_1_5
        (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
         .CASCADEINA(cam_fb_reg_0_5_n_0),
         .CASCADEINB(cam_fb_reg_0_5_n_1),
         .CASCADEOUTA(NLW_cam_fb_reg_1_5_CASCADEOUTA_UNCONNECTED),
@@ -5630,16 +6764,16 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLKARDCLK(cam_pclk),
         .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_cam_fb_reg_1_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[5]}),
         .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_5_DIPADIP_UNCONNECTED[0]}),
         .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_1_5_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_5_n_35}),
+        .DOADO(NLW_cam_fb_reg_1_5_DOADO_UNCONNECTED[31:0]),
         .DOBDO({NLW_cam_fb_reg_1_5_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_5_n_67}),
         .DOPADOP(NLW_cam_fb_reg_1_5_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_cam_fb_reg_1_5_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_cam_fb_reg_1_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_fb_reg_0_4_i_1_n_0),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
         .ENBWREN(vga_n_2),
         .INJECTDBITERR(NLW_cam_fb_reg_1_5_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_cam_fb_reg_1_5_INJECTSBITERR_UNCONNECTED),
@@ -5653,6 +6787,80 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .SBITERR(NLW_cam_fb_reg_1_5_SBITERR_UNCONNECTED),
         .WEA({cam_fb_reg_1_5_i_1_n_0,cam_fb_reg_1_5_i_1_n_0,cam_fb_reg_1_5_i_1_n_0,cam_fb_reg_1_5_i_1_n_0}),
         .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_5" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "5" *) 
+  (* ram_slice_end = "5" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("NONE"),
+    .RAM_EXTENSION_B("NONE"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_5__0
+       (.ADDRARDADDR({1'b1,cam_wr_addr[14:0]}),
+        .ADDRBWRADDR({1'b1,cam_rd_addr[14:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_5__0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_5__0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_5__0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[5]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
+        .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
+        .DOADO({NLW_cam_fb_reg_1_5__0_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_5__0_n_35}),
+        .DOBDO({NLW_cam_fb_reg_1_5__0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_5__0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_5__0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_5__0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_5__0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_1_0__0_i_1_n_0),
+        .ENBWREN(cam_fb_reg_1_0__0_i_2_n_0),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_5__0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_5__0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_5__0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_5__0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_5__0_i_1_n_0,cam_fb_reg_1_5__0_i_1_n_0,cam_fb_reg_1_5__0_i_1_n_0,cam_fb_reg_1_5__0_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT3 #(
+    .INIT(8'h20)) 
+    cam_fb_reg_1_5__0_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[15]),
+        .I2(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_5__0_i_1_n_0));
   LUT2 #(
     .INIT(4'h2)) 
     cam_fb_reg_1_5_i_1
@@ -5662,7 +6870,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
+  (* RTL_RAM_BITS = "614400" *) 
   (* RTL_RAM_NAME = "inst/cam_fb_reg_1_6" *) 
   (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "32768" *) 
@@ -5695,7 +6903,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(1)) 
     cam_fb_reg_1_6
        (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
         .CASCADEINA(cam_fb_reg_0_6_n_0),
         .CASCADEINB(cam_fb_reg_0_6_n_1),
         .CASCADEOUTA(NLW_cam_fb_reg_1_6_CASCADEOUTA_UNCONNECTED),
@@ -5703,16 +6911,16 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLKARDCLK(cam_pclk),
         .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_cam_fb_reg_1_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[6]}),
         .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_6_DIPADIP_UNCONNECTED[0]}),
         .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_1_6_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_6_n_35}),
+        .DOADO(NLW_cam_fb_reg_1_6_DOADO_UNCONNECTED[31:0]),
         .DOBDO({NLW_cam_fb_reg_1_6_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_6_n_67}),
         .DOPADOP(NLW_cam_fb_reg_1_6_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_cam_fb_reg_1_6_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_cam_fb_reg_1_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_fb_reg_0_4_i_1_n_0),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
         .ENBWREN(vga_n_2),
         .INJECTDBITERR(NLW_cam_fb_reg_1_6_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_cam_fb_reg_1_6_INJECTSBITERR_UNCONNECTED),
@@ -5726,6 +6934,80 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .SBITERR(NLW_cam_fb_reg_1_6_SBITERR_UNCONNECTED),
         .WEA({cam_fb_reg_1_6_i_1_n_0,cam_fb_reg_1_6_i_1_n_0,cam_fb_reg_1_6_i_1_n_0,cam_fb_reg_1_6_i_1_n_0}),
         .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_6" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "6" *) 
+  (* ram_slice_end = "6" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("NONE"),
+    .RAM_EXTENSION_B("NONE"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_6__0
+       (.ADDRARDADDR({1'b1,cam_wr_addr[14:0]}),
+        .ADDRBWRADDR({1'b1,cam_rd_addr[14:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_6__0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_6__0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_6__0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[6]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
+        .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
+        .DOADO({NLW_cam_fb_reg_1_6__0_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_6__0_n_35}),
+        .DOBDO({NLW_cam_fb_reg_1_6__0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_6__0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_6__0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_6__0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_6__0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_1_0__0_i_1_n_0),
+        .ENBWREN(cam_fb_reg_1_0__0_i_2_n_0),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_6__0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_6__0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_6__0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_6__0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_6__0_i_1_n_0,cam_fb_reg_1_6__0_i_1_n_0,cam_fb_reg_1_6__0_i_1_n_0,cam_fb_reg_1_6__0_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT3 #(
+    .INIT(8'h20)) 
+    cam_fb_reg_1_6__0_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[15]),
+        .I2(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_6__0_i_1_n_0));
   LUT2 #(
     .INIT(4'h2)) 
     cam_fb_reg_1_6_i_1
@@ -5735,7 +7017,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
   (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
+  (* RTL_RAM_BITS = "614400" *) 
   (* RTL_RAM_NAME = "inst/cam_fb_reg_1_7" *) 
   (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "32768" *) 
@@ -5768,7 +7050,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(1)) 
     cam_fb_reg_1_7
        (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
+        .ADDRBWRADDR({cam_rd_addr[15:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
         .CASCADEINA(cam_fb_reg_0_7_n_0),
         .CASCADEINB(cam_fb_reg_0_7_n_1),
         .CASCADEOUTA(NLW_cam_fb_reg_1_7_CASCADEOUTA_UNCONNECTED),
@@ -5776,16 +7058,16 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLKARDCLK(cam_pclk),
         .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_cam_fb_reg_1_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[7]}),
         .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_7_DIPADIP_UNCONNECTED[0]}),
         .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_1_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_1_7_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_7_n_35}),
+        .DOADO(NLW_cam_fb_reg_1_7_DOADO_UNCONNECTED[31:0]),
         .DOBDO({NLW_cam_fb_reg_1_7_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_7_n_67}),
         .DOPADOP(NLW_cam_fb_reg_1_7_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_cam_fb_reg_1_7_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_cam_fb_reg_1_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_fb_reg_0_4_i_1_n_0),
+        .ENARDEN(cam_fb_reg_0_0_i_1_n_0),
         .ENBWREN(vga_n_2),
         .INJECTDBITERR(NLW_cam_fb_reg_1_7_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_cam_fb_reg_1_7_INJECTSBITERR_UNCONNECTED),
@@ -5799,2228 +7081,97 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .SBITERR(NLW_cam_fb_reg_1_7_SBITERR_UNCONNECTED),
         .WEA({cam_fb_reg_1_7_i_1_n_0,cam_fb_reg_1_7_i_1_n_0,cam_fb_reg_1_7_i_1_n_0,cam_fb_reg_1_7_i_1_n_0}),
         .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
+  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
+  (* RTL_RAM_BITS = "614400" *) 
+  (* RTL_RAM_NAME = "inst/cam_fb_reg_1_7" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
+  (* ram_addr_begin = "32768" *) 
+  (* ram_addr_end = "65535" *) 
+  (* ram_offset = "0" *) 
+  (* ram_slice_begin = "7" *) 
+  (* ram_slice_end = "7" *) 
+  RAMB36E1 #(
+    .DOA_REG(0),
+    .DOB_REG(0),
+    .EN_ECC_READ("FALSE"),
+    .EN_ECC_WRITE("FALSE"),
+    .INIT_A(36'h000000000),
+    .INIT_B(36'h000000000),
+    .RAM_EXTENSION_A("NONE"),
+    .RAM_EXTENSION_B("NONE"),
+    .RAM_MODE("TDP"),
+    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
+    .READ_WIDTH_A(1),
+    .READ_WIDTH_B(1),
+    .RSTREG_PRIORITY_A("RSTREG"),
+    .RSTREG_PRIORITY_B("RSTREG"),
+    .SIM_COLLISION_CHECK("ALL"),
+    .SIM_DEVICE("7SERIES"),
+    .SRVAL_A(36'h000000000),
+    .SRVAL_B(36'h000000000),
+    .WRITE_MODE_A("NO_CHANGE"),
+    .WRITE_MODE_B("WRITE_FIRST"),
+    .WRITE_WIDTH_A(1),
+    .WRITE_WIDTH_B(1)) 
+    cam_fb_reg_1_7__0
+       (.ADDRARDADDR({1'b1,cam_wr_addr[14:0]}),
+        .ADDRBWRADDR({1'b1,cam_rd_addr[14:6],char_x[2:0],vga_n_41,vga_n_42,vga_n_43}),
+        .CASCADEINA(1'b1),
+        .CASCADEINB(1'b1),
+        .CASCADEOUTA(NLW_cam_fb_reg_1_7__0_CASCADEOUTA_UNCONNECTED),
+        .CASCADEOUTB(NLW_cam_fb_reg_1_7__0_CASCADEOUTB_UNCONNECTED),
+        .CLKARDCLK(cam_pclk),
+        .CLKBWRCLK(clk_25MHz),
+        .DBITERR(NLW_cam_fb_reg_1_7__0_DBITERR_UNCONNECTED),
+        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[7]}),
+        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
+        .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
+        .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
+        .DOADO({NLW_cam_fb_reg_1_7__0_DOADO_UNCONNECTED[31:1],cam_fb_reg_1_7__0_n_35}),
+        .DOBDO({NLW_cam_fb_reg_1_7__0_DOBDO_UNCONNECTED[31:1],cam_fb_reg_1_7__0_n_67}),
+        .DOPADOP(NLW_cam_fb_reg_1_7__0_DOPADOP_UNCONNECTED[3:0]),
+        .DOPBDOP(NLW_cam_fb_reg_1_7__0_DOPBDOP_UNCONNECTED[3:0]),
+        .ECCPARITY(NLW_cam_fb_reg_1_7__0_ECCPARITY_UNCONNECTED[7:0]),
+        .ENARDEN(cam_fb_reg_1_0__0_i_1_n_0),
+        .ENBWREN(cam_fb_reg_1_0__0_i_2_n_0),
+        .INJECTDBITERR(NLW_cam_fb_reg_1_7__0_INJECTDBITERR_UNCONNECTED),
+        .INJECTSBITERR(NLW_cam_fb_reg_1_7__0_INJECTSBITERR_UNCONNECTED),
+        .RDADDRECC(NLW_cam_fb_reg_1_7__0_RDADDRECC_UNCONNECTED[8:0]),
+        .REGCEAREGCE(1'b0),
+        .REGCEB(1'b0),
+        .RSTRAMARSTRAM(1'b0),
+        .RSTRAMB(1'b0),
+        .RSTREGARSTREG(1'b0),
+        .RSTREGB(1'b0),
+        .SBITERR(NLW_cam_fb_reg_1_7__0_SBITERR_UNCONNECTED),
+        .WEA({cam_fb_reg_1_7__0_i_1_n_0,cam_fb_reg_1_7__0_i_1_n_0,cam_fb_reg_1_7__0_i_1_n_0,cam_fb_reg_1_7__0_i_1_n_0}),
+        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT3 #(
+    .INIT(8'h20)) 
+    cam_fb_reg_1_7__0_i_1
+       (.I0(cam_we),
+        .I1(cam_wr_addr[15]),
+        .I2(cam_wr_addr[16]),
+        .O(cam_fb_reg_1_7__0_i_1_n_0));
   LUT2 #(
     .INIT(4'h2)) 
     cam_fb_reg_1_7_i_1
        (.I0(cam_we),
         .I1(cam_wr_addr[16]),
         .O(cam_fb_reg_1_7_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_2_4" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "65536" *) 
-  (* ram_addr_end = "98303" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "4" *) 
-  (* ram_slice_end = "4" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_2_4
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_2_4_n_0),
-        .CASCADEOUTB(cam_fb_reg_2_4_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_2_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_2_4_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_2_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_2_4_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_2_4_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_2_4_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_2_4_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_2_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_wr_addr[16]),
-        .ENBWREN(vga_n_15),
-        .INJECTDBITERR(NLW_cam_fb_reg_2_4_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_2_4_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_2_4_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_2_4_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_2_4_i_2_n_0,cam_fb_reg_2_4_i_2_n_0,cam_fb_reg_2_4_i_2_n_0,cam_fb_reg_2_4_i_2_n_0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT2 #(
-    .INIT(4'h8)) 
-    cam_fb_reg_2_4_i_2
-       (.I0(cam_we),
-        .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_2_4_i_2_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_2_5" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "65536" *) 
-  (* ram_addr_end = "98303" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "5" *) 
-  (* ram_slice_end = "5" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_2_5
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_2_5_n_0),
-        .CASCADEOUTB(cam_fb_reg_2_5_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_2_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_2_5_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_2_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_2_5_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_2_5_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_2_5_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_2_5_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_2_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_wr_addr[16]),
-        .ENBWREN(vga_n_15),
-        .INJECTDBITERR(NLW_cam_fb_reg_2_5_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_2_5_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_2_5_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_2_5_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_2_5_i_1_n_0,cam_fb_reg_2_5_i_1_n_0,cam_fb_reg_2_5_i_1_n_0,cam_fb_reg_2_5_i_1_n_0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT2 #(
-    .INIT(4'h8)) 
-    cam_fb_reg_2_5_i_1
-       (.I0(cam_we),
-        .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_2_5_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_2_6" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "65536" *) 
-  (* ram_addr_end = "98303" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "6" *) 
-  (* ram_slice_end = "6" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_2_6
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_2_6_n_0),
-        .CASCADEOUTB(cam_fb_reg_2_6_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_2_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_2_6_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_2_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_2_6_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_2_6_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_2_6_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_2_6_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_2_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_wr_addr[16]),
-        .ENBWREN(vga_n_15),
-        .INJECTDBITERR(NLW_cam_fb_reg_2_6_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_2_6_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_2_6_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_2_6_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_2_6_i_1_n_0,cam_fb_reg_2_6_i_1_n_0,cam_fb_reg_2_6_i_1_n_0,cam_fb_reg_2_6_i_1_n_0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT2 #(
-    .INIT(4'h8)) 
-    cam_fb_reg_2_6_i_1
-       (.I0(cam_we),
-        .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_2_6_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_2_7" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "65536" *) 
-  (* ram_addr_end = "98303" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "7" *) 
-  (* ram_slice_end = "7" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_2_7
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_2_7_n_0),
-        .CASCADEOUTB(cam_fb_reg_2_7_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_2_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_2_7_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_2_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_2_7_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_2_7_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_2_7_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_2_7_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_2_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_wr_addr[16]),
-        .ENBWREN(vga_n_15),
-        .INJECTDBITERR(NLW_cam_fb_reg_2_7_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_2_7_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_2_7_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_2_7_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_2_7_i_1_n_0,cam_fb_reg_2_7_i_1_n_0,cam_fb_reg_2_7_i_1_n_0,cam_fb_reg_2_7_i_1_n_0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT2 #(
-    .INIT(4'h8)) 
-    cam_fb_reg_2_7_i_1
-       (.I0(cam_we),
-        .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_2_7_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_3_4" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "98304" *) 
-  (* ram_addr_end = "131071" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "4" *) 
-  (* ram_slice_end = "4" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_3_4
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(cam_fb_reg_2_4_n_0),
-        .CASCADEINB(cam_fb_reg_2_4_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_3_4_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_3_4_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_3_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_3_4_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_3_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_3_4_DOADO_UNCONNECTED[31:1],cam_fb_reg_3_4_n_35}),
-        .DOBDO({NLW_cam_fb_reg_3_4_DOBDO_UNCONNECTED[31:1],cam_fb_reg_3_4_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_3_4_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_3_4_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_3_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_wr_addr[16]),
-        .ENBWREN(vga_n_15),
-        .INJECTDBITERR(NLW_cam_fb_reg_3_4_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_3_4_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_3_4_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_3_4_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_3_4_i_1_n_0,cam_fb_reg_3_4_i_1_n_0,cam_fb_reg_3_4_i_1_n_0,cam_fb_reg_3_4_i_1_n_0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT2 #(
-    .INIT(4'h8)) 
-    cam_fb_reg_3_4_i_1
-       (.I0(cam_we),
-        .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_3_4_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_3_5" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "98304" *) 
-  (* ram_addr_end = "131071" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "5" *) 
-  (* ram_slice_end = "5" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_3_5
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(cam_fb_reg_2_5_n_0),
-        .CASCADEINB(cam_fb_reg_2_5_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_3_5_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_3_5_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_3_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_3_5_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_3_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_3_5_DOADO_UNCONNECTED[31:1],cam_fb_reg_3_5_n_35}),
-        .DOBDO({NLW_cam_fb_reg_3_5_DOBDO_UNCONNECTED[31:1],cam_fb_reg_3_5_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_3_5_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_3_5_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_3_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_wr_addr[16]),
-        .ENBWREN(vga_n_15),
-        .INJECTDBITERR(NLW_cam_fb_reg_3_5_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_3_5_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_3_5_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_3_5_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_3_5_i_1_n_0,cam_fb_reg_3_5_i_1_n_0,cam_fb_reg_3_5_i_1_n_0,cam_fb_reg_3_5_i_1_n_0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT2 #(
-    .INIT(4'h8)) 
-    cam_fb_reg_3_5_i_1
-       (.I0(cam_we),
-        .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_3_5_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_3_6" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "98304" *) 
-  (* ram_addr_end = "131071" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "6" *) 
-  (* ram_slice_end = "6" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_3_6
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(cam_fb_reg_2_6_n_0),
-        .CASCADEINB(cam_fb_reg_2_6_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_3_6_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_3_6_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_3_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_3_6_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_3_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_3_6_DOADO_UNCONNECTED[31:1],cam_fb_reg_3_6_n_35}),
-        .DOBDO({NLW_cam_fb_reg_3_6_DOBDO_UNCONNECTED[31:1],cam_fb_reg_3_6_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_3_6_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_3_6_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_3_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_wr_addr[16]),
-        .ENBWREN(vga_n_15),
-        .INJECTDBITERR(NLW_cam_fb_reg_3_6_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_3_6_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_3_6_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_3_6_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_3_6_i_1_n_0,cam_fb_reg_3_6_i_1_n_0,cam_fb_reg_3_6_i_1_n_0,cam_fb_reg_3_6_i_1_n_0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT2 #(
-    .INIT(4'h8)) 
-    cam_fb_reg_3_6_i_1
-       (.I0(cam_we),
-        .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_3_6_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_3_7" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "98304" *) 
-  (* ram_addr_end = "131071" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "7" *) 
-  (* ram_slice_end = "7" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_3_7
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(cam_fb_reg_2_7_n_0),
-        .CASCADEINB(cam_fb_reg_2_7_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_3_7_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_3_7_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_3_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_3_7_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_3_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_3_7_DOADO_UNCONNECTED[31:1],cam_fb_reg_3_7_n_35}),
-        .DOBDO({NLW_cam_fb_reg_3_7_DOBDO_UNCONNECTED[31:1],cam_fb_reg_3_7_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_3_7_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_3_7_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_3_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(cam_wr_addr[16]),
-        .ENBWREN(vga_n_15),
-        .INJECTDBITERR(NLW_cam_fb_reg_3_7_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_3_7_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_3_7_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_3_7_SBITERR_UNCONNECTED),
-        .WEA({cam_fb_reg_3_7_i_1_n_0,cam_fb_reg_3_7_i_1_n_0,cam_fb_reg_3_7_i_1_n_0,cam_fb_reg_3_7_i_1_n_0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT2 #(
-    .INIT(4'h8)) 
-    cam_fb_reg_3_7_i_1
-       (.I0(cam_we),
-        .I1(cam_wr_addr[16]),
-        .O(cam_fb_reg_3_7_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_4_4" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "131072" *) 
-  (* ram_addr_end = "163839" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "4" *) 
-  (* ram_slice_end = "4" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_4_4
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_4_4_n_0),
-        .CASCADEOUTB(cam_fb_reg_4_4_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_4_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_4_4_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_4_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_4_4_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_4_4_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_4_4_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_4_4_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_4_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_16),
-        .INJECTDBITERR(NLW_cam_fb_reg_4_4_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_4_4_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_4_4_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_4_4_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_4_5" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "131072" *) 
-  (* ram_addr_end = "163839" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "5" *) 
-  (* ram_slice_end = "5" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_4_5
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_4_5_n_0),
-        .CASCADEOUTB(cam_fb_reg_4_5_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_4_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_4_5_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_4_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_4_5_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_4_5_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_4_5_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_4_5_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_4_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_16),
-        .INJECTDBITERR(NLW_cam_fb_reg_4_5_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_4_5_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_4_5_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_4_5_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_4_6" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "131072" *) 
-  (* ram_addr_end = "163839" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "6" *) 
-  (* ram_slice_end = "6" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_4_6
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_4_6_n_0),
-        .CASCADEOUTB(cam_fb_reg_4_6_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_4_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_4_6_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_4_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_4_6_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_4_6_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_4_6_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_4_6_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_4_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_16),
-        .INJECTDBITERR(NLW_cam_fb_reg_4_6_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_4_6_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_4_6_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_4_6_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_4_7" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "131072" *) 
-  (* ram_addr_end = "163839" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "7" *) 
-  (* ram_slice_end = "7" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_4_7
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_4_7_n_0),
-        .CASCADEOUTB(cam_fb_reg_4_7_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_4_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_4_7_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_4_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_4_7_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_4_7_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_4_7_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_4_7_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_4_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_16),
-        .INJECTDBITERR(NLW_cam_fb_reg_4_7_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_4_7_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_4_7_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_4_7_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_5_4" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "163840" *) 
-  (* ram_addr_end = "196607" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "4" *) 
-  (* ram_slice_end = "4" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_5_4
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(cam_fb_reg_4_4_n_0),
-        .CASCADEINB(cam_fb_reg_4_4_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_5_4_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_5_4_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_5_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_5_4_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_5_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_5_4_DOADO_UNCONNECTED[31:1],cam_fb_reg_5_4_n_35}),
-        .DOBDO({NLW_cam_fb_reg_5_4_DOBDO_UNCONNECTED[31:1],cam_fb_reg_5_4_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_5_4_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_5_4_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_5_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_16),
-        .INJECTDBITERR(NLW_cam_fb_reg_5_4_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_5_4_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_5_4_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_5_4_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_5_5" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "163840" *) 
-  (* ram_addr_end = "196607" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "5" *) 
-  (* ram_slice_end = "5" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_5_5
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(cam_fb_reg_4_5_n_0),
-        .CASCADEINB(cam_fb_reg_4_5_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_5_5_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_5_5_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_5_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_5_5_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_5_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_5_5_DOADO_UNCONNECTED[31:1],cam_fb_reg_5_5_n_35}),
-        .DOBDO({NLW_cam_fb_reg_5_5_DOBDO_UNCONNECTED[31:1],cam_fb_reg_5_5_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_5_5_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_5_5_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_5_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_16),
-        .INJECTDBITERR(NLW_cam_fb_reg_5_5_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_5_5_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_5_5_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_5_5_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_5_6" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "163840" *) 
-  (* ram_addr_end = "196607" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "6" *) 
-  (* ram_slice_end = "6" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_5_6
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(cam_fb_reg_4_6_n_0),
-        .CASCADEINB(cam_fb_reg_4_6_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_5_6_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_5_6_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_5_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_5_6_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_5_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_5_6_DOADO_UNCONNECTED[31:1],cam_fb_reg_5_6_n_35}),
-        .DOBDO({NLW_cam_fb_reg_5_6_DOBDO_UNCONNECTED[31:1],cam_fb_reg_5_6_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_5_6_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_5_6_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_5_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_16),
-        .INJECTDBITERR(NLW_cam_fb_reg_5_6_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_5_6_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_5_6_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_5_6_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_5_7" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "163840" *) 
-  (* ram_addr_end = "196607" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "7" *) 
-  (* ram_slice_end = "7" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_5_7
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(cam_fb_reg_4_7_n_0),
-        .CASCADEINB(cam_fb_reg_4_7_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_5_7_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_5_7_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_5_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_5_7_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_5_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_5_7_DOADO_UNCONNECTED[31:1],cam_fb_reg_5_7_n_35}),
-        .DOBDO({NLW_cam_fb_reg_5_7_DOBDO_UNCONNECTED[31:1],cam_fb_reg_5_7_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_5_7_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_5_7_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_5_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_16),
-        .INJECTDBITERR(NLW_cam_fb_reg_5_7_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_5_7_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_5_7_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_5_7_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_6_4" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "196608" *) 
-  (* ram_addr_end = "229375" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "4" *) 
-  (* ram_slice_end = "4" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_6_4
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_6_4_n_0),
-        .CASCADEOUTB(cam_fb_reg_6_4_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_6_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_6_4_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_6_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_6_4_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_6_4_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_6_4_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_6_4_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_6_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_17),
-        .INJECTDBITERR(NLW_cam_fb_reg_6_4_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_6_4_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_6_4_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_6_4_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_6_5" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "196608" *) 
-  (* ram_addr_end = "229375" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "5" *) 
-  (* ram_slice_end = "5" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_6_5
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_6_5_n_0),
-        .CASCADEOUTB(cam_fb_reg_6_5_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_6_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_6_5_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_6_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_6_5_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_6_5_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_6_5_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_6_5_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_6_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_17),
-        .INJECTDBITERR(NLW_cam_fb_reg_6_5_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_6_5_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_6_5_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_6_5_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_6_6" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "196608" *) 
-  (* ram_addr_end = "229375" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "6" *) 
-  (* ram_slice_end = "6" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_6_6
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_6_6_n_0),
-        .CASCADEOUTB(cam_fb_reg_6_6_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_6_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_6_6_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_6_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_6_6_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_6_6_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_6_6_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_6_6_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_6_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_17),
-        .INJECTDBITERR(NLW_cam_fb_reg_6_6_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_6_6_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_6_6_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_6_6_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_6_7" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "196608" *) 
-  (* ram_addr_end = "229375" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "7" *) 
-  (* ram_slice_end = "7" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_6_7
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_6_7_n_0),
-        .CASCADEOUTB(cam_fb_reg_6_7_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_6_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_6_7_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_6_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_6_7_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_6_7_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_6_7_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_6_7_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_6_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_17),
-        .INJECTDBITERR(NLW_cam_fb_reg_6_7_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_6_7_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_6_7_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_6_7_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_7_4" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "229376" *) 
-  (* ram_addr_end = "262143" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "4" *) 
-  (* ram_slice_end = "4" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_7_4
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(cam_fb_reg_6_4_n_0),
-        .CASCADEINB(cam_fb_reg_6_4_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_7_4_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_7_4_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_7_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_7_4_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_7_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_7_4_DOADO_UNCONNECTED[31:1],cam_fb_reg_7_4_n_35}),
-        .DOBDO({NLW_cam_fb_reg_7_4_DOBDO_UNCONNECTED[31:1],cam_fb_reg_7_4_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_7_4_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_7_4_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_7_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_17),
-        .INJECTDBITERR(NLW_cam_fb_reg_7_4_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_7_4_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_7_4_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_7_4_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_7_5" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "229376" *) 
-  (* ram_addr_end = "262143" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "5" *) 
-  (* ram_slice_end = "5" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_7_5
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(cam_fb_reg_6_5_n_0),
-        .CASCADEINB(cam_fb_reg_6_5_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_7_5_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_7_5_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_7_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_7_5_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_7_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_7_5_DOADO_UNCONNECTED[31:1],cam_fb_reg_7_5_n_35}),
-        .DOBDO({NLW_cam_fb_reg_7_5_DOBDO_UNCONNECTED[31:1],cam_fb_reg_7_5_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_7_5_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_7_5_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_7_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_17),
-        .INJECTDBITERR(NLW_cam_fb_reg_7_5_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_7_5_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_7_5_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_7_5_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_7_6" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "229376" *) 
-  (* ram_addr_end = "262143" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "6" *) 
-  (* ram_slice_end = "6" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_7_6
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(cam_fb_reg_6_6_n_0),
-        .CASCADEINB(cam_fb_reg_6_6_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_7_6_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_7_6_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_7_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_7_6_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_7_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_7_6_DOADO_UNCONNECTED[31:1],cam_fb_reg_7_6_n_35}),
-        .DOBDO({NLW_cam_fb_reg_7_6_DOBDO_UNCONNECTED[31:1],cam_fb_reg_7_6_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_7_6_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_7_6_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_7_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_17),
-        .INJECTDBITERR(NLW_cam_fb_reg_7_6_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_7_6_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_7_6_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_7_6_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_7_7" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "229376" *) 
-  (* ram_addr_end = "262143" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "7" *) 
-  (* ram_slice_end = "7" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_7_7
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(cam_fb_reg_6_7_n_0),
-        .CASCADEINB(cam_fb_reg_6_7_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_7_7_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_7_7_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_7_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_7_7_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_7_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_7_7_DOADO_UNCONNECTED[31:1],cam_fb_reg_7_7_n_35}),
-        .DOBDO({NLW_cam_fb_reg_7_7_DOBDO_UNCONNECTED[31:1],cam_fb_reg_7_7_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_7_7_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_7_7_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_7_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(vga_n_17),
-        .INJECTDBITERR(NLW_cam_fb_reg_7_7_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_7_7_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_7_7_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_7_7_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_8_4" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "262144" *) 
-  (* ram_addr_end = "294911" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "4" *) 
-  (* ram_slice_end = "4" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_8_4
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_8_4_n_0),
-        .CASCADEOUTB(cam_fb_reg_8_4_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_8_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_8_4_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_8_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_8_4_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_8_4_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_8_4_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_8_4_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_8_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(cam_fb_reg_8_4_i_1_n_0),
-        .INJECTDBITERR(NLW_cam_fb_reg_8_4_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_8_4_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_8_4_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_8_4_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  LUT3 #(
-    .INIT(8'h02)) 
-    cam_fb_reg_8_4_i_1
-       (.I0(cam_rd_addr[18]),
-        .I1(cam_rd_addr[16]),
-        .I2(cam_rd_addr[17]),
-        .O(cam_fb_reg_8_4_i_1_n_0));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_8_5" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "262144" *) 
-  (* ram_addr_end = "294911" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "5" *) 
-  (* ram_slice_end = "5" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_8_5
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_8_5_n_0),
-        .CASCADEOUTB(cam_fb_reg_8_5_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_8_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_8_5_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_8_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_8_5_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_8_5_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_8_5_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_8_5_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_8_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(cam_fb_reg_8_4_i_1_n_0),
-        .INJECTDBITERR(NLW_cam_fb_reg_8_5_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_8_5_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_8_5_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_8_5_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_8_6" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "262144" *) 
-  (* ram_addr_end = "294911" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "6" *) 
-  (* ram_slice_end = "6" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_8_6
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_8_6_n_0),
-        .CASCADEOUTB(cam_fb_reg_8_6_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_8_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_8_6_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_8_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_8_6_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_8_6_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_8_6_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_8_6_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_8_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(cam_fb_reg_8_4_i_1_n_0),
-        .INJECTDBITERR(NLW_cam_fb_reg_8_6_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_8_6_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_8_6_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_8_6_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_8_7" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "262144" *) 
-  (* ram_addr_end = "294911" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "7" *) 
-  (* ram_slice_end = "7" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("LOWER"),
-    .RAM_EXTENSION_B("LOWER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_8_7
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(1'b1),
-        .CASCADEINB(1'b1),
-        .CASCADEOUTA(cam_fb_reg_8_7_n_0),
-        .CASCADEOUTB(cam_fb_reg_8_7_n_1),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_8_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_8_7_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_8_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO(NLW_cam_fb_reg_8_7_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(NLW_cam_fb_reg_8_7_DOBDO_UNCONNECTED[31:0]),
-        .DOPADOP(NLW_cam_fb_reg_8_7_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_8_7_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_8_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(cam_fb_reg_8_4_i_1_n_0),
-        .INJECTDBITERR(NLW_cam_fb_reg_8_7_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_8_7_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_8_7_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_8_7_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_9_4" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "294912" *) 
-  (* ram_addr_end = "327679" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "4" *) 
-  (* ram_slice_end = "4" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_9_4
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(cam_fb_reg_8_4_n_0),
-        .CASCADEINB(cam_fb_reg_8_4_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_9_4_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_9_4_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_9_4_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[0]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_9_4_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_9_4_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_9_4_DOADO_UNCONNECTED[31:1],cam_fb_reg_9_4_n_35}),
-        .DOBDO({NLW_cam_fb_reg_9_4_DOBDO_UNCONNECTED[31:1],cam_fb_reg_9_4_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_9_4_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_9_4_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_9_4_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(cam_fb_reg_8_4_i_1_n_0),
-        .INJECTDBITERR(NLW_cam_fb_reg_9_4_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_9_4_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_9_4_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_9_4_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_9_5" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "294912" *) 
-  (* ram_addr_end = "327679" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "5" *) 
-  (* ram_slice_end = "5" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_9_5
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],drawX[6],vga_n_40,drawX[4:3],vga_n_41,vga_n_42,vga_n_43}),
-        .CASCADEINA(cam_fb_reg_8_5_n_0),
-        .CASCADEINB(cam_fb_reg_8_5_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_9_5_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_9_5_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_9_5_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[1]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_9_5_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_9_5_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_9_5_DOADO_UNCONNECTED[31:1],cam_fb_reg_9_5_n_35}),
-        .DOBDO({NLW_cam_fb_reg_9_5_DOBDO_UNCONNECTED[31:1],cam_fb_reg_9_5_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_9_5_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_9_5_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_9_5_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(cam_fb_reg_8_4_i_1_n_0),
-        .INJECTDBITERR(NLW_cam_fb_reg_9_5_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_9_5_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_9_5_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_9_5_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_9_6" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "294912" *) 
-  (* ram_addr_end = "327679" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "6" *) 
-  (* ram_slice_end = "6" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_9_6
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(cam_fb_reg_8_6_n_0),
-        .CASCADEINB(cam_fb_reg_8_6_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_9_6_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_9_6_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_9_6_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[2]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_9_6_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_9_6_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_9_6_DOADO_UNCONNECTED[31:1],cam_fb_reg_9_6_n_35}),
-        .DOBDO({NLW_cam_fb_reg_9_6_DOBDO_UNCONNECTED[31:1],cam_fb_reg_9_6_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_9_6_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_9_6_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_9_6_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(cam_fb_reg_8_4_i_1_n_0),
-        .INJECTDBITERR(NLW_cam_fb_reg_9_6_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_9_6_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_9_6_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_9_6_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d1" *) 
-  (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
-  (* RTL_RAM_BITS = "2457600" *) 
-  (* RTL_RAM_NAME = "inst/cam_fb_reg_9_7" *) 
-  (* RTL_RAM_TYPE = "RAM_SDP" *) 
-  (* ram_addr_begin = "294912" *) 
-  (* ram_addr_end = "327679" *) 
-  (* ram_offset = "0" *) 
-  (* ram_slice_begin = "7" *) 
-  (* ram_slice_end = "7" *) 
-  RAMB36E1 #(
-    .DOA_REG(0),
-    .DOB_REG(0),
-    .EN_ECC_READ("FALSE"),
-    .EN_ECC_WRITE("FALSE"),
-    .INIT_A(36'h000000000),
-    .INIT_B(36'h000000000),
-    .RAM_EXTENSION_A("UPPER"),
-    .RAM_EXTENSION_B("UPPER"),
-    .RAM_MODE("TDP"),
-    .RDADDR_COLLISION_HWCONFIG("DELAYED_WRITE"),
-    .READ_WIDTH_A(1),
-    .READ_WIDTH_B(1),
-    .RSTREG_PRIORITY_A("RSTREG"),
-    .RSTREG_PRIORITY_B("RSTREG"),
-    .SIM_COLLISION_CHECK("ALL"),
-    .SIM_DEVICE("7SERIES"),
-    .SRVAL_A(36'h000000000),
-    .SRVAL_B(36'h000000000),
-    .WRITE_MODE_A("NO_CHANGE"),
-    .WRITE_MODE_B("WRITE_FIRST"),
-    .WRITE_WIDTH_A(1),
-    .WRITE_WIDTH_B(1)) 
-    cam_fb_reg_9_7
-       (.ADDRARDADDR(cam_wr_addr[15:0]),
-        .ADDRBWRADDR({cam_rd_addr[15:7],vga_n_44,drawX[5],vga_n_45,vga_n_46,drawX[2:1],vga_n_47}),
-        .CASCADEINA(cam_fb_reg_8_7_n_0),
-        .CASCADEINB(cam_fb_reg_8_7_n_1),
-        .CASCADEOUTA(NLW_cam_fb_reg_9_7_CASCADEOUTA_UNCONNECTED),
-        .CASCADEOUTB(NLW_cam_fb_reg_9_7_CASCADEOUTB_UNCONNECTED),
-        .CLKARDCLK(cam_pclk),
-        .CLKBWRCLK(clk_25MHz),
-        .DBITERR(NLW_cam_fb_reg_9_7_DBITERR_UNCONNECTED),
-        .DIADI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,cam_wr_data[3]}),
-        .DIBDI({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b1}),
-        .DIPADIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_9_7_DIPADIP_UNCONNECTED[0]}),
-        .DIPBDIP({1'b0,1'b0,1'b0,NLW_cam_fb_reg_9_7_DIPBDIP_UNCONNECTED[0]}),
-        .DOADO({NLW_cam_fb_reg_9_7_DOADO_UNCONNECTED[31:1],cam_fb_reg_9_7_n_35}),
-        .DOBDO({NLW_cam_fb_reg_9_7_DOBDO_UNCONNECTED[31:1],cam_fb_reg_9_7_n_67}),
-        .DOPADOP(NLW_cam_fb_reg_9_7_DOPADOP_UNCONNECTED[3:0]),
-        .DOPBDOP(NLW_cam_fb_reg_9_7_DOPBDOP_UNCONNECTED[3:0]),
-        .ECCPARITY(NLW_cam_fb_reg_9_7_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(1'b0),
-        .ENBWREN(cam_fb_reg_8_4_i_1_n_0),
-        .INJECTDBITERR(NLW_cam_fb_reg_9_7_INJECTDBITERR_UNCONNECTED),
-        .INJECTSBITERR(NLW_cam_fb_reg_9_7_INJECTSBITERR_UNCONNECTED),
-        .RDADDRECC(NLW_cam_fb_reg_9_7_RDADDRECC_UNCONNECTED[8:0]),
-        .REGCEAREGCE(1'b0),
-        .REGCEB(1'b0),
-        .RSTRAMARSTRAM(1'b0),
-        .RSTRAMB(1'b0),
-        .RSTREGARSTREG(1'b0),
-        .RSTREGB(1'b0),
-        .SBITERR(NLW_cam_fb_reg_9_7_SBITERR_UNCONNECTED),
-        .WEA({1'b0,1'b0,1'b0,1'b0}),
-        .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
-  FDRE cam_fb_reg_mux_sel_b_pos_0__4
-       (.C(clk_25MHz),
-        .CE(1'b1),
-        .D(cam_rd_addr[18]),
-        .Q(cam_fb_reg_mux_sel_b_pos_0__4_n_0),
-        .R(1'b0));
-  FDRE cam_fb_reg_mux_sel_b_pos_1__4
-       (.C(clk_25MHz),
-        .CE(1'b1),
-        .D(cam_rd_addr[17]),
-        .Q(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .R(1'b0));
-  FDRE cam_fb_reg_mux_sel_b_pos_2__4
+  FDRE cam_fb_reg_mux_sel_b_pos_0
        (.C(clk_25MHz),
         .CE(1'b1),
         .D(cam_rd_addr[16]),
-        .Q(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
+        .Q(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .R(1'b0));
+  FDRE cam_fb_reg_mux_sel_b_pos_1
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(cam_rd_addr[15]),
+        .Q(cam_fb_reg_mux_sel_b_pos_1_n_0),
         .R(1'b0));
   mb_usb_hdmi_text_controller_0_2_clk_wiz_0 clk_wiz
        (.clk_in1(axi_aclk),
@@ -8028,6 +7179,48 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .clk_out2(clk_125MHz),
         .locked(locked),
         .reset(reset_ah));
+  FDRE \font_col_r_reg[0] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(vga_n_43),
+        .Q(font_col_r[0]),
+        .R(1'b0));
+  FDRE \font_col_r_reg[1] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(vga_n_42),
+        .Q(font_col_r[1]),
+        .R(1'b0));
+  FDRE \font_col_r_reg[2] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(vga_n_41),
+        .Q(font_col_r[2]),
+        .R(1'b0));
+  FDRE \font_row_r_reg[0] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(p_0_in[0]),
+        .Q(sel[0]),
+        .R(1'b0));
+  FDRE \font_row_r_reg[1] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(p_0_in[1]),
+        .Q(sel[1]),
+        .R(1'b0));
+  FDRE \font_row_r_reg[2] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(p_0_in[2]),
+        .Q(sel[2]),
+        .R(1'b0));
+  FDRE \font_row_r_reg[3] 
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(p_0_in[3]),
+        .Q(sel[3]),
+        .R(1'b0));
   LUT1 #(
     .INIT(2'h1)) 
     \frame_counter[0]_i_3 
@@ -8227,7 +7420,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .Q(frame_counter_meta[9]));
   FDCE \frame_counter_reg[0] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[0]_i_2_n_7 ),
         .Q(frame_counter_reg[0]));
@@ -8241,19 +7434,19 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .S({frame_counter_reg[3:1],\frame_counter[0]_i_3_n_0 }));
   FDCE \frame_counter_reg[10] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[8]_i_1_n_5 ),
         .Q(frame_counter_reg[10]));
   FDCE \frame_counter_reg[11] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[8]_i_1_n_4 ),
         .Q(frame_counter_reg[11]));
   FDCE \frame_counter_reg[12] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[12]_i_1_n_7 ),
         .Q(frame_counter_reg[12]));
@@ -8267,25 +7460,25 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .S(frame_counter_reg[15:12]));
   FDCE \frame_counter_reg[13] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[12]_i_1_n_6 ),
         .Q(frame_counter_reg[13]));
   FDCE \frame_counter_reg[14] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[12]_i_1_n_5 ),
         .Q(frame_counter_reg[14]));
   FDCE \frame_counter_reg[15] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[12]_i_1_n_4 ),
         .Q(frame_counter_reg[15]));
   FDCE \frame_counter_reg[16] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[16]_i_1_n_7 ),
         .Q(frame_counter_reg[16]));
@@ -8299,31 +7492,31 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .S(frame_counter_reg[19:16]));
   FDCE \frame_counter_reg[17] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[16]_i_1_n_6 ),
         .Q(frame_counter_reg[17]));
   FDCE \frame_counter_reg[18] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[16]_i_1_n_5 ),
         .Q(frame_counter_reg[18]));
   FDCE \frame_counter_reg[19] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[16]_i_1_n_4 ),
         .Q(frame_counter_reg[19]));
   FDCE \frame_counter_reg[1] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[0]_i_2_n_6 ),
         .Q(frame_counter_reg[1]));
   FDCE \frame_counter_reg[20] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[20]_i_1_n_7 ),
         .Q(frame_counter_reg[20]));
@@ -8337,25 +7530,25 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .S(frame_counter_reg[23:20]));
   FDCE \frame_counter_reg[21] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[20]_i_1_n_6 ),
         .Q(frame_counter_reg[21]));
   FDCE \frame_counter_reg[22] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[20]_i_1_n_5 ),
         .Q(frame_counter_reg[22]));
   FDCE \frame_counter_reg[23] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[20]_i_1_n_4 ),
         .Q(frame_counter_reg[23]));
   FDCE \frame_counter_reg[24] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[24]_i_1_n_7 ),
         .Q(frame_counter_reg[24]));
@@ -8369,25 +7562,25 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .S(frame_counter_reg[27:24]));
   FDCE \frame_counter_reg[25] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[24]_i_1_n_6 ),
         .Q(frame_counter_reg[25]));
   FDCE \frame_counter_reg[26] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[24]_i_1_n_5 ),
         .Q(frame_counter_reg[26]));
   FDCE \frame_counter_reg[27] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[24]_i_1_n_4 ),
         .Q(frame_counter_reg[27]));
   FDCE \frame_counter_reg[28] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[28]_i_1_n_7 ),
         .Q(frame_counter_reg[28]));
@@ -8401,37 +7594,37 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .S(frame_counter_reg[31:28]));
   FDCE \frame_counter_reg[29] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[28]_i_1_n_6 ),
         .Q(frame_counter_reg[29]));
   FDCE \frame_counter_reg[2] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[0]_i_2_n_5 ),
         .Q(frame_counter_reg[2]));
   FDCE \frame_counter_reg[30] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[28]_i_1_n_5 ),
         .Q(frame_counter_reg[30]));
   FDCE \frame_counter_reg[31] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[28]_i_1_n_4 ),
         .Q(frame_counter_reg[31]));
   FDCE \frame_counter_reg[3] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[0]_i_2_n_4 ),
         .Q(frame_counter_reg[3]));
   FDCE \frame_counter_reg[4] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[4]_i_1_n_7 ),
         .Q(frame_counter_reg[4]));
@@ -8445,25 +7638,25 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .S(frame_counter_reg[7:4]));
   FDCE \frame_counter_reg[5] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[4]_i_1_n_6 ),
         .Q(frame_counter_reg[5]));
   FDCE \frame_counter_reg[6] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[4]_i_1_n_5 ),
         .Q(frame_counter_reg[6]));
   FDCE \frame_counter_reg[7] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[4]_i_1_n_4 ),
         .Q(frame_counter_reg[7]));
   FDCE \frame_counter_reg[8] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[8]_i_1_n_7 ),
         .Q(frame_counter_reg[8]));
@@ -8477,7 +7670,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .S(frame_counter_reg[11:8]));
   FDCE \frame_counter_reg[9] 
        (.C(clk_25MHz),
-        .CE(vga_n_58),
+        .CE(frame_counter0),
         .CLR(reset_ah),
         .D(\frame_counter_reg[8]_i_1_n_6 ),
         .Q(frame_counter_reg[9]));
@@ -8673,21 +7866,2380 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .CLR(reset_ah),
         .D(frame_counter_meta[9]),
         .Q(frame_counter_sync[9]));
+  LUT6 #(
+    .INIT(64'h000007F807F80000)) 
+    g0_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g0_b0_n_0));
+  LUT6 #(
+    .INIT(64'hF0AAFFCCF0AA00CC)) 
+    g0_b0_i_1
+       (.I0(vram_reg_n_51),
+        .I1(vram_reg_n_67),
+        .I2(vram_reg_n_43),
+        .I3(byte_index_r[0]),
+        .I4(byte_index_r[1]),
+        .I5(vram_reg_n_59),
+        .O(sel[4]));
+  LUT6 #(
+    .INIT(64'hAACCF0FFAACCF000)) 
+    g0_b0_i_2
+       (.I0(vram_reg_n_42),
+        .I1(vram_reg_n_50),
+        .I2(vram_reg_n_58),
+        .I3(byte_index_r[0]),
+        .I4(byte_index_r[1]),
+        .I5(vram_reg_n_66),
+        .O(sel[5]));
+  LUT6 #(
+    .INIT(64'h01E00FFC08040000)) 
+    g0_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g0_b1_n_0));
+  LUT6 #(
+    .INIT(64'h03F00F6C08940000)) 
+    g0_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g0_b2_n_0));
+  LUT6 #(
+    .INIT(64'h07F00E7C09840000)) 
+    g0_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g0_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0FE00E7C09840000)) 
+    g0_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g0_b4_n_0));
+  LUT6 #(
+    .INIT(64'h07F00F6C08940000)) 
+    g0_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g0_b5_n_0));
+  LUT6 #(
+    .INIT(64'h03F00FFC08040000)) 
+    g0_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g0_b6_n_0));
+  LUT6 #(
+    .INIT(64'h01E007F807F80000)) 
+    g0_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g0_b7_n_0));
+  LUT6 #(
+    .INIT(64'h008002A000000000)) 
+    g10_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g10_b1_n_0));
+  LUT6 #(
+    .INIT(64'h008003E003F00804)) 
+    g10_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g10_b2_n_0));
+  LUT6 #(
+    .INIT(64'h03E001C007F80C0C)) 
+    g10_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g10_b3_n_0));
+  LUT6 #(
+    .INIT(64'h03E001C00C0C07F8)) 
+    g10_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g10_b4_n_0));
+  LUT6 #(
+    .INIT(64'h008003E0080403F0)) 
+    g10_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g10_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0000008000000000)) 
+    g10_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g10_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0030000000800000)) 
+    g11_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g11_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0060000000800000)) 
+    g11_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g11_b2_n_0));
+  LUT6 #(
+    .INIT(64'h00C00C0000800E00)) 
+    g11_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g11_b3_n_0));
+  LUT6 #(
+    .INIT(64'h01800C0000801E00)) 
+    g11_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g11_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0300000000801000)) 
+    g11_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g11_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0600000000800000)) 
+    g11_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g11_b6_n_0));
+  (* SOFT_HLUTNM = "soft_lutpair62" *) 
+  LUT5 #(
+    .INIT(32'h20000000)) 
+    g11_b7
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g11_b7_n_0));
+  LUT6 #(
+    .INIT(64'h07B80C18080007F8)) 
+    g12_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g12_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0FFC0C3C08000FFC)) 
+    g12_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g12_b2_n_0));
+  LUT6 #(
+    .INIT(64'h084408640FFC0864)) 
+    g12_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g12_b3_n_0));
+  LUT6 #(
+    .INIT(64'h084408C40FFC08C4)) 
+    g12_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g12_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0844098408180984)) 
+    g12_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g12_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0C0C0F0C08100FFC)) 
+    g12_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g12_b6_n_0));
+  LUT6 #(
+    .INIT(64'h04080E08000007F8)) 
+    g12_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g12_b7_n_0));
+  LUT6 #(
+    .INIT(64'h003C078007840880)) 
+    g13_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g13_b1_n_0));
+  LUT6 #(
+    .INIT(64'h007C0FC00FC40FFC)) 
+    g13_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g13_b2_n_0));
+  LUT6 #(
+    .INIT(64'h00C4084408440FFC)) 
+    g13_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g13_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0F84084408440898)) 
+    g13_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g13_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0F04084C084400B0)) 
+    g13_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g13_b5_n_0));
+  LUT6 #(
+    .INIT(64'h000C0FF80C7C00E0)) 
+    g13_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g13_b6_n_0));
+  LUT6 #(
+    .INIT(64'h000C07F0047C00C0)) 
+    g13_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g13_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0000000003F807B8)) 
+    g14_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g14_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0000000007FC0FFC)) 
+    g14_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g14_b2_n_0));
+  LUT6 #(
+    .INIT(64'h063006300C440844)) 
+    g14_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g14_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0E30063008440844)) 
+    g14_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g14_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0800000008440844)) 
+    g14_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g14_b5_n_0));
+  LUT6 #(
+    .INIT(64'h00000000087C0FFC)) 
+    g14_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g14_b6_n_0));
+  LUT6 #(
+    .INIT(64'h00000000003807B8)) 
+    g14_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g14_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0018008001200808)) 
+    g15_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g15_b1_n_0));
+  LUT6 #(
+    .INIT(64'h003C01C001200C18)) 
+    g15_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g15_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0DE4036001200630)) 
+    g15_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g15_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0DC4063001200360)) 
+    g15_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g15_b4_n_0));
+  LUT6 #(
+    .INIT(64'h00040C18012001C0)) 
+    g15_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g15_b5_n_0));
+  LUT6 #(
+    .INIT(64'h001C080801200080)) 
+    g15_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g15_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0018000000000000)) 
+    g15_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g15_b7_n_0));
+  LUT6 #(
+    .INIT(64'h061807B80FE001F8)) 
+    g16_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g16_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0C0C0FFC0FF00BFC)) 
+    g16_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g16_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0804084400980BC4)) 
+    g16_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g16_b3_n_0));
+  LUT6 #(
+    .INIT(64'h08040844008C0BC4)) 
+    g16_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g16_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0C0C0FFC00980804)) 
+    g16_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g16_b5_n_0));
+  LUT6 #(
+    .INIT(64'h07F80FFC0FF00FFC)) 
+    g16_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g16_b6_n_0));
+  LUT6 #(
+    .INIT(64'h03F008040FE007F8)) 
+    g16_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g16_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0F98001C0E1C03F0)) 
+    g17_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g17_b1_n_0));
+  LUT6 #(
+    .INIT(64'h078C000C0C0C07F8)) 
+    g17_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g17_b2_n_0));
+  LUT6 #(
+    .INIT(64'h088400E408E40C0C)) 
+    g17_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g17_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0884084408440804)) 
+    g17_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g17_b4_n_0));
+  LUT5 #(
+    .INIT(32'h223E3E3E)) 
+    g17_b5
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g17_b5_n_0));
+  LUT6 #(
+    .INIT(64'h07F80FFC0FFC0FFC)) 
+    g17_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g17_b6_n_0));
+  LUT6 #(
+    .INIT(64'h03F0080408040804)) 
+    g17_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g17_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0E1C000400000FFC)) 
+    g18_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g18_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0F3C07FC08040FFC)) 
+    g18_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g18_b2_n_0));
+  LUT6 #(
+    .INIT(64'h01E00FFC0FFC0040)) 
+    g18_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g18_b3_n_0));
+  LUT6 #(
+    .INIT(64'h00C008040FFC0040)) 
+    g18_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g18_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0FFC080008040040)) 
+    g18_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g18_b5_n_0));
+  LUT5 #(
+    .INIT(32'h3E30003E)) 
+    g18_b6
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g18_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0804070000000FFC)) 
+    g18_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g18_b7_n_0));
+  (* SOFT_HLUTNM = "soft_lutpair63" *) 
+  LUT5 #(
+    .INIT(32'h00003E00)) 
+    g19_b0
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g19_b0_n_0));
+  LUT6 #(
+    .INIT(64'h07F80FFC0FFC0E00)) 
+    g19_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g19_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0FFC0FFC00380C00)) 
+    g19_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g19_b2_n_0));
+  LUT6 #(
+    .INIT(64'h080400E000700800)) 
+    g19_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g19_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0804007000700804)) 
+    g19_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g19_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0804003800380FFC)) 
+    g19_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g19_b5_n_0));
+  LUT3 #(
+    .INIT(8'h3E)) 
+    g19_b6
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .O(g19_b6_n_0));
+  LUT6 #(
+    .INIT(64'h07F80FFC0FFC0804)) 
+    g19_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g19_b7_n_0));
+  LUT6 #(
+    .INIT(64'h000000C001C00000)) 
+    g1_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g1_b0_n_0));
+  LUT6 #(
+    .INIT(64'h000001E001C00080)) 
+    g1_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g1_b1_n_0));
+  LUT6 #(
+    .INIT(64'h018009F009F001C0)) 
+    g1_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g1_b2_n_0));
+  LUT6 #(
+    .INIT(64'h03C00FF80E3803E0)) 
+    g1_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g1_b3_n_0));
+  LUT6 #(
+    .INIT(64'h03C00FF80E3807F0)) 
+    g1_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g1_b4_n_0));
+  LUT6 #(
+    .INIT(64'h018009F009F003E0)) 
+    g1_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g1_b5_n_0));
+  LUT6 #(
+    .INIT(64'h000001E001C001C0)) 
+    g1_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g1_b6_n_0));
+  LUT6 #(
+    .INIT(64'h000000C001C00080)) 
+    g1_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g1_b7_n_0));
+  LUT6 #(
+    .INIT(64'h07180F3827F80038)) 
+    g20_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g20_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0F9C0FFC3FFC007C)) 
+    g20_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g20_b2_n_0));
+  LUT6 #(
+    .INIT(64'h08C400C43C040044)) 
+    g20_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g20_b3_n_0));
+  LUT6 #(
+    .INIT(64'h084400440E040844)) 
+    g20_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g20_b4_n_0));
+  LUT6 #(
+    .INIT(64'h08640FFC08040FFC)) 
+    g20_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g20_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0E3C0FFC0FFC0FFC)) 
+    g20_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g20_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0618080407F80804)) 
+    g20_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g20_b7_n_0));
+  LUT6 #(
+    .INIT(64'h03FC01FC0000001C)) 
+    g21_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g21_b0_n_0));
+  LUT6 #(
+    .INIT(64'h0FFC03FC07FC000C)) 
+    g21_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g21_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0E0006000FFC0804)) 
+    g21_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g21_b2_n_0));
+  LUT6 #(
+    .INIT(64'h03800C0008000FFC)) 
+    g21_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g21_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0E00060008000804)) 
+    g21_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g21_b5_n_0));
+  LUT5 #(
+    .INIT(32'h3E1E3E02)) 
+    g21_b6
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g21_b6_n_0));
+  LUT6 #(
+    .INIT(64'h03FC01FC07FC001C)) 
+    g21_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g21_b7_n_0));
+  LUT6 #(
+    .INIT(64'h00000E0C001C0C0C)) 
+    g22_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g22_b0_n_0));
+  LUT6 #(
+    .INIT(64'h00000C1C003C0E1C)) 
+    g22_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g22_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0804083408600330)) 
+    g22_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g22_b2_n_0));
+  LUT6 #(
+    .INIT(64'h080408640FC001E0)) 
+    g22_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g22_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0FFC08C40FC001E0)) 
+    g22_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g22_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0FFC098408600330)) 
+    g22_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g22_b5_n_0));
+  LUT6 #(
+    .INIT(64'h00000F0C003C0E1C)) 
+    g22_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g22_b6_n_0));
+  LUT6 #(
+    .INIT(64'h00000E1C001C0C0C)) 
+    g22_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g22_b7_n_0));
+  LUT6 #(
+    .INIT(64'h2000000000000000)) 
+    g23_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g23_b0_n_0));
+  LUT6 #(
+    .INIT(64'h2000000800000E00)) 
+    g23_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g23_b1_n_0));
+  LUT6 #(
+    .INIT(64'h2000000C0FFC0700)) 
+    g23_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g23_b2_n_0));
+  LUT6 #(
+    .INIT(64'h200000060FFC0380)) 
+    g23_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g23_b3_n_0));
+  LUT6 #(
+    .INIT(64'h20000003080401C0)) 
+    g23_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g23_b4_n_0));
+  LUT6 #(
+    .INIT(64'h20000006080400E0)) 
+    g23_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g23_b5_n_0));
+  LUT6 #(
+    .INIT(64'h2000000C00000070)) 
+    g23_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g23_b6_n_0));
+  LUT6 #(
+    .INIT(64'h2000000800000038)) 
+    g23_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g23_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0440078008000000)) 
+    g24_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g24_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0C600FC00FC00000)) 
+    g24_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g24_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0820086007E00004)) 
+    g24_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g24_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0820082008A00007)) 
+    g24_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g24_b4_n_0));
+  LUT6 #(
+    .INIT(64'h08200FFC08A00003)) 
+    g24_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g24_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0FE00FFC0FA00000)) 
+    g24_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g24_b6_n_0));
+  LUT6 #(
+    .INIT(64'h07C0000407000000)) 
+    g24_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g24_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0020000004C00800)) 
+    g25_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g25_b1_n_0));
+  LUT6 #(
+    .INIT(64'h3FE000180CE00FFC)) 
+    g25_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g25_b2_n_0));
+  LUT6 #(
+    .INIT(64'h7FC0000C08A007FC)) 
+    g25_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g25_b3_n_0));
+  LUT6 #(
+    .INIT(64'h4820084408A00824)) 
+    g25_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g25_b4_n_0));
+  LUT6 #(
+    .INIT(64'h48200FFC08A00860)) 
+    g25_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g25_b5_n_0));
+  LUT6 #(
+    .INIT(64'h6FE00FF80FE00FC0)) 
+    g25_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g25_b6_n_0));
+  LUT6 #(
+    .INIT(64'h27C0084007C00780)) 
+    g25_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g25_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0C203FEC00000FC0)) 
+    g26_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g26_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0E607FEC08000FE0)) 
+    g26_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g26_b2_n_0));
+  LUT6 #(
+    .INIT(64'h03C040200FEC0020)) 
+    g26_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g26_b3_n_0));
+  LUT6 #(
+    .INIT(64'h018040000FEC0040)) 
+    g26_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g26_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0FFC700008200FFC)) 
+    g26_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g26_b5_n_0));
+  LUT5 #(
+    .INIT(32'h3E40003E)) 
+    g26_b6
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g26_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0804000000000804)) 
+    g26_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g26_b7_n_0));
+  (* SOFT_HLUTNM = "soft_lutpair63" *) 
+  LUT5 #(
+    .INIT(32'h00003800)) 
+    g27_b0
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g27_b0_n_0));
+  LUT6 #(
+    .INIT(64'h07C00FC00FE00000)) 
+    g27_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g27_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0FE00FE000600800)) 
+    g27_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g27_b2_n_0));
+  LUT6 #(
+    .INIT(64'h082000200FC00FFC)) 
+    g27_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g27_b3_n_0));
+  LUT6 #(
+    .INIT(64'h08200FC000600804)) 
+    g27_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g27_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0FE00FE00FE00000)) 
+    g27_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g27_b6_n_0));
+  LUT6 #(
+    .INIT(64'h07C000200FE00000)) 
+    g27_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g27_b7_n_0));
+  LUT6 #(
+    .INIT(64'h044000C0402007C0)) 
+    g28_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g28_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0E6000E07FE00FE0)) 
+    g28_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g28_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0B2000207FC00820)) 
+    g28_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g28_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0920086048204820)) 
+    g28_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g28_b4_n_0));
+  LUT6 #(
+    .INIT(64'h09A00FC008207FC0)) 
+    g28_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g28_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0CE00FE00FE07FE0)) 
+    g28_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g28_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0440082007C04020)) 
+    g28_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g28_b7_n_0));
+  LUT6 #(
+    .INIT(64'h07E001E000000000)) 
+    g29_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g29_b0_n_0));
+  LUT6 #(
+    .INIT(64'h0FE003E008000400)) 
+    g29_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g29_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0C0006000FE00C20)) 
+    g29_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g29_b2_n_0));
+  LUT6 #(
+    .INIT(64'h07000C0007E00820)) 
+    g29_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g29_b3_n_0));
+  LUT6 #(
+    .INIT(64'h07000C0008000FFC)) 
+    g29_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g29_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0C000600080007F8)) 
+    g29_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g29_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0FE003E00FE00020)) 
+    g29_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g29_b6_n_0));
+  LUT6 #(
+    .INIT(64'h07E001E007E00020)) 
+    g29_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g29_b7_n_0));
+  LUT6 #(
+    .INIT(64'hCFC05F5FCFC05050)) 
+    g2_b0
+       (.I0(sel[4]),
+        .I1(g3_b0_n_0),
+        .I2(sel[7]),
+        .I3(g1_b0_n_0),
+        .I4(sel[6]),
+        .I5(g0_b0_n_0),
+        .O(g2_b0_n_0));
+  LUT6 #(
+    .INIT(64'hCCAAF0FFCCAAF000)) 
+    g2_b0_i_1
+       (.I0(vram_reg_n_48),
+        .I1(vram_reg_n_40),
+        .I2(vram_reg_n_56),
+        .I3(byte_index_r[0]),
+        .I4(byte_index_r[1]),
+        .I5(vram_reg_n_64),
+        .O(sel[7]));
+  LUT6 #(
+    .INIT(64'hCCAAF0FFCCAAF000)) 
+    g2_b0_i_2
+       (.I0(vram_reg_n_49),
+        .I1(vram_reg_n_41),
+        .I2(vram_reg_n_57),
+        .I3(byte_index_r[0]),
+        .I4(byte_index_r[1]),
+        .I5(vram_reg_n_65),
+        .O(sel[6]));
+  LUT5 #(
+    .INIT(32'h06E718FF)) 
+    g2_b1
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g2_b1_n_0));
+  LUT6 #(
+    .INIT(64'h078CF99F0660FE7F)) 
+    g2_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g2_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0FDCFBDF0420FC3F)) 
+    g2_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g2_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0874FBDF0420FC3F)) 
+    g2_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g2_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0860F99F0660FE7F)) 
+    g2_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g2_b5_n_0));
+  LUT5 #(
+    .INIT(32'h38E718FF)) 
+    g2_b6
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g2_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0780FFFF0000FFFF)) 
+    g2_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g2_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0000000000000820)) 
+    g30_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g30_b0_n_0));
+  LUT6 #(
+    .INIT(64'h08040C201FE00C60)) 
+    g30_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g30_b1_n_0));
+  LUT6 #(
+    .INIT(64'h08040C603FE006C0)) 
+    g30_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g30_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0FBC08E068000380)) 
+    g30_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g30_b3_n_0));
+  LUT6 #(
+    .INIT(64'h07F809A048000380)) 
+    g30_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g30_b4_n_0));
+  LUT6 #(
+    .INIT(64'h00400B20480006C0)) 
+    g30_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g30_b5_n_0));
+  LUT6 #(
+    .INIT(64'h00400E604FE00C60)) 
+    g30_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g30_b6_n_0));
+  LUT6 #(
+    .INIT(64'h00000C6047E00820)) 
+    g30_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g30_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0780000400400000)) 
+    g31_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g31_b1_n_0));
+  LUT6 #(
+    .INIT(64'h07C0000C00400000)) 
+    g31_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g31_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0460000807F80FBC)) 
+    g31_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g31_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0430000C0FBC0FBC)) 
+    g31_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g31_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0460000408040000)) 
+    g31_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g31_b5_n_0));
+  LUT6 #(
+    .INIT(64'h07C0000C08040000)) 
+    g31_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g31_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0780000800000000)) 
+    g31_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g31_b7_n_0));
+  LUT6 #(
+    .INIT(64'h02A007FC001C0000)) 
+    g3_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g3_b0_n_0));
+  LUT6 #(
+    .INIT(64'h02A00FFC001C0278)) 
+    g3_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g3_b1_n_0));
+  LUT6 #(
+    .INIT(64'h01C00E14001402FC)) 
+    g3_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g3_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0F78001400140F84)) 
+    g3_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g3_b3_n_0));
+  LUT6 #(
+    .INIT(64'h0F78001407FC0F84)) 
+    g3_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g3_b4_n_0));
+  LUT6 #(
+    .INIT(64'h01C00FFC0FFC02FC)) 
+    g3_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g3_b5_n_0));
+  LUT6 #(
+    .INIT(64'h02A01FFC0E000278)) 
+    g3_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g3_b6_n_0));
+  LUT6 #(
+    .INIT(64'h02A01C000C000000)) 
+    g3_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g3_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0DFC01100FFE0040)) 
+    g4_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g4_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0DFC031807FC0040)) 
+    g4_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g4_b2_n_0));
+  LUT6 #(
+    .INIT(64'h000007FC03F800E0)) 
+    g4_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g4_b3_n_0));
+  LUT6 #(
+    .INIT(64'h000007FC01F001F0)) 
+    g4_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g4_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0DFC031800E003F8)) 
+    g4_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g4_b5_n_0));
+  LUT6 #(
+    .INIT(64'h0DFC0110004007FC)) 
+    g4_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g4_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0000000000400FFE)) 
+    g4_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g4_b7_n_0));
+  (* SOFT_HLUTNM = "soft_lutpair62" *) 
+  LUT5 #(
+    .INIT(32'h0000003E)) 
+    g5_b0
+       (.I0(sel[1]),
+        .I1(sel[2]),
+        .I2(sel[3]),
+        .I3(sel[4]),
+        .I4(sel[5]),
+        .O(g5_b0_n_0));
+  LUT6 #(
+    .INIT(64'h09100F0008C40FFC)) 
+    g5_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g5_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0B180F001DE60004)) 
+    g5_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g5_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0FFC0F0017320FFC)) 
+    g5_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g5_b3_n_0));
+  LUT6 #(
+    .INIT(64'h1FFC0F0012120FFC)) 
+    g5_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g5_b4_n_0));
+  LUT6 #(
+    .INIT(64'h1B180F00133A0044)) 
+    g5_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g5_b5_n_0));
+  LUT6 #(
+    .INIT(64'h09100F0019EE007C)) 
+    g5_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g5_b6_n_0));
+  LUT6 #(
+    .INIT(64'h00000F0008C40038)) 
+    g5_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g5_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0080008002000010)) 
+    g6_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g6_b1_n_0));
+  LUT6 #(
+    .INIT(64'h008001C006000018)) 
+    g6_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g6_b2_n_0));
+  LUT6 #(
+    .INIT(64'h008003E00FFC0FFC)) 
+    g6_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g6_b3_n_0));
+  LUT5 #(
+    .INIT(32'h02A00FFC)) 
+    g6_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[5]),
+        .O(g6_b4_n_0));
+  LUT6 #(
+    .INIT(64'h03E0008006000018)) 
+    g6_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g6_b5_n_0));
+  LUT6 #(
+    .INIT(64'h01C0008002000010)) 
+    g6_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g6_b6_n_0));
+  LUT5 #(
+    .INIT(32'h00800000)) 
+    g6_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[5]),
+        .O(g6_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0000000000800000)) 
+    g7_b0
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g7_b0_n_0));
+  LUT6 #(
+    .INIT(64'h0030060001C00200)) 
+    g7_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g7_b1_n_0));
+  LUT6 #(
+    .INIT(64'h00F0078003E00200)) 
+    g7_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g7_b2_n_0));
+  LUT6 #(
+    .INIT(64'h03F007E000800200)) 
+    g7_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g7_b3_n_0));
+  LUT6 #(
+    .INIT(64'h07F007F000800200)) 
+    g7_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g7_b4_n_0));
+  LUT6 #(
+    .INIT(64'h03F007E003E00200)) 
+    g7_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g7_b5_n_0));
+  LUT6 #(
+    .INIT(64'h00F0078001C003C0)) 
+    g7_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g7_b6_n_0));
+  LUT6 #(
+    .INIT(64'h00300600008003C0)) 
+    g7_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g7_b7_n_0));
+  LUT6 #(
+    .INIT(64'h0220000E00000000)) 
+    g8_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g8_b1_n_0));
+  LUT6 #(
+    .INIT(64'h0FF8001E00380000)) 
+    g8_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g8_b2_n_0));
+  LUT6 #(
+    .INIT(64'h0FF800000DFC0000)) 
+    g8_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g8_b3_n_0));
+  LUT6 #(
+    .INIT(64'h022000000DFC0000)) 
+    g8_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g8_b4_n_0));
+  LUT6 #(
+    .INIT(64'h0FF8000E00000000)) 
+    g8_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g8_b6_n_0));
+  LUT6 #(
+    .INIT(64'h0220000000000000)) 
+    g8_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g8_b7_n_0));
+  LUT6 #(
+    .INIT(64'h000008400C300798)) 
+    g9_b1
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g9_b1_n_0));
+  LUT6 #(
+    .INIT(64'h00000FD80C600FCC)) 
+    g9_b2
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g9_b2_n_0));
+  LUT6 #(
+    .INIT(64'h000007BC00C03847)) 
+    g9_b3
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g9_b3_n_0));
+  LUT6 #(
+    .INIT(64'h000E08E401803847)) 
+    g9_b4
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g9_b4_n_0));
+  LUT6 #(
+    .INIT(64'h001E087C03000844)) 
+    g9_b5
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g9_b5_n_0));
+  LUT6 #(
+    .INIT(64'h00100FD806300C7C)) 
+    g9_b6
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g9_b6_n_0));
+  LUT6 #(
+    .INIT(64'h000007800C300638)) 
+    g9_b7
+       (.I0(sel[0]),
+        .I1(sel[1]),
+        .I2(sel[2]),
+        .I3(sel[3]),
+        .I4(sel[4]),
+        .I5(sel[5]),
+        .O(g9_b7_n_0));
   mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI hdmi_text_controller_v1_0_AXI_inst
        (.ADDRARDADDR(vram_addr),
         .D(reg_data_out),
-        .DOBDO(vram_rdata),
+        .DOADO(vram_rdata[31:10]),
         .Q(color_reg),
+        .WEA({p_0_in0_out[24],p_0_in0_out[16],p_0_in0_out[8],p_0_in0_out[0]}),
         .axi_aclk(axi_aclk),
         .axi_araddr(axi_araddr),
-        .\axi_araddr[2]_0 (hdmi_text_controller_v1_0_AXI_inst_n_29),
-        .axi_araddr_2_sp_1(hdmi_text_controller_v1_0_AXI_inst_n_18),
-        .axi_araddr_7_sp_1(hdmi_text_controller_v1_0_AXI_inst_n_17),
+        .axi_araddr_5_sp_1(hdmi_text_controller_v1_0_AXI_inst_n_55),
+        .axi_araddr_8_sp_1(hdmi_text_controller_v1_0_AXI_inst_n_54),
         .axi_aresetn(axi_aresetn),
-        .axi_arready(axi_arready),
+        .axi_arready_reg_0(axi_arready),
         .axi_arvalid(axi_arvalid),
         .axi_awaddr(axi_awaddr),
-        .axi_awready(axi_awready),
+        .axi_awready_reg_0(axi_awready),
         .axi_awvalid(axi_awvalid),
         .axi_bready(axi_bready),
         .axi_bvalid(axi_bvalid),
@@ -8696,21 +10248,30 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .axi_rready(axi_rready),
         .axi_rvalid(axi_rvalid),
         .axi_wdata(axi_wdata),
-        .axi_wready(axi_wready),
+        .axi_wready_reg_0(axi_wready),
         .axi_wstrb(axi_wstrb),
         .axi_wvalid(axi_wvalid),
+        .blue(blue),
+        .green(green),
+        .in_cam_region_r(in_cam_region_r),
+        .red(red),
         .reset_ah(reset_ah),
-        .vram_reg(hdmi_text_controller_v1_0_AXI_inst_n_30),
-        .vram_reg_0(hdmi_text_controller_v1_0_AXI_inst_n_31),
-        .vram_reg_1(hdmi_text_controller_v1_0_AXI_inst_n_32),
-        .vram_reg_2(hdmi_text_controller_v1_0_AXI_inst_n_33),
-        .vram_reg_3(hdmi_text_controller_v1_0_AXI_inst_n_34),
-        .vram_reg_4(hdmi_text_controller_v1_0_AXI_inst_n_35),
-        .vram_reg_5(hdmi_text_controller_v1_0_AXI_inst_n_36),
-        .vram_reg_6(hdmi_text_controller_v1_0_AXI_inst_n_37),
-        .vram_reg_7(hdmi_text_controller_v1_0_AXI_inst_n_38),
-        .vram_reg_8(hdmi_text_controller_v1_0_AXI_inst_n_39),
-        .vram_we(vram_we));
+        .\srl[24].srl16_i (vga_to_hdmi_i_27_n_0),
+        .\srl[24].srl16_i_0 (vga_to_hdmi_i_35_n_0),
+        .\srl[25].srl16_i (vga_to_hdmi_i_34_n_0),
+        .\srl[26].srl16_i (vga_to_hdmi_i_33_n_0),
+        .\srl[27].srl16_i (vga_to_hdmi_i_32_n_0),
+        .\srl[28].srl16_i (vga_to_hdmi_i_31_n_0),
+        .\srl[29].srl16_i (vga_to_hdmi_i_30_n_0),
+        .\srl[30].srl16_i (vga_to_hdmi_i_29_n_0),
+        .\srl[31].srl16_i (vga_to_hdmi_i_28_n_0),
+        .vde_r(vde_r));
+  FDRE in_cam_region_r_reg
+       (.C(clk_25MHz),
+        .CE(1'b1),
+        .D(in_cam_region),
+        .Q(in_cam_region_r),
+        .R(1'b0));
   FDRE vde_r_reg
        (.C(clk_25MHz),
         .CE(1'b1),
@@ -8718,42 +10279,30 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .Q(vde_r),
         .R(1'b0));
   mb_usb_hdmi_text_controller_0_2_vga_controller vga
-       (.ADDRBWRADDR({vga_n_40,vga_n_41,vga_n_42,vga_n_43}),
+       (.ADDRBWRADDR({word_index,char_x[3:2]}),
         .D(reg_data_out),
-        .DI({vga_n_18,vga_n_19,p_0_in[0]}),
-        .Q(p_0_in[9:1]),
-        .S({cam_fb_reg_0_4_i_10_n_0,cam_fb_reg_0_4_i_11_n_0,cam_fb_reg_0_4_i_12_n_0}),
-        .axi_araddr(axi_araddr[0]),
-        .\axi_rdata_reg[0] (hdmi_text_controller_v1_0_AXI_inst_n_30),
-        .\axi_rdata_reg[0]_0 (hdmi_text_controller_v1_0_AXI_inst_n_18),
-        .\axi_rdata_reg[0]_1 (hdmi_text_controller_v1_0_AXI_inst_n_29),
-        .\axi_rdata_reg[0]_2 (hdmi_text_controller_v1_0_AXI_inst_n_17),
-        .\axi_rdata_reg[1] (hdmi_text_controller_v1_0_AXI_inst_n_31),
-        .\axi_rdata_reg[2] (hdmi_text_controller_v1_0_AXI_inst_n_32),
-        .\axi_rdata_reg[3] (hdmi_text_controller_v1_0_AXI_inst_n_33),
-        .\axi_rdata_reg[4] (hdmi_text_controller_v1_0_AXI_inst_n_34),
-        .\axi_rdata_reg[5] (hdmi_text_controller_v1_0_AXI_inst_n_35),
-        .\axi_rdata_reg[6] (hdmi_text_controller_v1_0_AXI_inst_n_36),
-        .\axi_rdata_reg[7] (hdmi_text_controller_v1_0_AXI_inst_n_37),
-        .\axi_rdata_reg[8] (hdmi_text_controller_v1_0_AXI_inst_n_38),
+        .DI({char_index0,p_0_in[4]}),
+        .DOADO(vram_rdata[9:0]),
+        .O({vga_n_32,vga_n_33,vga_n_34}),
+        .Q({p_0_in[5],p_0_in[3:0]}),
+        .S({vram_reg_i_28_n_0,vram_reg_i_29_n_0,vram_reg_i_30_n_0}),
+        .axi_araddr(axi_araddr[1:0]),
+        .\axi_rdata_reg[0] (hdmi_text_controller_v1_0_AXI_inst_n_54),
+        .\axi_rdata_reg[0]_0 (hdmi_text_controller_v1_0_AXI_inst_n_55),
         .\axi_rdata_reg[9] (color_reg),
         .\axi_rdata_reg[9]_0 (frame_counter_sync[9:0]),
-        .\axi_rdata_reg[9]_1 (hdmi_text_controller_v1_0_AXI_inst_n_39),
-        .cam_fb_reg_0_4({cam_fb_reg_0_4_i_7_n_0,cam_fb_reg_0_4_i_8_n_0,cam_fb_reg_0_4_i_9_n_0}),
-        .cam_fb_reg_mux_sel_b_pos_0__4({cam_fb_mux_sel_b_pos_0__4_i_5_n_0,cam_fb_mux_sel_b_pos_0__4_i_6_n_0,cam_fb_mux_sel_b_pos_0__4_i_7_n_0,cam_fb_mux_sel_b_pos_0__4_i_8_n_0}),
-        .cam_fb_reg_mux_sel_b_pos_0__4_0(cam_fb_mux_sel_b_pos_0__4_i_4_n_0),
-        .cam_fb_reg_mux_sel_b_pos_0__4_i_1_0(vga_n_2),
-        .cam_fb_reg_mux_sel_b_pos_0__4_i_1_1(vga_n_15),
-        .cam_fb_reg_mux_sel_b_pos_0__4_i_1_2(vga_n_16),
-        .cam_fb_reg_mux_sel_b_pos_0__4_i_1_3(vga_n_17),
+        .cam_fb_reg_0_0({cam_fb_reg_0_0_i_11_n_0,cam_fb_reg_0_0_i_12_n_0,cam_fb_reg_0_0_i_13_n_0}),
+        .cam_fb_reg_0_0_0({cam_fb_reg_0_0_i_7_n_0,cam_fb_reg_0_0_i_8_n_0,cam_fb_reg_0_0_i_9_n_0,cam_fb_reg_0_0_i_10_n_0}),
+        .cam_fb_reg_mux_sel_b_pos_0(cam_fb_mux_sel_b_pos_0_i_7_n_0),
+        .cam_fb_reg_mux_sel_b_pos_0_i_1_0(vga_n_2),
         .cam_rd_addr(cam_rd_addr),
         .clk_out1(clk_25MHz),
-        .\hc_reg[6]_rep_0 ({vga_n_44,vga_n_45,vga_n_46,vga_n_47}),
-        .\hc_reg[9]_0 (drawX),
+        .frame_counter0(frame_counter0),
+        .\hc_reg[9]_0 ({char_x[6:4],char_x[1:0],vga_n_41,vga_n_42,vga_n_43}),
         .hsync(hsync),
+        .in_cam_region(in_cam_region),
         .reset_ah(reset_ah),
         .vde(vde),
-        .vs_reg_0(vga_n_58),
         .vsync(vsync),
         .vsync_p(vsync_p));
   (* CHECK_LICENSE_TYPE = "hdmi_tx_0,hdmi_tx_v1_0,{}" *) 
@@ -8769,8 +10318,8 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .aux0_din({1'b0,1'b0,1'b0,1'b0}),
         .aux1_din({1'b0,1'b0,1'b0,1'b0}),
         .aux2_din({1'b0,1'b0,1'b0,1'b0}),
-        .blue({1'b0,1'b0,1'b0,1'b0}),
-        .green({1'b0,1'b0,1'b0,1'b0}),
+        .blue(blue),
+        .green(green),
         .hsync(hsync),
         .pix_clk(clk_25MHz),
         .pix_clk_locked(locked),
@@ -8779,92 +10328,1130 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .rst(reset_ah),
         .vde(vde),
         .vsync(vsync));
+  MUXF8 vga_to_hdmi_i_100
+       (.I0(vga_to_hdmi_i_188_n_0),
+        .I1(vga_to_hdmi_i_189_n_0),
+        .O(vga_to_hdmi_i_100_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_101
+       (.I0(vga_to_hdmi_i_190_n_0),
+        .I1(vga_to_hdmi_i_191_n_0),
+        .O(vga_to_hdmi_i_101_n_0),
+        .S(sel[7]));
+  LUT6 #(
+    .INIT(64'h0FC000C0A000A000)) 
+    vga_to_hdmi_i_102
+       (.I0(g30_b0_n_0),
+        .I1(g29_b0_n_0),
+        .I2(sel[8]),
+        .I3(sel[7]),
+        .I4(g27_b0_n_0),
+        .I5(sel[6]),
+        .O(vga_to_hdmi_i_102_n_0));
+  LUT6 #(
+    .INIT(64'hAFC0A0C0A000A000)) 
+    vga_to_hdmi_i_103
+       (.I0(vga_to_hdmi_i_192_n_0),
+        .I1(g21_b0_n_0),
+        .I2(sel[8]),
+        .I3(sel[7]),
+        .I4(g19_b0_n_0),
+        .I5(sel[6]),
+        .O(vga_to_hdmi_i_103_n_0));
+  LUT4 #(
+    .INIT(16'h0020)) 
+    vga_to_hdmi_i_104
+       (.I0(g10_b7_n_0),
+        .I1(sel[6]),
+        .I2(sel[7]),
+        .I3(sel[8]),
+        .O(vga_to_hdmi_i_104_n_0));
+  MUXF7 vga_to_hdmi_i_105
+       (.I0(g2_b0_n_0),
+        .I1(vga_to_hdmi_i_193_n_0),
+        .O(vga_to_hdmi_i_105_n_0),
+        .S(sel[8]));
+  MUXF7 vga_to_hdmi_i_106
+       (.I0(g4_b5_n_0),
+        .I1(g5_b5_n_0),
+        .O(vga_to_hdmi_i_106_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_107
+       (.I0(g6_b5_n_0),
+        .I1(g7_b5_n_0),
+        .O(vga_to_hdmi_i_107_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_108
+       (.I0(g0_b5_n_0),
+        .I1(g1_b5_n_0),
+        .O(vga_to_hdmi_i_108_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_109
+       (.I0(g2_b5_n_0),
+        .I1(g3_b5_n_0),
+        .O(vga_to_hdmi_i_109_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_110
+       (.I0(g28_b5_n_0),
+        .I1(g29_b5_n_0),
+        .O(vga_to_hdmi_i_110_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_111
+       (.I0(g30_b5_n_0),
+        .I1(g31_b5_n_0),
+        .O(vga_to_hdmi_i_111_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_112
+       (.I0(g24_b5_n_0),
+        .I1(g25_b5_n_0),
+        .O(vga_to_hdmi_i_112_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_113
+       (.I0(g26_b5_n_0),
+        .I1(g27_b5_n_0),
+        .O(vga_to_hdmi_i_113_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_114
+       (.I0(g20_b5_n_0),
+        .I1(g21_b5_n_0),
+        .O(vga_to_hdmi_i_114_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_115
+       (.I0(g22_b5_n_0),
+        .I1(g23_b5_n_0),
+        .O(vga_to_hdmi_i_115_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_116
+       (.I0(g16_b5_n_0),
+        .I1(g17_b5_n_0),
+        .O(vga_to_hdmi_i_116_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_117
+       (.I0(g18_b5_n_0),
+        .I1(g19_b5_n_0),
+        .O(vga_to_hdmi_i_117_n_0),
+        .S(sel[6]));
   LUT6 #(
     .INIT(64'hAFA0CFCFAFA0C0C0)) 
-    vga_to_hdmi_i_10
-       (.I0(cam_fb_reg_7_4_n_67),
-        .I1(cam_fb_reg_5_4_n_67),
-        .I2(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .I3(cam_fb_reg_3_4_n_67),
-        .I4(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
-        .I5(cam_fb_reg_1_4_n_67),
-        .O(vga_to_hdmi_i_10_n_0));
-  LUT6 #(
-    .INIT(64'h0808080808A80808)) 
-    vga_to_hdmi_i_2
-       (.I0(vde_r),
-        .I1(vga_to_hdmi_i_7_n_0),
-        .I2(cam_fb_reg_mux_sel_b_pos_0__4_n_0),
-        .I3(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .I4(cam_fb_reg_9_7_n_67),
-        .I5(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
-        .O(red[3]));
-  LUT6 #(
-    .INIT(64'h0808080808A80808)) 
-    vga_to_hdmi_i_3
-       (.I0(vde_r),
-        .I1(vga_to_hdmi_i_8_n_0),
-        .I2(cam_fb_reg_mux_sel_b_pos_0__4_n_0),
-        .I3(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .I4(cam_fb_reg_9_6_n_67),
-        .I5(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
-        .O(red[2]));
-  LUT6 #(
-    .INIT(64'h0808080808A80808)) 
-    vga_to_hdmi_i_4
-       (.I0(vde_r),
-        .I1(vga_to_hdmi_i_9_n_0),
-        .I2(cam_fb_reg_mux_sel_b_pos_0__4_n_0),
-        .I3(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .I4(cam_fb_reg_9_5_n_67),
-        .I5(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
-        .O(red[1]));
-  LUT6 #(
-    .INIT(64'h0808080808A80808)) 
-    vga_to_hdmi_i_5
-       (.I0(vde_r),
-        .I1(vga_to_hdmi_i_10_n_0),
-        .I2(cam_fb_reg_mux_sel_b_pos_0__4_n_0),
-        .I3(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .I4(cam_fb_reg_9_4_n_67),
-        .I5(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
-        .O(red[0]));
+    vga_to_hdmi_i_118
+       (.I0(g27_b3_n_0),
+        .I1(g26_b3_n_0),
+        .I2(sel[7]),
+        .I3(g25_b3_n_0),
+        .I4(sel[6]),
+        .I5(g24_b3_n_0),
+        .O(vga_to_hdmi_i_118_n_0));
   LUT6 #(
     .INIT(64'hAFA0CFCFAFA0C0C0)) 
-    vga_to_hdmi_i_7
-       (.I0(cam_fb_reg_7_7_n_67),
-        .I1(cam_fb_reg_5_7_n_67),
-        .I2(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .I3(cam_fb_reg_3_7_n_67),
-        .I4(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
-        .I5(cam_fb_reg_1_7_n_67),
-        .O(vga_to_hdmi_i_7_n_0));
+    vga_to_hdmi_i_119
+       (.I0(g31_b3_n_0),
+        .I1(g30_b3_n_0),
+        .I2(sel[7]),
+        .I3(g29_b3_n_0),
+        .I4(sel[6]),
+        .I5(g28_b3_n_0),
+        .O(vga_to_hdmi_i_119_n_0));
   LUT6 #(
     .INIT(64'hAFA0CFCFAFA0C0C0)) 
-    vga_to_hdmi_i_8
-       (.I0(cam_fb_reg_7_6_n_67),
-        .I1(cam_fb_reg_5_6_n_67),
-        .I2(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .I3(cam_fb_reg_3_6_n_67),
-        .I4(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
-        .I5(cam_fb_reg_1_6_n_67),
-        .O(vga_to_hdmi_i_8_n_0));
+    vga_to_hdmi_i_120
+       (.I0(g19_b3_n_0),
+        .I1(g18_b3_n_0),
+        .I2(sel[7]),
+        .I3(g17_b3_n_0),
+        .I4(sel[6]),
+        .I5(g16_b3_n_0),
+        .O(vga_to_hdmi_i_120_n_0));
   LUT6 #(
     .INIT(64'hAFA0CFCFAFA0C0C0)) 
-    vga_to_hdmi_i_9
-       (.I0(cam_fb_reg_7_5_n_67),
-        .I1(cam_fb_reg_5_5_n_67),
-        .I2(cam_fb_reg_mux_sel_b_pos_1__4_n_0),
-        .I3(cam_fb_reg_3_5_n_67),
-        .I4(cam_fb_reg_mux_sel_b_pos_2__4_n_0),
-        .I5(cam_fb_reg_1_5_n_67),
-        .O(vga_to_hdmi_i_9_n_0));
+    vga_to_hdmi_i_121
+       (.I0(g23_b3_n_0),
+        .I1(g22_b3_n_0),
+        .I2(sel[7]),
+        .I3(g21_b3_n_0),
+        .I4(sel[6]),
+        .I5(g20_b3_n_0),
+        .O(vga_to_hdmi_i_121_n_0));
+  MUXF7 vga_to_hdmi_i_122
+       (.I0(g14_b3_n_0),
+        .I1(g15_b3_n_0),
+        .O(vga_to_hdmi_i_122_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_123
+       (.I0(g12_b3_n_0),
+        .I1(g13_b3_n_0),
+        .O(vga_to_hdmi_i_123_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_124
+       (.I0(g10_b3_n_0),
+        .I1(g11_b3_n_0),
+        .O(vga_to_hdmi_i_124_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_125
+       (.I0(g8_b3_n_0),
+        .I1(g9_b3_n_0),
+        .O(vga_to_hdmi_i_125_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_126
+       (.I0(g6_b3_n_0),
+        .I1(g7_b3_n_0),
+        .O(vga_to_hdmi_i_126_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_127
+       (.I0(g4_b3_n_0),
+        .I1(g5_b3_n_0),
+        .O(vga_to_hdmi_i_127_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_128
+       (.I0(g2_b3_n_0),
+        .I1(g3_b3_n_0),
+        .O(vga_to_hdmi_i_128_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_129
+       (.I0(g0_b3_n_0),
+        .I1(g1_b3_n_0),
+        .O(vga_to_hdmi_i_129_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_130
+       (.I0(g4_b6_n_0),
+        .I1(g5_b6_n_0),
+        .O(vga_to_hdmi_i_130_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_131
+       (.I0(g6_b6_n_0),
+        .I1(g7_b6_n_0),
+        .O(vga_to_hdmi_i_131_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_132
+       (.I0(g0_b6_n_0),
+        .I1(g1_b6_n_0),
+        .O(vga_to_hdmi_i_132_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_133
+       (.I0(g2_b6_n_0),
+        .I1(g3_b6_n_0),
+        .O(vga_to_hdmi_i_133_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_134
+       (.I0(g28_b6_n_0),
+        .I1(g29_b6_n_0),
+        .O(vga_to_hdmi_i_134_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_135
+       (.I0(g30_b6_n_0),
+        .I1(g31_b6_n_0),
+        .O(vga_to_hdmi_i_135_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_136
+       (.I0(g24_b6_n_0),
+        .I1(g25_b6_n_0),
+        .O(vga_to_hdmi_i_136_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_137
+       (.I0(g26_b6_n_0),
+        .I1(g27_b6_n_0),
+        .O(vga_to_hdmi_i_137_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_138
+       (.I0(g20_b6_n_0),
+        .I1(g21_b6_n_0),
+        .O(vga_to_hdmi_i_138_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_139
+       (.I0(g22_b6_n_0),
+        .I1(g23_b6_n_0),
+        .O(vga_to_hdmi_i_139_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_140
+       (.I0(g16_b6_n_0),
+        .I1(g17_b6_n_0),
+        .O(vga_to_hdmi_i_140_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_141
+       (.I0(g18_b6_n_0),
+        .I1(g19_b6_n_0),
+        .O(vga_to_hdmi_i_141_n_0),
+        .S(sel[6]));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_142
+       (.I0(g27_b3_n_0),
+        .I1(g26_b4_n_0),
+        .I2(sel[7]),
+        .I3(g25_b4_n_0),
+        .I4(sel[6]),
+        .I5(g24_b4_n_0),
+        .O(vga_to_hdmi_i_142_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_143
+       (.I0(g31_b4_n_0),
+        .I1(g30_b4_n_0),
+        .I2(sel[7]),
+        .I3(g29_b4_n_0),
+        .I4(sel[6]),
+        .I5(g28_b4_n_0),
+        .O(vga_to_hdmi_i_143_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_144
+       (.I0(g19_b4_n_0),
+        .I1(g18_b4_n_0),
+        .I2(sel[7]),
+        .I3(g17_b4_n_0),
+        .I4(sel[6]),
+        .I5(g16_b4_n_0),
+        .O(vga_to_hdmi_i_144_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_145
+       (.I0(g23_b4_n_0),
+        .I1(g22_b4_n_0),
+        .I2(sel[7]),
+        .I3(g21_b3_n_0),
+        .I4(sel[6]),
+        .I5(g20_b4_n_0),
+        .O(vga_to_hdmi_i_145_n_0));
+  MUXF7 vga_to_hdmi_i_146
+       (.I0(g14_b4_n_0),
+        .I1(g15_b4_n_0),
+        .O(vga_to_hdmi_i_146_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_147
+       (.I0(g12_b4_n_0),
+        .I1(g13_b4_n_0),
+        .O(vga_to_hdmi_i_147_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_148
+       (.I0(g10_b4_n_0),
+        .I1(g11_b4_n_0),
+        .O(vga_to_hdmi_i_148_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_149
+       (.I0(g8_b4_n_0),
+        .I1(g9_b4_n_0),
+        .O(vga_to_hdmi_i_149_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_150
+       (.I0(g6_b4_n_0),
+        .I1(g7_b4_n_0),
+        .O(vga_to_hdmi_i_150_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_151
+       (.I0(g4_b4_n_0),
+        .I1(g5_b4_n_0),
+        .O(vga_to_hdmi_i_151_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_152
+       (.I0(g2_b4_n_0),
+        .I1(g3_b4_n_0),
+        .O(vga_to_hdmi_i_152_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_153
+       (.I0(g0_b4_n_0),
+        .I1(g1_b4_n_0),
+        .O(vga_to_hdmi_i_153_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_154
+       (.I0(g4_b1_n_0),
+        .I1(g5_b1_n_0),
+        .O(vga_to_hdmi_i_154_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_155
+       (.I0(g6_b1_n_0),
+        .I1(g7_b1_n_0),
+        .O(vga_to_hdmi_i_155_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_156
+       (.I0(g0_b1_n_0),
+        .I1(g1_b1_n_0),
+        .O(vga_to_hdmi_i_156_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_157
+       (.I0(g2_b1_n_0),
+        .I1(g3_b1_n_0),
+        .O(vga_to_hdmi_i_157_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_158
+       (.I0(g28_b1_n_0),
+        .I1(g29_b1_n_0),
+        .O(vga_to_hdmi_i_158_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_159
+       (.I0(g30_b1_n_0),
+        .I1(g31_b1_n_0),
+        .O(vga_to_hdmi_i_159_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_160
+       (.I0(g24_b1_n_0),
+        .I1(g25_b1_n_0),
+        .O(vga_to_hdmi_i_160_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_161
+       (.I0(g26_b1_n_0),
+        .I1(g27_b1_n_0),
+        .O(vga_to_hdmi_i_161_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_162
+       (.I0(g20_b1_n_0),
+        .I1(g21_b1_n_0),
+        .O(vga_to_hdmi_i_162_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_163
+       (.I0(g22_b1_n_0),
+        .I1(g23_b1_n_0),
+        .O(vga_to_hdmi_i_163_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_164
+       (.I0(g16_b1_n_0),
+        .I1(g17_b1_n_0),
+        .O(vga_to_hdmi_i_164_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_165
+       (.I0(g18_b1_n_0),
+        .I1(g19_b1_n_0),
+        .O(vga_to_hdmi_i_165_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_166
+       (.I0(g30_b7_n_0),
+        .I1(g31_b7_n_0),
+        .O(vga_to_hdmi_i_166_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_167
+       (.I0(g28_b7_n_0),
+        .I1(g29_b7_n_0),
+        .O(vga_to_hdmi_i_167_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_168
+       (.I0(g26_b7_n_0),
+        .I1(g27_b7_n_0),
+        .O(vga_to_hdmi_i_168_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_169
+       (.I0(g24_b7_n_0),
+        .I1(g25_b7_n_0),
+        .O(vga_to_hdmi_i_169_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_170
+       (.I0(g22_b7_n_0),
+        .I1(g23_b7_n_0),
+        .O(vga_to_hdmi_i_170_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_171
+       (.I0(g20_b7_n_0),
+        .I1(g21_b7_n_0),
+        .O(vga_to_hdmi_i_171_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_172
+       (.I0(g18_b7_n_0),
+        .I1(g19_b7_n_0),
+        .O(vga_to_hdmi_i_172_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_173
+       (.I0(g16_b7_n_0),
+        .I1(g17_b7_n_0),
+        .O(vga_to_hdmi_i_173_n_0),
+        .S(sel[6]));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_174
+       (.I0(g11_b7_n_0),
+        .I1(g10_b7_n_0),
+        .I2(sel[7]),
+        .I3(g9_b7_n_0),
+        .I4(sel[6]),
+        .I5(g8_b7_n_0),
+        .O(vga_to_hdmi_i_174_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_175
+       (.I0(g15_b7_n_0),
+        .I1(g14_b7_n_0),
+        .I2(sel[7]),
+        .I3(g13_b7_n_0),
+        .I4(sel[6]),
+        .I5(g12_b7_n_0),
+        .O(vga_to_hdmi_i_175_n_0));
+  MUXF7 vga_to_hdmi_i_176
+       (.I0(g6_b7_n_0),
+        .I1(g7_b7_n_0),
+        .O(vga_to_hdmi_i_176_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_177
+       (.I0(g4_b7_n_0),
+        .I1(g5_b7_n_0),
+        .O(vga_to_hdmi_i_177_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_178
+       (.I0(g2_b7_n_0),
+        .I1(g3_b7_n_0),
+        .O(vga_to_hdmi_i_178_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_179
+       (.I0(g0_b7_n_0),
+        .I1(g1_b7_n_0),
+        .O(vga_to_hdmi_i_179_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_180
+       (.I0(g4_b2_n_0),
+        .I1(g5_b2_n_0),
+        .O(vga_to_hdmi_i_180_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_181
+       (.I0(g6_b2_n_0),
+        .I1(g7_b2_n_0),
+        .O(vga_to_hdmi_i_181_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_182
+       (.I0(g0_b2_n_0),
+        .I1(g1_b2_n_0),
+        .O(vga_to_hdmi_i_182_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_183
+       (.I0(g2_b2_n_0),
+        .I1(g3_b2_n_0),
+        .O(vga_to_hdmi_i_183_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_184
+       (.I0(g28_b2_n_0),
+        .I1(g29_b2_n_0),
+        .O(vga_to_hdmi_i_184_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_185
+       (.I0(g30_b2_n_0),
+        .I1(g31_b2_n_0),
+        .O(vga_to_hdmi_i_185_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_186
+       (.I0(g24_b2_n_0),
+        .I1(g25_b2_n_0),
+        .O(vga_to_hdmi_i_186_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_187
+       (.I0(g26_b2_n_0),
+        .I1(g27_b2_n_0),
+        .O(vga_to_hdmi_i_187_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_188
+       (.I0(g20_b2_n_0),
+        .I1(g21_b2_n_0),
+        .O(vga_to_hdmi_i_188_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_189
+       (.I0(g22_b2_n_0),
+        .I1(g23_b2_n_0),
+        .O(vga_to_hdmi_i_189_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_190
+       (.I0(g16_b2_n_0),
+        .I1(g17_b2_n_0),
+        .O(vga_to_hdmi_i_190_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_191
+       (.I0(g18_b2_n_0),
+        .I1(g19_b2_n_0),
+        .O(vga_to_hdmi_i_191_n_0),
+        .S(sel[6]));
+  MUXF7 vga_to_hdmi_i_192
+       (.I0(g22_b0_n_0),
+        .I1(g23_b0_n_0),
+        .O(vga_to_hdmi_i_192_n_0),
+        .S(sel[6]));
+  LUT4 #(
+    .INIT(16'hB080)) 
+    vga_to_hdmi_i_193
+       (.I0(g7_b0_n_0),
+        .I1(sel[7]),
+        .I2(sel[6]),
+        .I3(g5_b0_n_0),
+        .O(vga_to_hdmi_i_193_n_0));
+  LUT6 #(
+    .INIT(64'h555655565556AA56)) 
+    vga_to_hdmi_i_27
+       (.I0(vga_to_hdmi_i_37_n_0),
+        .I1(vga_to_hdmi_i_38_n_0),
+        .I2(vga_to_hdmi_i_39_n_0),
+        .I3(vga_to_hdmi_i_40_n_0),
+        .I4(vga_to_hdmi_i_41_n_0),
+        .I5(vga_to_hdmi_i_42_n_0),
+        .O(vga_to_hdmi_i_27_n_0));
+  LUT6 #(
+    .INIT(64'h08AA080000000000)) 
+    vga_to_hdmi_i_28
+       (.I0(vde_r),
+        .I1(cam_fb_reg_1_7__0_n_67),
+        .I2(cam_fb_reg_mux_sel_b_pos_1_n_0),
+        .I3(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .I4(cam_fb_reg_1_7_n_67),
+        .I5(in_cam_region_r),
+        .O(vga_to_hdmi_i_28_n_0));
+  LUT6 #(
+    .INIT(64'h08AA080000000000)) 
+    vga_to_hdmi_i_29
+       (.I0(vde_r),
+        .I1(cam_fb_reg_1_6__0_n_67),
+        .I2(cam_fb_reg_mux_sel_b_pos_1_n_0),
+        .I3(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .I4(cam_fb_reg_1_6_n_67),
+        .I5(in_cam_region_r),
+        .O(vga_to_hdmi_i_29_n_0));
+  LUT6 #(
+    .INIT(64'h08AA080000000000)) 
+    vga_to_hdmi_i_30
+       (.I0(vde_r),
+        .I1(cam_fb_reg_1_5__0_n_67),
+        .I2(cam_fb_reg_mux_sel_b_pos_1_n_0),
+        .I3(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .I4(cam_fb_reg_1_5_n_67),
+        .I5(in_cam_region_r),
+        .O(vga_to_hdmi_i_30_n_0));
+  LUT6 #(
+    .INIT(64'h08AA080000000000)) 
+    vga_to_hdmi_i_31
+       (.I0(vde_r),
+        .I1(cam_fb_reg_1_4__0_n_67),
+        .I2(cam_fb_reg_mux_sel_b_pos_1_n_0),
+        .I3(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .I4(cam_fb_reg_1_4_n_67),
+        .I5(in_cam_region_r),
+        .O(vga_to_hdmi_i_31_n_0));
+  LUT6 #(
+    .INIT(64'h08AA080000000000)) 
+    vga_to_hdmi_i_32
+       (.I0(vde_r),
+        .I1(cam_fb_reg_1_3__0_n_67),
+        .I2(cam_fb_reg_mux_sel_b_pos_1_n_0),
+        .I3(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .I4(cam_fb_reg_1_3_n_67),
+        .I5(in_cam_region_r),
+        .O(vga_to_hdmi_i_32_n_0));
+  LUT6 #(
+    .INIT(64'h08AA080000000000)) 
+    vga_to_hdmi_i_33
+       (.I0(vde_r),
+        .I1(cam_fb_reg_1_2__0_n_67),
+        .I2(cam_fb_reg_mux_sel_b_pos_1_n_0),
+        .I3(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .I4(cam_fb_reg_1_2_n_67),
+        .I5(in_cam_region_r),
+        .O(vga_to_hdmi_i_33_n_0));
+  LUT6 #(
+    .INIT(64'h08AA080000000000)) 
+    vga_to_hdmi_i_34
+       (.I0(vde_r),
+        .I1(cam_fb_reg_1_1__0_n_67),
+        .I2(cam_fb_reg_mux_sel_b_pos_1_n_0),
+        .I3(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .I4(cam_fb_reg_1_1_n_67),
+        .I5(in_cam_region_r),
+        .O(vga_to_hdmi_i_34_n_0));
+  LUT6 #(
+    .INIT(64'h08AA080000000000)) 
+    vga_to_hdmi_i_35
+       (.I0(vde_r),
+        .I1(cam_fb_reg_1_0__0_n_67),
+        .I2(cam_fb_reg_mux_sel_b_pos_1_n_0),
+        .I3(cam_fb_reg_mux_sel_b_pos_0_n_0),
+        .I4(cam_fb_reg_1_0_n_67),
+        .I5(in_cam_region_r),
+        .O(vga_to_hdmi_i_35_n_0));
+  LUT6 #(
+    .INIT(64'h0F5533000F5533FF)) 
+    vga_to_hdmi_i_37
+       (.I0(vram_reg_n_44),
+        .I1(vram_reg_n_52),
+        .I2(vram_reg_n_36),
+        .I3(byte_index_r[0]),
+        .I4(byte_index_r[1]),
+        .I5(vram_reg_n_60),
+        .O(vga_to_hdmi_i_37_n_0));
+  LUT6 #(
+    .INIT(64'h00E200FF00E20000)) 
+    vga_to_hdmi_i_38
+       (.I0(vga_to_hdmi_i_43_n_0),
+        .I1(sel[10]),
+        .I2(vga_to_hdmi_i_45_n_0),
+        .I3(font_col_r[0]),
+        .I4(font_col_r[1]),
+        .I5(data4),
+        .O(vga_to_hdmi_i_38_n_0));
+  LUT6 #(
+    .INIT(64'hFF00E2000000E200)) 
+    vga_to_hdmi_i_39
+       (.I0(vga_to_hdmi_i_47_n_0),
+        .I1(sel[10]),
+        .I2(vga_to_hdmi_i_48_n_0),
+        .I3(font_col_r[0]),
+        .I4(font_col_r[1]),
+        .I5(data5),
+        .O(vga_to_hdmi_i_39_n_0));
+  LUT3 #(
+    .INIT(8'hA9)) 
+    vga_to_hdmi_i_40
+       (.I0(font_col_r[2]),
+        .I1(font_col_r[1]),
+        .I2(font_col_r[0]),
+        .O(vga_to_hdmi_i_40_n_0));
+  LUT6 #(
+    .INIT(64'h00E200FF00E20000)) 
+    vga_to_hdmi_i_41
+       (.I0(vga_to_hdmi_i_50_n_0),
+        .I1(sel[10]),
+        .I2(vga_to_hdmi_i_51_n_0),
+        .I3(font_col_r[0]),
+        .I4(font_col_r[1]),
+        .I5(data0),
+        .O(vga_to_hdmi_i_41_n_0));
+  LUT6 #(
+    .INIT(64'hFF00E2000000E200)) 
+    vga_to_hdmi_i_42
+       (.I0(vga_to_hdmi_i_53_n_0),
+        .I1(sel[10]),
+        .I2(vga_to_hdmi_i_54_n_0),
+        .I3(font_col_r[0]),
+        .I4(font_col_r[1]),
+        .I5(vga_to_hdmi_i_55_n_0),
+        .O(vga_to_hdmi_i_42_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_43
+       (.I0(vga_to_hdmi_i_56_n_0),
+        .I1(vga_to_hdmi_i_57_n_0),
+        .I2(sel[9]),
+        .I3(vga_to_hdmi_i_59_n_0),
+        .I4(sel[8]),
+        .I5(vga_to_hdmi_i_61_n_0),
+        .O(vga_to_hdmi_i_43_n_0));
+  LUT6 #(
+    .INIT(64'hAACCF0FFAACCF000)) 
+    vga_to_hdmi_i_44
+       (.I0(vram_reg_n_37),
+        .I1(vram_reg_n_45),
+        .I2(vram_reg_n_53),
+        .I3(byte_index_r[0]),
+        .I4(byte_index_r[1]),
+        .I5(vram_reg_n_61),
+        .O(sel[10]));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_45
+       (.I0(vga_to_hdmi_i_62_n_0),
+        .I1(vga_to_hdmi_i_63_n_0),
+        .I2(sel[9]),
+        .I3(vga_to_hdmi_i_64_n_0),
+        .I4(sel[8]),
+        .I5(vga_to_hdmi_i_65_n_0),
+        .O(vga_to_hdmi_i_45_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_46
+       (.I0(vga_to_hdmi_i_66_n_0),
+        .I1(vga_to_hdmi_i_67_n_0),
+        .I2(sel[10]),
+        .I3(vga_to_hdmi_i_68_n_0),
+        .I4(sel[9]),
+        .I5(vga_to_hdmi_i_69_n_0),
+        .O(data4));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_47
+       (.I0(vga_to_hdmi_i_70_n_0),
+        .I1(vga_to_hdmi_i_71_n_0),
+        .I2(sel[9]),
+        .I3(vga_to_hdmi_i_72_n_0),
+        .I4(sel[8]),
+        .I5(vga_to_hdmi_i_73_n_0),
+        .O(vga_to_hdmi_i_47_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_48
+       (.I0(vga_to_hdmi_i_74_n_0),
+        .I1(vga_to_hdmi_i_75_n_0),
+        .I2(sel[9]),
+        .I3(vga_to_hdmi_i_76_n_0),
+        .I4(sel[8]),
+        .I5(vga_to_hdmi_i_77_n_0),
+        .O(vga_to_hdmi_i_48_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_49
+       (.I0(vga_to_hdmi_i_78_n_0),
+        .I1(vga_to_hdmi_i_79_n_0),
+        .I2(sel[10]),
+        .I3(vga_to_hdmi_i_80_n_0),
+        .I4(sel[9]),
+        .I5(vga_to_hdmi_i_81_n_0),
+        .O(data5));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_50
+       (.I0(vga_to_hdmi_i_82_n_0),
+        .I1(vga_to_hdmi_i_83_n_0),
+        .I2(sel[9]),
+        .I3(vga_to_hdmi_i_84_n_0),
+        .I4(sel[8]),
+        .I5(vga_to_hdmi_i_85_n_0),
+        .O(vga_to_hdmi_i_50_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_51
+       (.I0(vga_to_hdmi_i_86_n_0),
+        .I1(vga_to_hdmi_i_87_n_0),
+        .I2(sel[9]),
+        .I3(vga_to_hdmi_i_88_n_0),
+        .I4(sel[8]),
+        .I5(vga_to_hdmi_i_89_n_0),
+        .O(vga_to_hdmi_i_51_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_52
+       (.I0(vga_to_hdmi_i_90_n_0),
+        .I1(vga_to_hdmi_i_91_n_0),
+        .I2(sel[10]),
+        .I3(vga_to_hdmi_i_92_n_0),
+        .I4(sel[9]),
+        .I5(vga_to_hdmi_i_93_n_0),
+        .O(data0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_53
+       (.I0(vga_to_hdmi_i_94_n_0),
+        .I1(vga_to_hdmi_i_95_n_0),
+        .I2(sel[9]),
+        .I3(vga_to_hdmi_i_96_n_0),
+        .I4(sel[8]),
+        .I5(vga_to_hdmi_i_97_n_0),
+        .O(vga_to_hdmi_i_53_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_54
+       (.I0(vga_to_hdmi_i_98_n_0),
+        .I1(vga_to_hdmi_i_99_n_0),
+        .I2(sel[9]),
+        .I3(vga_to_hdmi_i_100_n_0),
+        .I4(sel[8]),
+        .I5(vga_to_hdmi_i_101_n_0),
+        .O(vga_to_hdmi_i_54_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_55
+       (.I0(vga_to_hdmi_i_102_n_0),
+        .I1(vga_to_hdmi_i_103_n_0),
+        .I2(sel[10]),
+        .I3(vga_to_hdmi_i_104_n_0),
+        .I4(sel[9]),
+        .I5(vga_to_hdmi_i_105_n_0),
+        .O(vga_to_hdmi_i_55_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_56
+       (.I0(g15_b5_n_0),
+        .I1(g14_b5_n_0),
+        .I2(sel[7]),
+        .I3(g13_b5_n_0),
+        .I4(sel[6]),
+        .I5(g12_b5_n_0),
+        .O(vga_to_hdmi_i_56_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_57
+       (.I0(g11_b5_n_0),
+        .I1(g10_b5_n_0),
+        .I2(sel[7]),
+        .I3(g9_b5_n_0),
+        .I4(sel[6]),
+        .I5(g8_b2_n_0),
+        .O(vga_to_hdmi_i_57_n_0));
+  LUT6 #(
+    .INIT(64'hCCAAF0FFCCAAF000)) 
+    vga_to_hdmi_i_58
+       (.I0(vram_reg_n_46),
+        .I1(vram_reg_n_38),
+        .I2(vram_reg_n_54),
+        .I3(byte_index_r[0]),
+        .I4(byte_index_r[1]),
+        .I5(vram_reg_n_62),
+        .O(sel[9]));
+  MUXF8 vga_to_hdmi_i_59
+       (.I0(vga_to_hdmi_i_106_n_0),
+        .I1(vga_to_hdmi_i_107_n_0),
+        .O(vga_to_hdmi_i_59_n_0),
+        .S(sel[7]));
+  LUT6 #(
+    .INIT(64'hCCAAF0FFCCAAF000)) 
+    vga_to_hdmi_i_60
+       (.I0(vram_reg_n_47),
+        .I1(vram_reg_n_39),
+        .I2(vram_reg_n_55),
+        .I3(byte_index_r[0]),
+        .I4(byte_index_r[1]),
+        .I5(vram_reg_n_63),
+        .O(sel[8]));
+  MUXF8 vga_to_hdmi_i_61
+       (.I0(vga_to_hdmi_i_108_n_0),
+        .I1(vga_to_hdmi_i_109_n_0),
+        .O(vga_to_hdmi_i_61_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_62
+       (.I0(vga_to_hdmi_i_110_n_0),
+        .I1(vga_to_hdmi_i_111_n_0),
+        .O(vga_to_hdmi_i_62_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_63
+       (.I0(vga_to_hdmi_i_112_n_0),
+        .I1(vga_to_hdmi_i_113_n_0),
+        .O(vga_to_hdmi_i_63_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_64
+       (.I0(vga_to_hdmi_i_114_n_0),
+        .I1(vga_to_hdmi_i_115_n_0),
+        .O(vga_to_hdmi_i_64_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_65
+       (.I0(vga_to_hdmi_i_116_n_0),
+        .I1(vga_to_hdmi_i_117_n_0),
+        .O(vga_to_hdmi_i_65_n_0),
+        .S(sel[7]));
+  MUXF7 vga_to_hdmi_i_66
+       (.I0(vga_to_hdmi_i_118_n_0),
+        .I1(vga_to_hdmi_i_119_n_0),
+        .O(vga_to_hdmi_i_66_n_0),
+        .S(sel[8]));
+  MUXF7 vga_to_hdmi_i_67
+       (.I0(vga_to_hdmi_i_120_n_0),
+        .I1(vga_to_hdmi_i_121_n_0),
+        .O(vga_to_hdmi_i_67_n_0),
+        .S(sel[8]));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_68
+       (.I0(vga_to_hdmi_i_122_n_0),
+        .I1(vga_to_hdmi_i_123_n_0),
+        .I2(sel[8]),
+        .I3(vga_to_hdmi_i_124_n_0),
+        .I4(sel[7]),
+        .I5(vga_to_hdmi_i_125_n_0),
+        .O(vga_to_hdmi_i_68_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_69
+       (.I0(vga_to_hdmi_i_126_n_0),
+        .I1(vga_to_hdmi_i_127_n_0),
+        .I2(sel[8]),
+        .I3(vga_to_hdmi_i_128_n_0),
+        .I4(sel[7]),
+        .I5(vga_to_hdmi_i_129_n_0),
+        .O(vga_to_hdmi_i_69_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_70
+       (.I0(g15_b6_n_0),
+        .I1(g14_b6_n_0),
+        .I2(sel[7]),
+        .I3(g13_b6_n_0),
+        .I4(sel[6]),
+        .I5(g12_b6_n_0),
+        .O(vga_to_hdmi_i_70_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_71
+       (.I0(g11_b6_n_0),
+        .I1(g10_b1_n_0),
+        .I2(sel[7]),
+        .I3(g9_b6_n_0),
+        .I4(sel[6]),
+        .I5(g8_b6_n_0),
+        .O(vga_to_hdmi_i_71_n_0));
+  MUXF8 vga_to_hdmi_i_72
+       (.I0(vga_to_hdmi_i_130_n_0),
+        .I1(vga_to_hdmi_i_131_n_0),
+        .O(vga_to_hdmi_i_72_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_73
+       (.I0(vga_to_hdmi_i_132_n_0),
+        .I1(vga_to_hdmi_i_133_n_0),
+        .O(vga_to_hdmi_i_73_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_74
+       (.I0(vga_to_hdmi_i_134_n_0),
+        .I1(vga_to_hdmi_i_135_n_0),
+        .O(vga_to_hdmi_i_74_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_75
+       (.I0(vga_to_hdmi_i_136_n_0),
+        .I1(vga_to_hdmi_i_137_n_0),
+        .O(vga_to_hdmi_i_75_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_76
+       (.I0(vga_to_hdmi_i_138_n_0),
+        .I1(vga_to_hdmi_i_139_n_0),
+        .O(vga_to_hdmi_i_76_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_77
+       (.I0(vga_to_hdmi_i_140_n_0),
+        .I1(vga_to_hdmi_i_141_n_0),
+        .O(vga_to_hdmi_i_77_n_0),
+        .S(sel[7]));
+  MUXF7 vga_to_hdmi_i_78
+       (.I0(vga_to_hdmi_i_142_n_0),
+        .I1(vga_to_hdmi_i_143_n_0),
+        .O(vga_to_hdmi_i_78_n_0),
+        .S(sel[8]));
+  MUXF7 vga_to_hdmi_i_79
+       (.I0(vga_to_hdmi_i_144_n_0),
+        .I1(vga_to_hdmi_i_145_n_0),
+        .O(vga_to_hdmi_i_79_n_0),
+        .S(sel[8]));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_80
+       (.I0(vga_to_hdmi_i_146_n_0),
+        .I1(vga_to_hdmi_i_147_n_0),
+        .I2(sel[8]),
+        .I3(vga_to_hdmi_i_148_n_0),
+        .I4(sel[7]),
+        .I5(vga_to_hdmi_i_149_n_0),
+        .O(vga_to_hdmi_i_80_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_81
+       (.I0(vga_to_hdmi_i_150_n_0),
+        .I1(vga_to_hdmi_i_151_n_0),
+        .I2(sel[8]),
+        .I3(vga_to_hdmi_i_152_n_0),
+        .I4(sel[7]),
+        .I5(vga_to_hdmi_i_153_n_0),
+        .O(vga_to_hdmi_i_81_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_82
+       (.I0(g15_b1_n_0),
+        .I1(g14_b1_n_0),
+        .I2(sel[7]),
+        .I3(g13_b1_n_0),
+        .I4(sel[6]),
+        .I5(g12_b1_n_0),
+        .O(vga_to_hdmi_i_82_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_83
+       (.I0(g11_b1_n_0),
+        .I1(g10_b1_n_0),
+        .I2(sel[7]),
+        .I3(g9_b1_n_0),
+        .I4(sel[6]),
+        .I5(g8_b1_n_0),
+        .O(vga_to_hdmi_i_83_n_0));
+  MUXF8 vga_to_hdmi_i_84
+       (.I0(vga_to_hdmi_i_154_n_0),
+        .I1(vga_to_hdmi_i_155_n_0),
+        .O(vga_to_hdmi_i_84_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_85
+       (.I0(vga_to_hdmi_i_156_n_0),
+        .I1(vga_to_hdmi_i_157_n_0),
+        .O(vga_to_hdmi_i_85_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_86
+       (.I0(vga_to_hdmi_i_158_n_0),
+        .I1(vga_to_hdmi_i_159_n_0),
+        .O(vga_to_hdmi_i_86_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_87
+       (.I0(vga_to_hdmi_i_160_n_0),
+        .I1(vga_to_hdmi_i_161_n_0),
+        .O(vga_to_hdmi_i_87_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_88
+       (.I0(vga_to_hdmi_i_162_n_0),
+        .I1(vga_to_hdmi_i_163_n_0),
+        .O(vga_to_hdmi_i_88_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_89
+       (.I0(vga_to_hdmi_i_164_n_0),
+        .I1(vga_to_hdmi_i_165_n_0),
+        .O(vga_to_hdmi_i_89_n_0),
+        .S(sel[7]));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_90
+       (.I0(vga_to_hdmi_i_166_n_0),
+        .I1(vga_to_hdmi_i_167_n_0),
+        .I2(sel[8]),
+        .I3(vga_to_hdmi_i_168_n_0),
+        .I4(sel[7]),
+        .I5(vga_to_hdmi_i_169_n_0),
+        .O(vga_to_hdmi_i_90_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_91
+       (.I0(vga_to_hdmi_i_170_n_0),
+        .I1(vga_to_hdmi_i_171_n_0),
+        .I2(sel[8]),
+        .I3(vga_to_hdmi_i_172_n_0),
+        .I4(sel[7]),
+        .I5(vga_to_hdmi_i_173_n_0),
+        .O(vga_to_hdmi_i_91_n_0));
+  MUXF7 vga_to_hdmi_i_92
+       (.I0(vga_to_hdmi_i_174_n_0),
+        .I1(vga_to_hdmi_i_175_n_0),
+        .O(vga_to_hdmi_i_92_n_0),
+        .S(sel[8]));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_93
+       (.I0(vga_to_hdmi_i_176_n_0),
+        .I1(vga_to_hdmi_i_177_n_0),
+        .I2(sel[8]),
+        .I3(vga_to_hdmi_i_178_n_0),
+        .I4(sel[7]),
+        .I5(vga_to_hdmi_i_179_n_0),
+        .O(vga_to_hdmi_i_93_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_94
+       (.I0(g15_b2_n_0),
+        .I1(g14_b2_n_0),
+        .I2(sel[7]),
+        .I3(g13_b2_n_0),
+        .I4(sel[6]),
+        .I5(g12_b2_n_0),
+        .O(vga_to_hdmi_i_94_n_0));
+  LUT6 #(
+    .INIT(64'hAFA0CFCFAFA0C0C0)) 
+    vga_to_hdmi_i_95
+       (.I0(g11_b2_n_0),
+        .I1(g10_b2_n_0),
+        .I2(sel[7]),
+        .I3(g9_b2_n_0),
+        .I4(sel[6]),
+        .I5(g8_b2_n_0),
+        .O(vga_to_hdmi_i_95_n_0));
+  MUXF8 vga_to_hdmi_i_96
+       (.I0(vga_to_hdmi_i_180_n_0),
+        .I1(vga_to_hdmi_i_181_n_0),
+        .O(vga_to_hdmi_i_96_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_97
+       (.I0(vga_to_hdmi_i_182_n_0),
+        .I1(vga_to_hdmi_i_183_n_0),
+        .O(vga_to_hdmi_i_97_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_98
+       (.I0(vga_to_hdmi_i_184_n_0),
+        .I1(vga_to_hdmi_i_185_n_0),
+        .O(vga_to_hdmi_i_98_n_0),
+        .S(sel[7]));
+  MUXF8 vga_to_hdmi_i_99
+       (.I0(vga_to_hdmi_i_186_n_0),
+        .I1(vga_to_hdmi_i_187_n_0),
+        .O(vga_to_hdmi_i_99_n_0),
+        .S(sel[7]));
   (* \MEM.PORTA.DATA_BIT_LAYOUT  = "p0_d8_p0_d8_p0_d8_p0_d8" *) 
   (* \MEM.PORTB.DATA_BIT_LAYOUT  = "p0_d8_p0_d8_p0_d8_p0_d8" *) 
   (* METHODOLOGY_DRC_VIOS = "{SYNTH-6 {cell *THIS*}}" *) 
   (* RTL_RAM_BITS = "19200" *) 
   (* RTL_RAM_NAME = "inst/vram_reg" *) 
-  (* RTL_RAM_TYPE = "RAM_SP" *) 
+  (* RTL_RAM_TYPE = "RAM_TDP" *) 
   (* ram_addr_begin = "0" *) 
   (* ram_addr_end = "599" *) 
   (* ram_offset = "0" *) 
@@ -9039,24 +11626,24 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
     .WRITE_WIDTH_B(36)) 
     vram_reg
        (.ADDRARDADDR({1'b1,vram_addr,1'b0,1'b0,1'b0,1'b0,1'b0}),
-        .ADDRBWRADDR({1'b1,vram_addr,1'b0,1'b0,1'b0,1'b0,1'b0}),
+        .ADDRBWRADDR({1'b1,word_index,char_x[3:2],1'b0,1'b0,1'b0,1'b0,1'b0}),
         .CASCADEINA(1'b1),
         .CASCADEINB(1'b1),
         .CASCADEOUTA(NLW_vram_reg_CASCADEOUTA_UNCONNECTED),
         .CASCADEOUTB(NLW_vram_reg_CASCADEOUTB_UNCONNECTED),
         .CLKARDCLK(axi_aclk),
-        .CLKBWRCLK(axi_aclk),
+        .CLKBWRCLK(clk_25MHz),
         .DBITERR(NLW_vram_reg_DBITERR_UNCONNECTED),
-        .DIADI(axi_wdata),
+        .DIADI({vram_reg_i_13_n_0,vram_reg_i_14_n_0,vram_reg_i_15_n_0,vram_reg_i_16_n_0,vram_reg_i_17_n_0,vram_reg_i_18_n_0,vram_reg_i_19_n_0,vram_reg_i_20_n_0,axi_wdata[23:0]}),
         .DIBDI({1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1,1'b1}),
         .DIPADIP({1'b0,1'b0,1'b0,1'b0}),
         .DIPBDIP({1'b0,1'b0,1'b0,1'b0}),
-        .DOADO(NLW_vram_reg_DOADO_UNCONNECTED[31:0]),
-        .DOBDO(vram_rdata),
+        .DOADO(vram_rdata),
+        .DOBDO({vram_reg_n_36,vram_reg_n_37,vram_reg_n_38,vram_reg_n_39,vram_reg_n_40,vram_reg_n_41,vram_reg_n_42,vram_reg_n_43,vram_reg_n_44,vram_reg_n_45,vram_reg_n_46,vram_reg_n_47,vram_reg_n_48,vram_reg_n_49,vram_reg_n_50,vram_reg_n_51,vram_reg_n_52,vram_reg_n_53,vram_reg_n_54,vram_reg_n_55,vram_reg_n_56,vram_reg_n_57,vram_reg_n_58,vram_reg_n_59,vram_reg_n_60,vram_reg_n_61,vram_reg_n_62,vram_reg_n_63,vram_reg_n_64,vram_reg_n_65,vram_reg_n_66,vram_reg_n_67}),
         .DOPADOP(NLW_vram_reg_DOPADOP_UNCONNECTED[3:0]),
         .DOPBDOP(NLW_vram_reg_DOPBDOP_UNCONNECTED[3:0]),
         .ECCPARITY(NLW_vram_reg_ECCPARITY_UNCONNECTED[7:0]),
-        .ENARDEN(vram_we),
+        .ENARDEN(1'b1),
         .ENBWREN(1'b1),
         .INJECTDBITERR(NLW_vram_reg_INJECTDBITERR_UNCONNECTED),
         .INJECTSBITERR(NLW_vram_reg_INJECTSBITERR_UNCONNECTED),
@@ -9068,8 +11655,74 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0
         .RSTREGARSTREG(1'b0),
         .RSTREGB(1'b0),
         .SBITERR(NLW_vram_reg_SBITERR_UNCONNECTED),
-        .WEA(axi_wstrb),
+        .WEA({p_0_in0_out[24],p_0_in0_out[16],p_0_in0_out[8],p_0_in0_out[0]}),
         .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_13
+       (.I0(axi_wstrb[3]),
+        .I1(axi_wdata[31]),
+        .O(vram_reg_i_13_n_0));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_14
+       (.I0(axi_wstrb[3]),
+        .I1(axi_wdata[30]),
+        .O(vram_reg_i_14_n_0));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_15
+       (.I0(axi_wstrb[3]),
+        .I1(axi_wdata[29]),
+        .O(vram_reg_i_15_n_0));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_16
+       (.I0(axi_wstrb[3]),
+        .I1(axi_wdata[28]),
+        .O(vram_reg_i_16_n_0));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_17
+       (.I0(axi_wstrb[3]),
+        .I1(axi_wdata[27]),
+        .O(vram_reg_i_17_n_0));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_18
+       (.I0(axi_wstrb[3]),
+        .I1(axi_wdata[26]),
+        .O(vram_reg_i_18_n_0));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_19
+       (.I0(axi_wstrb[3]),
+        .I1(axi_wdata[25]),
+        .O(vram_reg_i_19_n_0));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_20
+       (.I0(axi_wstrb[3]),
+        .I1(axi_wdata[24]),
+        .O(vram_reg_i_20_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    vram_reg_i_28
+       (.I0(char_index0[6]),
+        .I1(char_x[6]),
+        .O(vram_reg_i_28_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    vram_reg_i_29
+       (.I0(char_index0[5]),
+        .I1(char_x[5]),
+        .O(vram_reg_i_29_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    vram_reg_i_30
+       (.I0(p_0_in[4]),
+        .I1(char_x[4]),
+        .O(vram_reg_i_30_n_0));
   FDCE vsync_p_reg
        (.C(clk_25MHz),
         .CE(1'b1),
@@ -9080,36 +11733,39 @@ endmodule
 
 (* ORIG_REF_NAME = "hdmi_text_controller_v1_0_AXI" *) 
 module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
-   (axi_wready,
+   (axi_wready_reg_0,
     reset_ah,
-    axi_awready,
-    axi_arready,
+    axi_awready_reg_0,
+    axi_arready_reg_0,
     axi_bvalid,
     axi_rvalid,
-    ADDRARDADDR,
-    vram_we,
-    axi_araddr_7_sp_1,
-    axi_araddr_2_sp_1,
+    green,
     Q,
-    \axi_araddr[2]_0 ,
-    vram_reg,
-    vram_reg_0,
-    vram_reg_1,
-    vram_reg_2,
-    vram_reg_3,
-    vram_reg_4,
-    vram_reg_5,
-    vram_reg_6,
-    vram_reg_7,
-    vram_reg_8,
+    blue,
+    red,
+    WEA,
+    ADDRARDADDR,
+    axi_araddr_8_sp_1,
+    axi_araddr_5_sp_1,
     axi_rdata,
     axi_aclk,
     axi_wvalid,
     axi_awvalid,
-    axi_araddr,
     axi_wstrb,
+    \srl[24].srl16_i ,
+    in_cam_region_r,
+    vde_r,
+    \srl[24].srl16_i_0 ,
+    \srl[25].srl16_i ,
+    \srl[26].srl16_i ,
+    \srl[27].srl16_i ,
+    \srl[28].srl16_i ,
+    \srl[29].srl16_i ,
+    \srl[30].srl16_i ,
+    \srl[31].srl16_i ,
+    axi_araddr,
     D,
-    DOBDO,
+    DOADO,
     \axi_rdata_reg[31]_0 ,
     axi_aresetn,
     axi_bready,
@@ -9117,36 +11773,39 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
     axi_rready,
     axi_awaddr,
     axi_wdata);
-  output axi_wready;
+  output axi_wready_reg_0;
   output reset_ah;
-  output axi_awready;
-  output axi_arready;
+  output axi_awready_reg_0;
+  output axi_arready_reg_0;
   output axi_bvalid;
   output axi_rvalid;
-  output [9:0]ADDRARDADDR;
-  output vram_we;
-  output axi_araddr_7_sp_1;
-  output axi_araddr_2_sp_1;
+  output [7:0]green;
   output [9:0]Q;
-  output \axi_araddr[2]_0 ;
-  output vram_reg;
-  output vram_reg_0;
-  output vram_reg_1;
-  output vram_reg_2;
-  output vram_reg_3;
-  output vram_reg_4;
-  output vram_reg_5;
-  output vram_reg_6;
-  output vram_reg_7;
-  output vram_reg_8;
+  output [7:0]blue;
+  output [7:0]red;
+  output [3:0]WEA;
+  output [9:0]ADDRARDADDR;
+  output axi_araddr_8_sp_1;
+  output axi_araddr_5_sp_1;
   output [31:0]axi_rdata;
   input axi_aclk;
   input axi_wvalid;
   input axi_awvalid;
-  input [9:0]axi_araddr;
   input [3:0]axi_wstrb;
+  input \srl[24].srl16_i ;
+  input in_cam_region_r;
+  input vde_r;
+  input \srl[24].srl16_i_0 ;
+  input \srl[25].srl16_i ;
+  input \srl[26].srl16_i ;
+  input \srl[27].srl16_i ;
+  input \srl[28].srl16_i ;
+  input \srl[29].srl16_i ;
+  input \srl[30].srl16_i ;
+  input \srl[31].srl16_i ;
+  input [9:0]axi_araddr;
   input [9:0]D;
-  input [31:0]DOBDO;
+  input [21:0]DOADO;
   input [21:0]\axi_rdata_reg[31]_0 ;
   input axi_aresetn;
   input axi_bready;
@@ -9157,82 +11816,98 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
 
   wire [9:0]ADDRARDADDR;
   wire [9:0]D;
-  wire [31:0]DOBDO;
+  wire [21:0]DOADO;
   wire [9:0]Q;
+  wire [3:0]WEA;
   wire aw_en_i_1_n_0;
   wire aw_en_reg_n_0;
   wire axi_aclk;
   wire [9:0]axi_araddr;
-  wire \axi_araddr[2]_0 ;
-  wire axi_araddr_2_sn_1;
-  wire axi_araddr_7_sn_1;
+  wire axi_araddr_5_sn_1;
+  wire axi_araddr_8_sn_1;
   wire axi_aresetn;
-  wire axi_arready;
   wire axi_arready0;
+  wire axi_arready_reg_0;
   wire axi_arvalid;
   wire [9:0]axi_awaddr;
-  wire axi_awready;
   wire axi_awready0;
+  wire axi_awready_reg_0;
   wire axi_awvalid;
   wire axi_bready;
   wire axi_bvalid;
   wire axi_bvalid_i_1_n_0;
   wire [31:0]axi_rdata;
+  wire \axi_rdata[10]_i_2_n_0 ;
+  wire \axi_rdata[11]_i_2_n_0 ;
+  wire \axi_rdata[12]_i_2_n_0 ;
+  wire \axi_rdata[13]_i_2_n_0 ;
+  wire \axi_rdata[14]_i_2_n_0 ;
+  wire \axi_rdata[15]_i_2_n_0 ;
+  wire \axi_rdata[16]_i_2_n_0 ;
+  wire \axi_rdata[17]_i_2_n_0 ;
+  wire \axi_rdata[18]_i_2_n_0 ;
+  wire \axi_rdata[19]_i_2_n_0 ;
+  wire \axi_rdata[20]_i_2_n_0 ;
+  wire \axi_rdata[21]_i_2_n_0 ;
+  wire \axi_rdata[22]_i_2_n_0 ;
+  wire \axi_rdata[23]_i_2_n_0 ;
+  wire \axi_rdata[24]_i_2_n_0 ;
+  wire \axi_rdata[25]_i_2_n_0 ;
+  wire \axi_rdata[26]_i_2_n_0 ;
+  wire \axi_rdata[27]_i_2_n_0 ;
+  wire \axi_rdata[28]_i_2_n_0 ;
+  wire \axi_rdata[29]_i_2_n_0 ;
+  wire \axi_rdata[30]_i_2_n_0 ;
   wire \axi_rdata[31]_i_2_n_0 ;
   wire \axi_rdata[31]_i_5_n_0 ;
   wire \axi_rdata[31]_i_6_n_0 ;
-  wire \axi_rdata[31]_i_7_n_0 ;
   wire [21:0]\axi_rdata_reg[31]_0 ;
   wire axi_rready;
   wire axi_rvalid;
   wire axi_rvalid_i_1_n_0;
   wire [31:0]axi_wdata;
-  wire axi_wready;
   wire axi_wready0;
+  wire axi_wready_reg_0;
   wire [3:0]axi_wstrb;
   wire axi_wvalid;
+  wire [7:0]blue;
   wire [31:10]color_reg;
   wire \color_reg[31]_i_2_n_0 ;
   wire \color_reg[31]_i_3_n_0 ;
+  wire \color_reg[31]_i_4_n_0 ;
+  wire \color_reg[31]_i_5_n_0 ;
+  wire [7:0]green;
+  wire in_cam_region_r;
   wire [31:7]p_1_in;
+  wire [7:0]red;
   wire [31:10]reg_data_out;
   wire reset_ah;
   wire slv_reg_rden__0;
-  wire vram_reg;
-  wire vram_reg_0;
-  wire vram_reg_1;
-  wire vram_reg_2;
-  wire vram_reg_3;
-  wire vram_reg_4;
-  wire vram_reg_5;
-  wire vram_reg_6;
-  wire vram_reg_7;
-  wire vram_reg_8;
-  wire vram_reg_i_12_n_0;
-  wire vram_reg_i_13_n_0;
-  wire vram_reg_i_14_n_0;
-  wire vram_reg_i_15_n_0;
-  wire vram_reg_i_16_n_0;
-  wire vram_reg_i_17_n_0;
-  wire vram_reg_i_18_n_0;
-  wire vram_reg_i_19_n_0;
-  wire vram_reg_i_20_n_0;
-  wire vram_reg_i_21_n_0;
-  wire vram_reg_i_22_n_0;
-  wire vram_we;
+  wire \srl[24].srl16_i ;
+  wire \srl[24].srl16_i_0 ;
+  wire \srl[25].srl16_i ;
+  wire \srl[26].srl16_i ;
+  wire \srl[27].srl16_i ;
+  wire \srl[28].srl16_i ;
+  wire \srl[29].srl16_i ;
+  wire \srl[30].srl16_i ;
+  wire \srl[31].srl16_i ;
+  wire vde_r;
+  wire vram_reg_i_25_n_0;
+  wire vram_reg_i_31_n_0;
   wire [9:0]wr_index;
 
-  assign axi_araddr_2_sp_1 = axi_araddr_2_sn_1;
-  assign axi_araddr_7_sp_1 = axi_araddr_7_sn_1;
+  assign axi_araddr_5_sp_1 = axi_araddr_5_sn_1;
+  assign axi_araddr_8_sp_1 = axi_araddr_8_sn_1;
   LUT6 #(
-    .INIT(64'hF0FFFFFF88888888)) 
+    .INIT(64'hFFFF88880FFF8888)) 
     aw_en_i_1
-       (.I0(axi_bready),
-        .I1(axi_bvalid),
-        .I2(axi_awready),
+       (.I0(axi_bvalid),
+        .I1(axi_bready),
+        .I2(axi_wvalid),
         .I3(axi_awvalid),
-        .I4(axi_wvalid),
-        .I5(aw_en_reg_n_0),
+        .I4(aw_en_reg_n_0),
+        .I5(axi_awready_reg_0),
         .O(aw_en_i_1_n_0));
   FDSE aw_en_reg
        (.C(axi_aclk),
@@ -9240,18 +11915,18 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
         .D(aw_en_i_1_n_0),
         .Q(aw_en_reg_n_0),
         .S(reset_ah));
-  (* SOFT_HLUTNM = "soft_lutpair52" *) 
+  (* SOFT_HLUTNM = "soft_lutpair51" *) 
   LUT2 #(
     .INIT(4'h2)) 
     axi_arready_i_1
        (.I0(axi_arvalid),
-        .I1(axi_arready),
+        .I1(axi_arready_reg_0),
         .O(axi_arready0));
   FDRE axi_arready_reg
        (.C(axi_aclk),
         .CE(1'b1),
         .D(axi_arready0),
-        .Q(axi_arready),
+        .Q(axi_arready_reg_0),
         .R(reset_ah));
   FDRE \axi_awaddr_reg[10] 
        (.C(axi_aclk),
@@ -9316,26 +11991,26 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
   LUT4 #(
     .INIT(16'h4000)) 
     axi_awready_i_1
-       (.I0(axi_awready),
-        .I1(axi_awvalid),
-        .I2(axi_wvalid),
-        .I3(aw_en_reg_n_0),
+       (.I0(axi_awready_reg_0),
+        .I1(aw_en_reg_n_0),
+        .I2(axi_awvalid),
+        .I3(axi_wvalid),
         .O(axi_awready0));
   FDRE axi_awready_reg
        (.C(axi_aclk),
         .CE(1'b1),
         .D(axi_awready0),
-        .Q(axi_awready),
+        .Q(axi_awready_reg_0),
         .R(reset_ah));
   LUT6 #(
-    .INIT(64'h7444444444444444)) 
+    .INIT(64'h00008000FFFF8000)) 
     axi_bvalid_i_1
-       (.I0(axi_bready),
-        .I1(axi_bvalid),
+       (.I0(axi_awready_reg_0),
+        .I1(axi_wready_reg_0),
         .I2(axi_wvalid),
         .I3(axi_awvalid),
-        .I4(axi_awready),
-        .I5(axi_wready),
+        .I4(axi_bvalid),
+        .I5(axi_bready),
         .O(axi_bvalid_i_1_n_0));
   FDRE axi_bvalid_reg
        (.C(axi_aclk),
@@ -9343,354 +12018,393 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
         .D(axi_bvalid_i_1_n_0),
         .Q(axi_bvalid),
         .R(reset_ah));
-  (* SOFT_HLUTNM = "soft_lutpair53" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[0]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[0]),
-        .O(vram_reg));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[10]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[10]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[10]),
-        .I4(\axi_rdata_reg[31]_0 [0]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[10]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[0]),
         .O(reg_data_out[10]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[10]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[10]),
+        .I2(\axi_rdata_reg[31]_0 [0]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[10]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[11]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[11]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[11]),
-        .I4(\axi_rdata_reg[31]_0 [1]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[11]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[1]),
         .O(reg_data_out[11]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[11]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[11]),
+        .I2(\axi_rdata_reg[31]_0 [1]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[11]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[12]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[12]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[12]),
-        .I4(\axi_rdata_reg[31]_0 [2]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[12]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[2]),
         .O(reg_data_out[12]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[12]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[12]),
+        .I2(\axi_rdata_reg[31]_0 [2]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[12]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[13]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[13]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[13]),
-        .I4(\axi_rdata_reg[31]_0 [3]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[13]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[3]),
         .O(reg_data_out[13]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[13]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[13]),
+        .I2(\axi_rdata_reg[31]_0 [3]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[13]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[14]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[14]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[14]),
-        .I4(\axi_rdata_reg[31]_0 [4]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[14]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[4]),
         .O(reg_data_out[14]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[14]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[14]),
+        .I2(\axi_rdata_reg[31]_0 [4]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[14]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[15]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[15]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[15]),
-        .I4(\axi_rdata_reg[31]_0 [5]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[15]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[5]),
         .O(reg_data_out[15]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[15]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[15]),
+        .I2(\axi_rdata_reg[31]_0 [5]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[15]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[16]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[16]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[16]),
-        .I4(\axi_rdata_reg[31]_0 [6]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[16]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[6]),
         .O(reg_data_out[16]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[16]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[16]),
+        .I2(\axi_rdata_reg[31]_0 [6]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[16]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[17]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[17]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[17]),
-        .I4(\axi_rdata_reg[31]_0 [7]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[17]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[7]),
         .O(reg_data_out[17]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[17]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[17]),
+        .I2(\axi_rdata_reg[31]_0 [7]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[17]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[18]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[18]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[18]),
-        .I4(\axi_rdata_reg[31]_0 [8]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[18]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[8]),
         .O(reg_data_out[18]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[18]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[18]),
+        .I2(\axi_rdata_reg[31]_0 [8]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[18]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[19]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[19]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[19]),
-        .I4(\axi_rdata_reg[31]_0 [9]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[19]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[9]),
         .O(reg_data_out[19]));
-  (* SOFT_HLUTNM = "soft_lutpair53" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[1]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[1]),
-        .O(vram_reg_0));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[19]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[19]),
+        .I2(\axi_rdata_reg[31]_0 [9]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[19]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[20]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[20]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[20]),
-        .I4(\axi_rdata_reg[31]_0 [10]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[20]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[10]),
         .O(reg_data_out[20]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[20]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[20]),
+        .I2(\axi_rdata_reg[31]_0 [10]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[20]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[21]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[21]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[21]),
-        .I4(\axi_rdata_reg[31]_0 [11]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[21]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[11]),
         .O(reg_data_out[21]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[21]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[21]),
+        .I2(\axi_rdata_reg[31]_0 [11]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[21]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[22]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[22]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[22]),
-        .I4(\axi_rdata_reg[31]_0 [12]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[22]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[12]),
         .O(reg_data_out[22]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[22]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[22]),
+        .I2(\axi_rdata_reg[31]_0 [12]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[22]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[23]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[23]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[23]),
-        .I4(\axi_rdata_reg[31]_0 [13]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[23]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[13]),
         .O(reg_data_out[23]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[23]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[23]),
+        .I2(\axi_rdata_reg[31]_0 [13]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[23]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[24]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[24]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[24]),
-        .I4(\axi_rdata_reg[31]_0 [14]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[24]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[14]),
         .O(reg_data_out[24]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[24]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[24]),
+        .I2(\axi_rdata_reg[31]_0 [14]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[24]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[25]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[25]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[25]),
-        .I4(\axi_rdata_reg[31]_0 [15]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[25]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[15]),
         .O(reg_data_out[25]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[25]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[25]),
+        .I2(\axi_rdata_reg[31]_0 [15]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[25]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[26]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[26]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[26]),
-        .I4(\axi_rdata_reg[31]_0 [16]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[26]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[16]),
         .O(reg_data_out[26]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[26]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[26]),
+        .I2(\axi_rdata_reg[31]_0 [16]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[26]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[27]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[27]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[27]),
-        .I4(\axi_rdata_reg[31]_0 [17]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[27]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[17]),
         .O(reg_data_out[27]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[27]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[27]),
+        .I2(\axi_rdata_reg[31]_0 [17]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[27]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[28]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[28]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[28]),
-        .I4(\axi_rdata_reg[31]_0 [18]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[28]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[18]),
         .O(reg_data_out[28]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[28]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[28]),
+        .I2(\axi_rdata_reg[31]_0 [18]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[28]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[29]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[29]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[29]),
-        .I4(\axi_rdata_reg[31]_0 [19]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[29]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[19]),
         .O(reg_data_out[29]));
-  (* SOFT_HLUTNM = "soft_lutpair54" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[2]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[2]),
-        .O(vram_reg_1));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[29]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[29]),
+        .I2(\axi_rdata_reg[31]_0 [19]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[29]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[30]_i_1 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[30]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[30]),
-        .I4(\axi_rdata_reg[31]_0 [20]),
-        .I5(\axi_araddr[2]_0 ),
+       (.I0(\axi_rdata[30]_i_2_n_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[20]),
         .O(reg_data_out[30]));
-  LUT6 #(
-    .INIT(64'hFFFFF888F888F888)) 
+  LUT4 #(
+    .INIT(16'hAFBB)) 
+    \axi_rdata[30]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[30]),
+        .I2(\axi_rdata_reg[31]_0 [20]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[30]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h4F44)) 
     \axi_rdata[31]_i_1 
        (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[31]),
-        .I2(axi_araddr_2_sn_1),
-        .I3(color_reg[31]),
-        .I4(\axi_rdata_reg[31]_0 [21]),
-        .I5(\axi_araddr[2]_0 ),
+        .I1(axi_araddr_8_sn_1),
+        .I2(axi_araddr_5_sn_1),
+        .I3(DOADO[21]),
         .O(reg_data_out[31]));
-  LUT6 #(
-    .INIT(64'h0000004FFFFFFFFF)) 
-    \axi_rdata[31]_i_2 
-       (.I0(axi_araddr[5]),
-        .I1(\axi_rdata[31]_i_5_n_0 ),
-        .I2(axi_araddr[6]),
-        .I3(axi_araddr[7]),
-        .I4(axi_araddr[8]),
-        .I5(axi_araddr[9]),
-        .O(\axi_rdata[31]_i_2_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair58" *) 
-  LUT2 #(
-    .INIT(4'h2)) 
-    \axi_rdata[31]_i_3 
-       (.I0(\axi_rdata[31]_i_6_n_0 ),
-        .I1(axi_araddr[0]),
-        .O(axi_araddr_2_sn_1));
-  (* SOFT_HLUTNM = "soft_lutpair58" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[31]_i_4 
-       (.I0(\axi_rdata[31]_i_6_n_0 ),
-        .I1(axi_araddr[0]),
-        .O(\axi_araddr[2]_0 ));
-  LUT2 #(
-    .INIT(4'h7)) 
-    \axi_rdata[31]_i_5 
-       (.I0(axi_araddr[3]),
-        .I1(axi_araddr[4]),
-        .O(\axi_rdata[31]_i_5_n_0 ));
-  LUT6 #(
-    .INIT(64'h0000000002000000)) 
-    \axi_rdata[31]_i_6 
-       (.I0(\axi_rdata[31]_i_7_n_0 ),
-        .I1(axi_araddr[5]),
-        .I2(axi_araddr[2]),
-        .I3(axi_araddr[4]),
-        .I4(axi_araddr[3]),
-        .I5(axi_araddr[1]),
-        .O(\axi_rdata[31]_i_6_n_0 ));
   LUT4 #(
-    .INIT(16'h0400)) 
-    \axi_rdata[31]_i_7 
-       (.I0(axi_araddr[8]),
+    .INIT(16'hAFBB)) 
+    \axi_rdata[31]_i_2 
+       (.I0(axi_araddr[1]),
+        .I1(color_reg[31]),
+        .I2(\axi_rdata_reg[31]_0 [21]),
+        .I3(axi_araddr[0]),
+        .O(\axi_rdata[31]_i_2_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair49" *) 
+  LUT5 #(
+    .INIT(32'h00080000)) 
+    \axi_rdata[31]_i_3 
+       (.I0(axi_araddr[6]),
         .I1(axi_araddr[9]),
         .I2(axi_araddr[7]),
-        .I3(axi_araddr[6]),
-        .O(\axi_rdata[31]_i_7_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair54" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[3]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[3]),
-        .O(vram_reg_2));
-  (* SOFT_HLUTNM = "soft_lutpair55" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[4]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[4]),
-        .O(vram_reg_3));
-  (* SOFT_HLUTNM = "soft_lutpair55" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[5]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[5]),
-        .O(vram_reg_4));
-  (* SOFT_HLUTNM = "soft_lutpair56" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[6]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[6]),
-        .O(vram_reg_5));
-  (* SOFT_HLUTNM = "soft_lutpair56" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[7]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[7]),
-        .O(vram_reg_6));
-  (* SOFT_HLUTNM = "soft_lutpair57" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[8]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[8]),
-        .O(vram_reg_7));
-  (* SOFT_HLUTNM = "soft_lutpair57" *) 
-  LUT2 #(
-    .INIT(4'h8)) 
-    \axi_rdata[9]_i_3 
-       (.I0(\axi_rdata[31]_i_2_n_0 ),
-        .I1(DOBDO[9]),
-        .O(vram_reg_8));
+        .I3(axi_araddr[8]),
+        .I4(\axi_rdata[31]_i_5_n_0 ),
+        .O(axi_araddr_8_sn_1));
   LUT6 #(
-    .INIT(64'h0200000000000000)) 
-    \axi_rdata[9]_i_4 
-       (.I0(\axi_rdata[31]_i_7_n_0 ),
-        .I1(axi_araddr[5]),
-        .I2(axi_araddr[2]),
+    .INIT(64'hF800FFFF00000000)) 
+    \axi_rdata[31]_i_4 
+       (.I0(axi_araddr[3]),
+        .I1(axi_araddr[4]),
+        .I2(axi_araddr[5]),
+        .I3(axi_araddr[6]),
+        .I4(\axi_rdata[31]_i_6_n_0 ),
+        .I5(axi_araddr[9]),
+        .O(axi_araddr_5_sn_1));
+  LUT4 #(
+    .INIT(16'h0400)) 
+    \axi_rdata[31]_i_5 
+       (.I0(axi_araddr[2]),
+        .I1(axi_araddr[3]),
+        .I2(axi_araddr[5]),
         .I3(axi_araddr[4]),
-        .I4(axi_araddr[3]),
-        .I5(axi_araddr[1]),
-        .O(axi_araddr_7_sn_1));
+        .O(\axi_rdata[31]_i_5_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair49" *) 
+  LUT2 #(
+    .INIT(4'h1)) 
+    \axi_rdata[31]_i_6 
+       (.I0(axi_araddr[7]),
+        .I1(axi_araddr[8]),
+        .O(\axi_rdata[31]_i_6_n_0 ));
   FDRE \axi_rdata_reg[0] 
        (.C(axi_aclk),
         .CE(slv_reg_rden__0),
@@ -9883,12 +12597,12 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
         .D(D[9]),
         .Q(axi_rdata[9]),
         .R(reset_ah));
-  (* SOFT_HLUTNM = "soft_lutpair52" *) 
+  (* SOFT_HLUTNM = "soft_lutpair51" *) 
   LUT4 #(
     .INIT(16'h08F8)) 
     axi_rvalid_i_1
        (.I0(axi_arvalid),
-        .I1(axi_arready),
+        .I1(axi_arready_reg_0),
         .I2(axi_rvalid),
         .I3(axi_rready),
         .O(axi_rvalid_i_1_n_0));
@@ -9898,64 +12612,97 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
         .D(axi_rvalid_i_1_n_0),
         .Q(axi_rvalid),
         .R(reset_ah));
-  (* SOFT_HLUTNM = "soft_lutpair51" *) 
+  (* SOFT_HLUTNM = "soft_lutpair50" *) 
   LUT4 #(
-    .INIT(16'h0080)) 
+    .INIT(16'h4000)) 
     axi_wready_i_1
-       (.I0(aw_en_reg_n_0),
-        .I1(axi_wvalid),
+       (.I0(axi_wready_reg_0),
+        .I1(aw_en_reg_n_0),
         .I2(axi_awvalid),
-        .I3(axi_wready),
+        .I3(axi_wvalid),
         .O(axi_wready0));
   FDRE axi_wready_reg
        (.C(axi_aclk),
         .CE(1'b1),
         .D(axi_wready0),
-        .Q(axi_wready),
+        .Q(axi_wready_reg_0),
         .R(reset_ah));
-  LUT2 #(
-    .INIT(4'h8)) 
+  LUT6 #(
+    .INIT(64'h0000020000000000)) 
     \color_reg[15]_i_1 
        (.I0(\color_reg[31]_i_2_n_0 ),
-        .I1(axi_wstrb[1]),
+        .I1(wr_index[5]),
+        .I2(wr_index[1]),
+        .I3(wr_index[4]),
+        .I4(\color_reg[31]_i_3_n_0 ),
+        .I5(axi_wstrb[1]),
         .O(p_1_in[15]));
-  LUT2 #(
-    .INIT(4'h8)) 
+  LUT6 #(
+    .INIT(64'h0000020000000000)) 
     \color_reg[23]_i_1 
        (.I0(\color_reg[31]_i_2_n_0 ),
-        .I1(axi_wstrb[2]),
+        .I1(wr_index[5]),
+        .I2(wr_index[1]),
+        .I3(wr_index[4]),
+        .I4(\color_reg[31]_i_3_n_0 ),
+        .I5(axi_wstrb[2]),
         .O(p_1_in[23]));
-  LUT2 #(
-    .INIT(4'h8)) 
+  LUT6 #(
+    .INIT(64'h0000020000000000)) 
     \color_reg[31]_i_1 
        (.I0(\color_reg[31]_i_2_n_0 ),
-        .I1(axi_wstrb[3]),
+        .I1(wr_index[5]),
+        .I2(wr_index[1]),
+        .I3(wr_index[4]),
+        .I4(\color_reg[31]_i_3_n_0 ),
+        .I5(axi_wstrb[3]),
         .O(p_1_in[31]));
-  LUT6 #(
-    .INIT(64'h0000001000000000)) 
+  (* SOFT_HLUTNM = "soft_lutpair48" *) 
+  LUT5 #(
+    .INIT(32'hF8000000)) 
     \color_reg[31]_i_2 
-       (.I0(wr_index[0]),
-        .I1(wr_index[1]),
-        .I2(vram_reg_i_18_n_0),
-        .I3(wr_index[2]),
-        .I4(wr_index[5]),
-        .I5(\color_reg[31]_i_3_n_0 ),
+       (.I0(wr_index[4]),
+        .I1(wr_index[3]),
+        .I2(wr_index[5]),
+        .I3(\color_reg[31]_i_4_n_0 ),
+        .I4(\color_reg[31]_i_5_n_0 ),
         .O(\color_reg[31]_i_2_n_0 ));
-  LUT6 #(
-    .INIT(64'h1000000000000000)) 
+  LUT4 #(
+    .INIT(16'hFFFD)) 
     \color_reg[31]_i_3 
-       (.I0(wr_index[8]),
-        .I1(wr_index[7]),
+       (.I0(wr_index[9]),
+        .I1(wr_index[8]),
+        .I2(wr_index[2]),
+        .I3(wr_index[7]),
+        .O(\color_reg[31]_i_3_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair50" *) 
+  LUT4 #(
+    .INIT(16'h8000)) 
+    \color_reg[31]_i_4 
+       (.I0(axi_awready_reg_0),
+        .I1(axi_wready_reg_0),
         .I2(axi_wvalid),
         .I3(axi_awvalid),
-        .I4(axi_awready),
-        .I5(axi_wready),
-        .O(\color_reg[31]_i_3_n_0 ));
-  LUT2 #(
-    .INIT(4'h8)) 
+        .O(\color_reg[31]_i_4_n_0 ));
+  LUT6 #(
+    .INIT(64'h0000F0FF00002022)) 
+    \color_reg[31]_i_5 
+       (.I0(wr_index[6]),
+        .I1(wr_index[7]),
+        .I2(wr_index[1]),
+        .I3(wr_index[0]),
+        .I4(wr_index[2]),
+        .I5(wr_index[8]),
+        .O(\color_reg[31]_i_5_n_0 ));
+  LUT6 #(
+    .INIT(64'h0000020000000000)) 
     \color_reg[7]_i_1 
        (.I0(\color_reg[31]_i_2_n_0 ),
-        .I1(axi_wstrb[0]),
+        .I1(wr_index[5]),
+        .I2(wr_index[1]),
+        .I3(wr_index[4]),
+        .I4(\color_reg[31]_i_3_n_0 ),
+        .I5(axi_wstrb[0]),
         .O(p_1_in[7]));
   FDRE \color_reg_reg[0] 
        (.C(axi_aclk),
@@ -10152,7 +12899,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
   LUT3 #(
     .INIT(8'h08)) 
     slv_reg_rden
-       (.I0(axi_arready),
+       (.I0(axi_arready_reg_0),
         .I1(axi_arvalid),
         .I2(axi_rvalid),
         .O(slv_reg_rden__0));
@@ -10162,208 +12909,357 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_text_controller_v1_0_AXI
        (.I0(axi_aresetn),
         .O(reset_ah));
   LUT6 #(
-    .INIT(64'h0000000001FF03FF)) 
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_10
+       (.I0(Q[7]),
+        .I1(color_reg[23]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[31].srl16_i ),
+        .O(green[7]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_11
+       (.I0(Q[6]),
+        .I1(color_reg[22]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[30].srl16_i ),
+        .O(green[6]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_12
+       (.I0(Q[5]),
+        .I1(color_reg[21]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[29].srl16_i ),
+        .O(green[5]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_13
+       (.I0(Q[4]),
+        .I1(color_reg[20]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[28].srl16_i ),
+        .O(green[4]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_14
+       (.I0(Q[7]),
+        .I1(color_reg[23]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[27].srl16_i ),
+        .O(green[3]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_15
+       (.I0(Q[6]),
+        .I1(color_reg[22]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[26].srl16_i ),
+        .O(green[2]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_16
+       (.I0(Q[5]),
+        .I1(color_reg[21]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[25].srl16_i ),
+        .O(green[1]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_17
+       (.I0(Q[4]),
+        .I1(color_reg[20]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[24].srl16_i_0 ),
+        .O(green[0]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_18
+       (.I0(Q[3]),
+        .I1(color_reg[19]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[31].srl16_i ),
+        .O(blue[7]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_19
+       (.I0(Q[2]),
+        .I1(color_reg[18]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[30].srl16_i ),
+        .O(blue[6]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF50440000)) 
+    vga_to_hdmi_i_2
+       (.I0(in_cam_region_r),
+        .I1(color_reg[27]),
+        .I2(color_reg[11]),
+        .I3(\srl[24].srl16_i ),
+        .I4(vde_r),
+        .I5(\srl[31].srl16_i ),
+        .O(red[7]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_20
+       (.I0(Q[1]),
+        .I1(color_reg[17]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[29].srl16_i ),
+        .O(blue[5]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_21
+       (.I0(Q[0]),
+        .I1(color_reg[16]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[28].srl16_i ),
+        .O(blue[4]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_22
+       (.I0(Q[3]),
+        .I1(color_reg[19]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[27].srl16_i ),
+        .O(blue[3]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_23
+       (.I0(Q[2]),
+        .I1(color_reg[18]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[26].srl16_i ),
+        .O(blue[2]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_24
+       (.I0(Q[1]),
+        .I1(color_reg[17]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[25].srl16_i ),
+        .O(blue[1]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF00AC0000)) 
+    vga_to_hdmi_i_25
+       (.I0(Q[0]),
+        .I1(color_reg[16]),
+        .I2(\srl[24].srl16_i ),
+        .I3(in_cam_region_r),
+        .I4(vde_r),
+        .I5(\srl[24].srl16_i_0 ),
+        .O(blue[0]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF50440000)) 
+    vga_to_hdmi_i_3
+       (.I0(in_cam_region_r),
+        .I1(color_reg[26]),
+        .I2(color_reg[10]),
+        .I3(\srl[24].srl16_i ),
+        .I4(vde_r),
+        .I5(\srl[30].srl16_i ),
+        .O(red[6]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF50440000)) 
+    vga_to_hdmi_i_4
+       (.I0(in_cam_region_r),
+        .I1(color_reg[25]),
+        .I2(Q[9]),
+        .I3(\srl[24].srl16_i ),
+        .I4(vde_r),
+        .I5(\srl[29].srl16_i ),
+        .O(red[5]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF50440000)) 
+    vga_to_hdmi_i_5
+       (.I0(in_cam_region_r),
+        .I1(color_reg[24]),
+        .I2(Q[8]),
+        .I3(\srl[24].srl16_i ),
+        .I4(vde_r),
+        .I5(\srl[28].srl16_i ),
+        .O(red[4]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF50440000)) 
+    vga_to_hdmi_i_6
+       (.I0(in_cam_region_r),
+        .I1(color_reg[27]),
+        .I2(color_reg[11]),
+        .I3(\srl[24].srl16_i ),
+        .I4(vde_r),
+        .I5(\srl[27].srl16_i ),
+        .O(red[3]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF50440000)) 
+    vga_to_hdmi_i_7
+       (.I0(in_cam_region_r),
+        .I1(color_reg[26]),
+        .I2(color_reg[10]),
+        .I3(\srl[24].srl16_i ),
+        .I4(vde_r),
+        .I5(\srl[26].srl16_i ),
+        .O(red[2]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF50440000)) 
+    vga_to_hdmi_i_8
+       (.I0(in_cam_region_r),
+        .I1(color_reg[25]),
+        .I2(Q[9]),
+        .I3(\srl[24].srl16_i ),
+        .I4(vde_r),
+        .I5(\srl[25].srl16_i ),
+        .O(red[1]));
+  LUT6 #(
+    .INIT(64'hFFFFFFFF50440000)) 
+    vga_to_hdmi_i_9
+       (.I0(in_cam_region_r),
+        .I1(color_reg[24]),
+        .I2(Q[8]),
+        .I3(\srl[24].srl16_i ),
+        .I4(vde_r),
+        .I5(\srl[24].srl16_i_0 ),
+        .O(red[0]));
+  LUT3 #(
+    .INIT(8'hB8)) 
     vram_reg_i_1
-       (.I0(wr_index[6]),
-        .I1(wr_index[7]),
-        .I2(wr_index[8]),
-        .I3(wr_index[9]),
-        .I4(vram_reg_i_12_n_0),
-        .I5(vram_reg_i_13_n_0),
-        .O(vram_we));
-  LUT4 #(
-    .INIT(16'hF888)) 
+       (.I0(wr_index[9]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[9]),
+        .O(ADDRARDADDR[9]));
+  LUT3 #(
+    .INIT(8'hB8)) 
     vram_reg_i_10
-       (.I0(axi_araddr[1]),
-        .I1(vram_reg_i_21_n_0),
-        .I2(wr_index[1]),
-        .I3(vram_we),
-        .O(ADDRARDADDR[1]));
-  LUT4 #(
-    .INIT(16'hF888)) 
-    vram_reg_i_11
-       (.I0(axi_araddr[0]),
-        .I1(vram_reg_i_21_n_0),
-        .I2(wr_index[0]),
-        .I3(vram_we),
+       (.I0(wr_index[0]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[0]),
         .O(ADDRARDADDR[0]));
   LUT3 #(
-    .INIT(8'hEA)) 
-    vram_reg_i_12
-       (.I0(wr_index[5]),
-        .I1(wr_index[4]),
-        .I2(wr_index[3]),
-        .O(vram_reg_i_12_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair51" *) 
-  LUT4 #(
-    .INIT(16'h7FFF)) 
-    vram_reg_i_13
-       (.I0(axi_wready),
-        .I1(axi_awready),
-        .I2(axi_awvalid),
-        .I3(axi_wvalid),
-        .O(vram_reg_i_13_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair50" *) 
-  LUT2 #(
-    .INIT(4'hE)) 
-    vram_reg_i_14
-       (.I0(wr_index[7]),
-        .I1(wr_index[8]),
-        .O(vram_reg_i_14_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair48" *) 
-  LUT5 #(
-    .INIT(32'h88888000)) 
-    vram_reg_i_15
-       (.I0(wr_index[9]),
-        .I1(wr_index[6]),
-        .I2(wr_index[3]),
-        .I3(wr_index[4]),
-        .I4(wr_index[5]),
-        .O(vram_reg_i_15_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair49" *) 
-  LUT4 #(
-    .INIT(16'hFFA8)) 
-    vram_reg_i_16
-       (.I0(wr_index[9]),
-        .I1(wr_index[7]),
-        .I2(wr_index[8]),
-        .I3(vram_reg_i_13_n_0),
-        .O(vram_reg_i_16_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair49" *) 
-  LUT4 #(
-    .INIT(16'h01FF)) 
-    vram_reg_i_17
-       (.I0(wr_index[6]),
-        .I1(wr_index[7]),
-        .I2(wr_index[8]),
-        .I3(wr_index[9]),
-        .O(vram_reg_i_17_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair48" *) 
-  LUT4 #(
-    .INIT(16'h8000)) 
-    vram_reg_i_18
-       (.I0(wr_index[9]),
-        .I1(wr_index[6]),
-        .I2(wr_index[4]),
-        .I3(wr_index[3]),
-        .O(vram_reg_i_18_n_0));
-  LUT6 #(
-    .INIT(64'hF4F40000FFF40000)) 
-    vram_reg_i_19
-       (.I0(vram_reg_i_13_n_0),
-        .I1(vram_reg_i_17_n_0),
-        .I2(axi_araddr[4]),
-        .I3(vram_reg_i_22_n_0),
-        .I4(wr_index[4]),
-        .I5(wr_index[3]),
-        .O(vram_reg_i_19_n_0));
-  LUT6 #(
-    .INIT(64'hAAAAAABFAA00AA00)) 
+    .INIT(8'hB8)) 
     vram_reg_i_2
-       (.I0(axi_araddr[9]),
-        .I1(vram_reg_i_12_n_0),
-        .I2(wr_index[6]),
-        .I3(vram_reg_i_13_n_0),
-        .I4(vram_reg_i_14_n_0),
-        .I5(wr_index[9]),
-        .O(ADDRARDADDR[9]));
-  LUT6 #(
-    .INIT(64'hF4F40000FFF40000)) 
-    vram_reg_i_20
-       (.I0(vram_reg_i_13_n_0),
-        .I1(vram_reg_i_17_n_0),
-        .I2(axi_araddr[3]),
-        .I3(vram_reg_i_22_n_0),
-        .I4(wr_index[3]),
-        .I5(wr_index[4]),
-        .O(vram_reg_i_20_n_0));
-  LUT6 #(
-    .INIT(64'hFFFFFFFFEA000000)) 
+       (.I0(wr_index[8]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[8]),
+        .O(ADDRARDADDR[8]));
+  LUT2 #(
+    .INIT(4'h8)) 
     vram_reg_i_21
-       (.I0(wr_index[5]),
-        .I1(wr_index[4]),
-        .I2(wr_index[3]),
+       (.I0(axi_wstrb[3]),
+        .I1(vram_reg_i_25_n_0),
+        .O(WEA[3]));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_22
+       (.I0(axi_wstrb[2]),
+        .I1(vram_reg_i_25_n_0),
+        .O(WEA[2]));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_23
+       (.I0(axi_wstrb[1]),
+        .I1(vram_reg_i_25_n_0),
+        .O(WEA[1]));
+  LUT2 #(
+    .INIT(4'h8)) 
+    vram_reg_i_24
+       (.I0(axi_wstrb[0]),
+        .I1(vram_reg_i_25_n_0),
+        .O(WEA[0]));
+  LUT6 #(
+    .INIT(64'h1011FFFF00000000)) 
+    vram_reg_i_25
+       (.I0(wr_index[8]),
+        .I1(wr_index[7]),
+        .I2(vram_reg_i_31_n_0),
         .I3(wr_index[6]),
         .I4(wr_index[9]),
-        .I5(vram_reg_i_16_n_0),
-        .O(vram_reg_i_21_n_0));
-  (* SOFT_HLUTNM = "soft_lutpair50" *) 
-  LUT4 #(
-    .INIT(16'h0001)) 
-    vram_reg_i_22
-       (.I0(vram_reg_i_13_n_0),
-        .I1(wr_index[7]),
-        .I2(wr_index[8]),
-        .I3(wr_index[5]),
-        .O(vram_reg_i_22_n_0));
-  LUT6 #(
-    .INIT(64'hFFFEFFEE000C000C)) 
+        .I5(\color_reg[31]_i_4_n_0 ),
+        .O(vram_reg_i_25_n_0));
+  LUT3 #(
+    .INIT(8'hB8)) 
     vram_reg_i_3
-       (.I0(vram_reg_i_15_n_0),
-        .I1(wr_index[8]),
-        .I2(wr_index[9]),
-        .I3(vram_reg_i_13_n_0),
-        .I4(wr_index[7]),
-        .I5(axi_araddr[8]),
-        .O(ADDRARDADDR[8]));
-  LUT6 #(
-    .INIT(64'hFFFEFFEE000C000C)) 
-    vram_reg_i_4
-       (.I0(vram_reg_i_15_n_0),
-        .I1(wr_index[7]),
-        .I2(wr_index[9]),
-        .I3(vram_reg_i_13_n_0),
-        .I4(wr_index[8]),
-        .I5(axi_araddr[7]),
+       (.I0(wr_index[7]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[7]),
         .O(ADDRARDADDR[7]));
-  LUT6 #(
-    .INIT(64'hAAACAAACAA8CAACC)) 
-    vram_reg_i_5
-       (.I0(axi_araddr[6]),
-        .I1(wr_index[6]),
-        .I2(wr_index[9]),
-        .I3(vram_reg_i_13_n_0),
-        .I4(vram_reg_i_12_n_0),
-        .I5(vram_reg_i_14_n_0),
-        .O(ADDRARDADDR[6]));
-  LUT6 #(
-    .INIT(64'hFFFFFAFA30003000)) 
-    vram_reg_i_6
-       (.I0(vram_reg_i_16_n_0),
-        .I1(vram_reg_i_13_n_0),
+  (* SOFT_HLUTNM = "soft_lutpair48" *) 
+  LUT3 #(
+    .INIT(8'h07)) 
+    vram_reg_i_31
+       (.I0(wr_index[4]),
+        .I1(wr_index[3]),
         .I2(wr_index[5]),
-        .I3(vram_reg_i_17_n_0),
-        .I4(vram_reg_i_18_n_0),
-        .I5(axi_araddr[5]),
+        .O(vram_reg_i_31_n_0));
+  LUT3 #(
+    .INIT(8'hB8)) 
+    vram_reg_i_4
+       (.I0(wr_index[6]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[6]),
+        .O(ADDRARDADDR[6]));
+  LUT3 #(
+    .INIT(8'hB8)) 
+    vram_reg_i_5
+       (.I0(wr_index[5]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[5]),
         .O(ADDRARDADDR[5]));
-  LUT6 #(
-    .INIT(64'hFFFFFFFFAAAA8000)) 
-    vram_reg_i_7
-       (.I0(axi_araddr[4]),
-        .I1(wr_index[5]),
-        .I2(wr_index[6]),
-        .I3(wr_index[9]),
-        .I4(vram_reg_i_16_n_0),
-        .I5(vram_reg_i_19_n_0),
+  LUT3 #(
+    .INIT(8'hB8)) 
+    vram_reg_i_6
+       (.I0(wr_index[4]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[4]),
         .O(ADDRARDADDR[4]));
-  LUT6 #(
-    .INIT(64'hFFFFFFFFAAAA8000)) 
-    vram_reg_i_8
-       (.I0(axi_araddr[3]),
-        .I1(wr_index[5]),
-        .I2(wr_index[6]),
-        .I3(wr_index[9]),
-        .I4(vram_reg_i_16_n_0),
-        .I5(vram_reg_i_20_n_0),
+  LUT3 #(
+    .INIT(8'hB8)) 
+    vram_reg_i_7
+       (.I0(wr_index[3]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[3]),
         .O(ADDRARDADDR[3]));
-  LUT4 #(
-    .INIT(16'hF888)) 
-    vram_reg_i_9
-       (.I0(axi_araddr[2]),
-        .I1(vram_reg_i_21_n_0),
-        .I2(wr_index[2]),
-        .I3(vram_we),
+  LUT3 #(
+    .INIT(8'hB8)) 
+    vram_reg_i_8
+       (.I0(wr_index[2]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[2]),
         .O(ADDRARDADDR[2]));
+  LUT3 #(
+    .INIT(8'hB8)) 
+    vram_reg_i_9
+       (.I0(wr_index[1]),
+        .I1(vram_reg_i_25_n_0),
+        .I2(axi_araddr[1]),
+        .O(ADDRARDADDR[1]));
 endmodule
 
 (* CHECK_LICENSE_TYPE = "hdmi_tx_0,hdmi_tx_v1_0,{}" *) (* DowngradeIPIdentifiedWarnings = "yes" *) (* IP_DEFINITION_SOURCE = "package_project" *) 
@@ -10391,9 +13287,9 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_tx_0
   (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 pix_clkx5 CLK" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME pix_clkx5, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, PHASE 0.0, INSERT_VIP 0" *) input pix_clkx5;
   input pix_clk_locked;
   (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 rst RST" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME rst, POLARITY ACTIVE_LOW, INSERT_VIP 0" *) input rst;
-  input [3:0]red;
-  input [3:0]green;
-  input [3:0]blue;
+  input [7:0]red;
+  input [7:0]green;
+  input [7:0]blue;
   input hsync;
   input vsync;
   input vde;
@@ -10410,11 +13306,13 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_tx_0
   wire TMDS_CLK_P;
   wire [2:0]TMDS_DATA_N;
   wire [2:0]TMDS_DATA_P;
+  wire [7:0]blue;
+  wire [7:0]green;
   wire hsync;
   wire pix_clk;
   wire pix_clk_locked;
   wire pix_clkx5;
-  wire [3:0]red;
+  wire [7:0]red;
   wire rst;
   wire vde;
   wire vsync;
@@ -10424,7 +13322,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_tx_0
         .TMDS_CLK_P(TMDS_CLK_P),
         .TMDS_DATA_N(TMDS_DATA_N),
         .TMDS_DATA_P(TMDS_DATA_P),
-        .data_i({red,hsync,vsync,vde}),
+        .data_i({blue,green,red,hsync,vsync,vde}),
         .pix_clk(pix_clk),
         .pix_clk_locked(pix_clk_locked),
         .pix_clkx5(pix_clkx5),
@@ -10446,7 +13344,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_tx_v1_0
   output [2:0]TMDS_DATA_N;
   output TMDS_CLK_P;
   output TMDS_CLK_N;
-  input [6:0]data_i;
+  input [26:0]data_i;
   input pix_clk;
   input pix_clkx5;
   input rst;
@@ -10466,7 +13364,7 @@ module mb_usb_hdmi_text_controller_0_2_hdmi_tx_v1_0
   wire [3:0]aux2_dly;
   wire [7:0]blue_dly;
   wire c0_reg;
-  wire [6:0]data_i;
+  wire [26:0]data_i;
   wire encb_n_3;
   wire encb_n_4;
   wire encb_n_5;
@@ -11173,9 +14071,9 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
     data_i);
   output [37:0]data_o;
   input pix_clk;
-  input [6:0]data_i;
+  input [26:0]data_i;
 
-  wire [6:0]data_i;
+  wire [26:0]data_i;
   wire [37:0]data_o;
   wire pix_clk;
 
@@ -11267,7 +14165,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[3]),
         .Q(data_o[14]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11282,7 +14180,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[4]),
         .Q(data_o[15]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11297,7 +14195,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[5]),
         .Q(data_o[16]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11312,7 +14210,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[6]),
         .Q(data_o[17]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11342,7 +14240,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[3]),
+        .D(data_i[7]),
         .Q(data_o[18]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11357,7 +14255,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[4]),
+        .D(data_i[8]),
         .Q(data_o[19]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11372,7 +14270,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[5]),
+        .D(data_i[9]),
         .Q(data_o[20]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11387,7 +14285,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[6]),
+        .D(data_i[10]),
         .Q(data_o[21]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11402,7 +14300,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[11]),
         .Q(data_o[22]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11417,7 +14315,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[12]),
         .Q(data_o[23]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11432,7 +14330,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[13]),
         .Q(data_o[24]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11447,7 +14345,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[14]),
         .Q(data_o[25]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11462,7 +14360,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[3]),
+        .D(data_i[15]),
         .Q(data_o[26]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11477,7 +14375,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[4]),
+        .D(data_i[16]),
         .Q(data_o[27]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11507,7 +14405,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[5]),
+        .D(data_i[17]),
         .Q(data_o[28]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11522,7 +14420,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[6]),
+        .D(data_i[18]),
         .Q(data_o[29]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11537,7 +14435,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[19]),
         .Q(data_o[30]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11552,7 +14450,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[20]),
         .Q(data_o[31]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11567,7 +14465,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[21]),
         .Q(data_o[32]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11582,7 +14480,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(1'b0),
+        .D(data_i[22]),
         .Q(data_o[33]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11597,7 +14495,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[3]),
+        .D(data_i[23]),
         .Q(data_o[34]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11612,7 +14510,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[4]),
+        .D(data_i[24]),
         .Q(data_o[35]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11627,7 +14525,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[5]),
+        .D(data_i[25]),
         .Q(data_o[36]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11642,7 +14540,7 @@ module mb_usb_hdmi_text_controller_0_2_srldelay
         .A3(1'b1),
         .CE(1'b1),
         .CLK(pix_clk),
-        .D(data_i[6]),
+        .D(data_i[26]),
         .Q(data_o[37]));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* srl_bus_name = "\inst/vga_to_hdmi /\inst/srldly_0/srl " *) 
@@ -11755,87 +14653,65 @@ endmodule
 module mb_usb_hdmi_text_controller_0_2_vga_controller
    (hsync,
     vsync,
-    cam_fb_reg_mux_sel_b_pos_0__4_i_1_0,
+    cam_fb_reg_mux_sel_b_pos_0_i_1_0,
     cam_rd_addr,
-    cam_fb_reg_mux_sel_b_pos_0__4_i_1_1,
-    cam_fb_reg_mux_sel_b_pos_0__4_i_1_2,
-    cam_fb_reg_mux_sel_b_pos_0__4_i_1_3,
     DI,
     Q,
+    ADDRBWRADDR,
+    O,
     vde,
     \hc_reg[9]_0 ,
-    ADDRBWRADDR,
-    \hc_reg[6]_rep_0 ,
+    in_cam_region,
     D,
-    vs_reg_0,
+    frame_counter0,
     clk_out1,
     reset_ah,
     S,
-    cam_fb_reg_mux_sel_b_pos_0__4,
-    cam_fb_reg_mux_sel_b_pos_0__4_0,
-    cam_fb_reg_0_4,
+    cam_fb_reg_0_0,
+    cam_fb_reg_mux_sel_b_pos_0,
+    cam_fb_reg_0_0_0,
     \axi_rdata_reg[0] ,
     \axi_rdata_reg[0]_0 ,
+    DOADO,
+    axi_araddr,
     \axi_rdata_reg[9] ,
     \axi_rdata_reg[9]_0 ,
-    \axi_rdata_reg[0]_1 ,
-    \axi_rdata_reg[0]_2 ,
-    axi_araddr,
-    \axi_rdata_reg[1] ,
-    \axi_rdata_reg[2] ,
-    \axi_rdata_reg[3] ,
-    \axi_rdata_reg[4] ,
-    \axi_rdata_reg[5] ,
-    \axi_rdata_reg[6] ,
-    \axi_rdata_reg[7] ,
-    \axi_rdata_reg[8] ,
-    \axi_rdata_reg[9]_1 ,
     vsync_p);
   output hsync;
   output vsync;
-  output cam_fb_reg_mux_sel_b_pos_0__4_i_1_0;
-  output [11:0]cam_rd_addr;
-  output cam_fb_reg_mux_sel_b_pos_0__4_i_1_1;
-  output cam_fb_reg_mux_sel_b_pos_0__4_i_1_2;
-  output cam_fb_reg_mux_sel_b_pos_0__4_i_1_3;
+  output cam_fb_reg_mux_sel_b_pos_0_i_1_0;
+  output [10:0]cam_rd_addr;
   output [2:0]DI;
-  output [8:0]Q;
+  output [4:0]Q;
+  output [9:0]ADDRBWRADDR;
+  output [2:0]O;
   output vde;
-  output [8:0]\hc_reg[9]_0 ;
-  output [3:0]ADDRBWRADDR;
-  output [3:0]\hc_reg[6]_rep_0 ;
+  output [7:0]\hc_reg[9]_0 ;
+  output in_cam_region;
   output [9:0]D;
-  output vs_reg_0;
+  output frame_counter0;
   input clk_out1;
   input reset_ah;
   input [2:0]S;
-  input [3:0]cam_fb_reg_mux_sel_b_pos_0__4;
-  input [0:0]cam_fb_reg_mux_sel_b_pos_0__4_0;
-  input [2:0]cam_fb_reg_0_4;
+  input [2:0]cam_fb_reg_0_0;
+  input [0:0]cam_fb_reg_mux_sel_b_pos_0;
+  input [3:0]cam_fb_reg_0_0_0;
   input \axi_rdata_reg[0] ;
   input \axi_rdata_reg[0]_0 ;
+  input [9:0]DOADO;
+  input [1:0]axi_araddr;
   input [9:0]\axi_rdata_reg[9] ;
   input [9:0]\axi_rdata_reg[9]_0 ;
-  input \axi_rdata_reg[0]_1 ;
-  input \axi_rdata_reg[0]_2 ;
-  input [0:0]axi_araddr;
-  input \axi_rdata_reg[1] ;
-  input \axi_rdata_reg[2] ;
-  input \axi_rdata_reg[3] ;
-  input \axi_rdata_reg[4] ;
-  input \axi_rdata_reg[5] ;
-  input \axi_rdata_reg[6] ;
-  input \axi_rdata_reg[7] ;
-  input \axi_rdata_reg[8] ;
-  input \axi_rdata_reg[9]_1 ;
   input vsync_p;
 
-  wire [3:0]ADDRBWRADDR;
+  wire [9:0]ADDRBWRADDR;
   wire [9:0]D;
   wire [2:0]DI;
-  wire [8:0]Q;
+  wire [9:0]DOADO;
+  wire [2:0]O;
+  wire [4:0]Q;
   wire [2:0]S;
-  wire [0:0]axi_araddr;
+  wire [1:0]axi_araddr;
   wire \axi_rdata[0]_i_2_n_0 ;
   wire \axi_rdata[1]_i_2_n_0 ;
   wire \axi_rdata[2]_i_2_n_0 ;
@@ -11848,826 +14724,739 @@ module mb_usb_hdmi_text_controller_0_2_vga_controller
   wire \axi_rdata[9]_i_2_n_0 ;
   wire \axi_rdata_reg[0] ;
   wire \axi_rdata_reg[0]_0 ;
-  wire \axi_rdata_reg[0]_1 ;
-  wire \axi_rdata_reg[0]_2 ;
-  wire \axi_rdata_reg[1] ;
-  wire \axi_rdata_reg[2] ;
-  wire \axi_rdata_reg[3] ;
-  wire \axi_rdata_reg[4] ;
-  wire \axi_rdata_reg[5] ;
-  wire \axi_rdata_reg[6] ;
-  wire \axi_rdata_reg[7] ;
-  wire \axi_rdata_reg[8] ;
   wire [9:0]\axi_rdata_reg[9] ;
   wire [9:0]\axi_rdata_reg[9]_0 ;
-  wire \axi_rdata_reg[9]_1 ;
-  wire [2:0]cam_fb_reg_0_4;
-  wire cam_fb_reg_0_4_i_3_n_0;
-  wire cam_fb_reg_0_4_i_3_n_1;
-  wire cam_fb_reg_0_4_i_3_n_2;
-  wire cam_fb_reg_0_4_i_3_n_3;
-  wire cam_fb_reg_0_4_i_4_n_0;
-  wire cam_fb_reg_0_4_i_4_n_1;
-  wire cam_fb_reg_0_4_i_4_n_2;
-  wire cam_fb_reg_0_4_i_4_n_3;
-  wire cam_fb_reg_0_4_i_6_n_0;
-  wire cam_fb_reg_0_4_i_6_n_1;
-  wire cam_fb_reg_0_4_i_6_n_2;
-  wire cam_fb_reg_0_4_i_6_n_3;
-  wire cam_fb_reg_0_4_i_6_n_4;
-  wire cam_fb_reg_0_4_i_6_n_5;
-  wire [3:0]cam_fb_reg_mux_sel_b_pos_0__4;
-  wire [0:0]cam_fb_reg_mux_sel_b_pos_0__4_0;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_1_0;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_1_1;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_1_2;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_1_3;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_1_n_1;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_1_n_2;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_1_n_3;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_2;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_3;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_5;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_6;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_7;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_0;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_1;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_2;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_3;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_4;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_5;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_6;
-  wire cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_7;
-  wire [11:0]cam_rd_addr;
+  wire cam_fb_mux_sel_b_pos_0_i_4_n_0;
+  wire cam_fb_mux_sel_b_pos_0_i_5_n_0;
+  wire cam_fb_mux_sel_b_pos_0_i_6_n_0;
+  wire [2:0]cam_fb_reg_0_0;
+  wire [3:0]cam_fb_reg_0_0_0;
+  wire cam_fb_reg_0_0_i_3_n_0;
+  wire cam_fb_reg_0_0_i_3_n_1;
+  wire cam_fb_reg_0_0_i_3_n_2;
+  wire cam_fb_reg_0_0_i_3_n_3;
+  wire cam_fb_reg_0_0_i_4_n_0;
+  wire cam_fb_reg_0_0_i_4_n_1;
+  wire cam_fb_reg_0_0_i_4_n_2;
+  wire cam_fb_reg_0_0_i_4_n_3;
+  wire cam_fb_reg_0_0_i_6_n_0;
+  wire cam_fb_reg_0_0_i_6_n_1;
+  wire cam_fb_reg_0_0_i_6_n_2;
+  wire cam_fb_reg_0_0_i_6_n_3;
+  wire cam_fb_reg_0_0_i_6_n_4;
+  wire [0:0]cam_fb_reg_mux_sel_b_pos_0;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_1_0;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_1_n_2;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_1_n_3;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_2_n_3;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_2_n_6;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_2_n_7;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_3_n_0;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_3_n_1;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_3_n_2;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_3_n_3;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_3_n_4;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_3_n_5;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_3_n_6;
+  wire cam_fb_reg_mux_sel_b_pos_0_i_3_n_7;
+  wire [10:0]cam_rd_addr;
+  wire [11:7]char_index0;
+  wire [5:5]char_y;
   wire clk_out1;
-  wire [0:0]drawX;
+  wire frame_counter0;
   wire [9:0]hc;
-  wire \hc[0]_rep__0_i_1_n_0 ;
-  wire \hc[0]_rep_i_1_n_0 ;
-  wire \hc[1]_rep_i_1_n_0 ;
-  wire \hc[2]_rep_i_1_n_0 ;
-  wire \hc[3]_rep_i_1_n_0 ;
-  wire \hc[4]_rep_i_1_n_0 ;
-  wire \hc[5]_rep_i_1_n_0 ;
-  wire \hc[6]_rep_i_1_n_0 ;
+  wire \hc[7]_i_2_n_0 ;
   wire \hc[9]_i_2_n_0 ;
-  wire [3:0]\hc_reg[6]_rep_0 ;
-  wire [8:0]\hc_reg[9]_0 ;
+  wire [7:0]\hc_reg[9]_0 ;
   wire hs_i_1_n_0;
   wire hs_i_2_n_0;
+  wire hs_i_3_n_0;
   wire hsync;
+  wire in_cam_region;
+  wire in_cam_region_r_i_2_n_0;
+  wire [8:6]p_0_in;
   wire reset_ah;
   wire vc;
   wire \vc[0]_i_1_n_0 ;
   wire \vc[1]_i_1_n_0 ;
   wire \vc[2]_i_1_n_0 ;
   wire \vc[3]_i_1_n_0 ;
-  wire \vc[3]_i_2_n_0 ;
   wire \vc[4]_i_1_n_0 ;
   wire \vc[5]_i_1_n_0 ;
   wire \vc[6]_i_1_n_0 ;
   wire \vc[7]_i_1_n_0 ;
   wire \vc[8]_i_1_n_0 ;
-  wire \vc[8]_i_2_n_0 ;
   wire \vc[9]_i_2_n_0 ;
   wire \vc[9]_i_3_n_0 ;
+  wire \vc[9]_i_4_n_0 ;
+  wire \vc[9]_i_5_n_0 ;
   wire vde;
-  wire vga_to_hdmi_i_11_n_0;
+  wire vga_to_hdmi_i_36_n_0;
+  wire vram_reg_i_11_n_1;
+  wire vram_reg_i_11_n_2;
+  wire vram_reg_i_11_n_3;
+  wire vram_reg_i_12_n_0;
+  wire vram_reg_i_12_n_1;
+  wire vram_reg_i_12_n_2;
+  wire vram_reg_i_12_n_3;
+  wire vram_reg_i_26_n_2;
+  wire vram_reg_i_26_n_3;
+  wire vram_reg_i_27_n_0;
+  wire vram_reg_i_27_n_1;
+  wire vram_reg_i_27_n_2;
+  wire vram_reg_i_27_n_3;
+  wire vram_reg_i_32_n_0;
+  wire vram_reg_i_33_n_0;
+  wire vram_reg_i_34_n_0;
+  wire vram_reg_i_35_n_0;
   wire vs_i_1_n_0;
   wire vs_i_2_n_0;
-  wire vs_reg_0;
   wire vsync;
   wire vsync_p;
-  wire [3:3]NLW_cam_fb_reg_mux_sel_b_pos_0__4_i_1_CO_UNCONNECTED;
-  wire [3:2]NLW_cam_fb_reg_mux_sel_b_pos_0__4_i_2_CO_UNCONNECTED;
-  wire [3:3]NLW_cam_fb_reg_mux_sel_b_pos_0__4_i_2_O_UNCONNECTED;
+  wire [3:2]NLW_cam_fb_reg_mux_sel_b_pos_0_i_1_CO_UNCONNECTED;
+  wire [3:3]NLW_cam_fb_reg_mux_sel_b_pos_0_i_1_O_UNCONNECTED;
+  wire [3:1]NLW_cam_fb_reg_mux_sel_b_pos_0_i_2_CO_UNCONNECTED;
+  wire [3:2]NLW_cam_fb_reg_mux_sel_b_pos_0_i_2_O_UNCONNECTED;
+  wire [3:3]NLW_vram_reg_i_11_CO_UNCONNECTED;
+  wire [3:2]NLW_vram_reg_i_26_CO_UNCONNECTED;
+  wire [3:3]NLW_vram_reg_i_26_O_UNCONNECTED;
 
-  LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[0]_i_1 
        (.I0(\axi_rdata[0]_i_2_n_0 ),
         .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [0]),
-        .I4(\axi_rdata_reg[9]_0 [0]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[0]),
         .O(D[0]));
-  (* SOFT_HLUTNM = "soft_lutpair62" *) 
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[0]_i_2 
-       (.I0(DI[0]),
-        .I1(\hc_reg[6]_rep_0 [0]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[0]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[0]_i_2 
+       (.I0(\hc_reg[9]_0 [0]),
+        .I1(Q[0]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [0]),
+        .I5(\axi_rdata_reg[9]_0 [0]),
+        .O(\axi_rdata[0]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[1]_i_1 
        (.I0(\axi_rdata[1]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[1] ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [1]),
-        .I4(\axi_rdata_reg[9]_0 [1]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[1]),
         .O(D[1]));
-  (* SOFT_HLUTNM = "soft_lutpair63" *) 
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[1]_i_2 
-       (.I0(Q[0]),
-        .I1(\hc_reg[9]_0 [0]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[1]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[1]_i_2 
+       (.I0(\hc_reg[9]_0 [1]),
+        .I1(Q[1]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [1]),
+        .I5(\axi_rdata_reg[9]_0 [1]),
+        .O(\axi_rdata[1]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[2]_i_1 
        (.I0(\axi_rdata[2]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[2] ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [2]),
-        .I4(\axi_rdata_reg[9]_0 [2]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[2]),
         .O(D[2]));
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[2]_i_2 
-       (.I0(Q[1]),
-        .I1(ADDRBWRADDR[2]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[2]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[2]_i_2 
+       (.I0(\hc_reg[9]_0 [2]),
+        .I1(Q[2]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [2]),
+        .I5(\axi_rdata_reg[9]_0 [2]),
+        .O(\axi_rdata[2]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[3]_i_1 
        (.I0(\axi_rdata[3]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[3] ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [3]),
-        .I4(\axi_rdata_reg[9]_0 [3]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[3]),
         .O(D[3]));
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[3]_i_2 
-       (.I0(Q[2]),
-        .I1(\hc_reg[9]_0 [2]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[3]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[3]_i_2 
+       (.I0(\hc_reg[9]_0 [3]),
+        .I1(Q[3]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [3]),
+        .I5(\axi_rdata_reg[9]_0 [3]),
+        .O(\axi_rdata[3]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[4]_i_1 
        (.I0(\axi_rdata[4]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[4] ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [4]),
-        .I4(\axi_rdata_reg[9]_0 [4]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[4]),
         .O(D[4]));
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[4]_i_2 
-       (.I0(Q[3]),
-        .I1(\hc_reg[9]_0 [3]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[4]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[4]_i_2 
+       (.I0(\hc_reg[9]_0 [4]),
+        .I1(DI[0]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [4]),
+        .I5(\axi_rdata_reg[9]_0 [4]),
+        .O(\axi_rdata[4]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[5]_i_1 
        (.I0(\axi_rdata[5]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[5] ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [5]),
-        .I4(\axi_rdata_reg[9]_0 [5]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[5]),
         .O(D[5]));
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[5]_i_2 
-       (.I0(Q[4]),
-        .I1(ADDRBWRADDR[3]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[5]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[5]_i_2 
+       (.I0(ADDRBWRADDR[0]),
+        .I1(Q[4]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [5]),
+        .I5(\axi_rdata_reg[9]_0 [5]),
+        .O(\axi_rdata[5]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[6]_i_1 
        (.I0(\axi_rdata[6]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[6] ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [6]),
-        .I4(\axi_rdata_reg[9]_0 [6]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[6]),
         .O(D[6]));
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[6]_i_2 
-       (.I0(Q[5]),
-        .I1(\hc_reg[9]_0 [5]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[6]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[6]_i_2 
+       (.I0(ADDRBWRADDR[1]),
+        .I1(p_0_in[6]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [6]),
+        .I5(\axi_rdata_reg[9]_0 [6]),
+        .O(\axi_rdata[6]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[7]_i_1 
        (.I0(\axi_rdata[7]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[7] ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [7]),
-        .I4(\axi_rdata_reg[9]_0 [7]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[7]),
         .O(D[7]));
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[7]_i_2 
-       (.I0(Q[6]),
-        .I1(\hc_reg[9]_0 [6]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[7]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[7]_i_2 
+       (.I0(\hc_reg[9]_0 [5]),
+        .I1(p_0_in[7]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [7]),
+        .I5(\axi_rdata_reg[9]_0 [7]),
+        .O(\axi_rdata[7]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[8]_i_1 
        (.I0(\axi_rdata[8]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[8] ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [8]),
-        .I4(\axi_rdata_reg[9]_0 [8]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[8]),
         .O(D[8]));
-  LUT4 #(
-    .INIT(16'hA0C0)) 
-    \axi_rdata[8]_i_2 
-       (.I0(Q[7]),
-        .I1(\hc_reg[9]_0 [7]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
-        .O(\axi_rdata[8]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hFFFFFEEEFEEEFEEE)) 
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
+    \axi_rdata[8]_i_2 
+       (.I0(\hc_reg[9]_0 [6]),
+        .I1(p_0_in[8]),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [8]),
+        .I5(\axi_rdata_reg[9]_0 [8]),
+        .O(\axi_rdata[8]_i_2_n_0 ));
+  LUT4 #(
+    .INIT(16'h8F88)) 
     \axi_rdata[9]_i_1 
        (.I0(\axi_rdata[9]_i_2_n_0 ),
-        .I1(\axi_rdata_reg[9]_1 ),
+        .I1(\axi_rdata_reg[0] ),
         .I2(\axi_rdata_reg[0]_0 ),
-        .I3(\axi_rdata_reg[9] [9]),
-        .I4(\axi_rdata_reg[9]_0 [9]),
-        .I5(\axi_rdata_reg[0]_1 ),
+        .I3(DOADO[9]),
         .O(D[9]));
-  LUT4 #(
-    .INIT(16'hA0C0)) 
+  LUT6 #(
+    .INIT(64'hCFAFCFA0C0AFC0A0)) 
     \axi_rdata[9]_i_2 
-       (.I0(Q[8]),
-        .I1(\hc_reg[9]_0 [8]),
-        .I2(\axi_rdata_reg[0]_2 ),
-        .I3(axi_araddr),
+       (.I0(\hc_reg[9]_0 [7]),
+        .I1(char_y),
+        .I2(axi_araddr[1]),
+        .I3(axi_araddr[0]),
+        .I4(\axi_rdata_reg[9] [9]),
+        .I5(\axi_rdata_reg[9]_0 [9]),
         .O(\axi_rdata[9]_i_2_n_0 ));
-  LUT3 #(
-    .INIT(8'h01)) 
-    cam_fb_reg_0_4_i_2
-       (.I0(cam_rd_addr[11]),
-        .I1(cam_rd_addr[9]),
-        .I2(cam_rd_addr[10]),
-        .O(cam_fb_reg_mux_sel_b_pos_0__4_i_1_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_mux_sel_b_pos_0_i_4
+       (.I0(p_0_in[6]),
+        .I1(p_0_in[8]),
+        .O(cam_fb_mux_sel_b_pos_0_i_4_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_mux_sel_b_pos_0_i_5
+       (.I0(Q[4]),
+        .I1(p_0_in[7]),
+        .O(cam_fb_mux_sel_b_pos_0_i_5_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    cam_fb_mux_sel_b_pos_0_i_6
+       (.I0(DI[0]),
+        .I1(p_0_in[6]),
+        .O(cam_fb_mux_sel_b_pos_0_i_6_n_0));
+  LUT1 #(
+    .INIT(2'h1)) 
+    cam_fb_reg_0_0_i_2
+       (.I0(cam_rd_addr[10]),
+        .O(cam_fb_reg_mux_sel_b_pos_0_i_1_0));
   (* ADDER_THRESHOLD = "35" *) 
-  CARRY4 cam_fb_reg_0_4_i_3
-       (.CI(cam_fb_reg_0_4_i_4_n_0),
-        .CO({cam_fb_reg_0_4_i_3_n_0,cam_fb_reg_0_4_i_3_n_1,cam_fb_reg_0_4_i_3_n_2,cam_fb_reg_0_4_i_3_n_3}),
+  CARRY4 cam_fb_reg_0_0_i_3
+       (.CI(cam_fb_reg_0_0_i_4_n_0),
+        .CO({cam_fb_reg_0_0_i_3_n_0,cam_fb_reg_0_0_i_3_n_1,cam_fb_reg_0_0_i_3_n_2,cam_fb_reg_0_0_i_3_n_3}),
         .CYINIT(1'b0),
         .DI({1'b0,1'b0,1'b0,1'b0}),
         .O(cam_rd_addr[7:4]),
-        .S({cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_5,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_6,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_7,cam_fb_reg_0_4_i_6_n_4}));
+        .S({cam_fb_reg_mux_sel_b_pos_0_i_3_n_5,cam_fb_reg_mux_sel_b_pos_0_i_3_n_6,cam_fb_reg_mux_sel_b_pos_0_i_3_n_7,cam_fb_reg_0_0_i_6_n_4}));
   (* ADDER_THRESHOLD = "35" *) 
-  CARRY4 cam_fb_reg_0_4_i_4
+  CARRY4 cam_fb_reg_0_0_i_4
        (.CI(1'b0),
-        .CO({cam_fb_reg_0_4_i_4_n_0,cam_fb_reg_0_4_i_4_n_1,cam_fb_reg_0_4_i_4_n_2,cam_fb_reg_0_4_i_4_n_3}),
+        .CO({cam_fb_reg_0_0_i_4_n_0,cam_fb_reg_0_0_i_4_n_1,cam_fb_reg_0_0_i_4_n_2,cam_fb_reg_0_0_i_4_n_3}),
         .CYINIT(1'b0),
-        .DI({1'b0,DI}),
+        .DI({O,Q[0]}),
         .O(cam_rd_addr[3:0]),
-        .S({cam_fb_reg_0_4_i_6_n_5,cam_fb_reg_0_4}));
+        .S(cam_fb_reg_0_0_0));
   (* ADDER_THRESHOLD = "35" *) 
-  CARRY4 cam_fb_reg_0_4_i_6
+  CARRY4 cam_fb_reg_0_0_i_6
        (.CI(1'b0),
-        .CO({cam_fb_reg_0_4_i_6_n_0,cam_fb_reg_0_4_i_6_n_1,cam_fb_reg_0_4_i_6_n_2,cam_fb_reg_0_4_i_6_n_3}),
+        .CO({cam_fb_reg_0_0_i_6_n_0,cam_fb_reg_0_0_i_6_n_1,cam_fb_reg_0_0_i_6_n_2,cam_fb_reg_0_0_i_6_n_3}),
         .CYINIT(1'b0),
-        .DI({Q[1:0],DI[0],1'b0}),
-        .O({cam_fb_reg_0_4_i_6_n_4,cam_fb_reg_0_4_i_6_n_5,DI[2:1]}),
-        .S({S,Q[0]}));
-  LUT3 #(
-    .INIT(8'h02)) 
-    cam_fb_reg_2_4_i_1
-       (.I0(cam_rd_addr[9]),
-        .I1(cam_rd_addr[10]),
-        .I2(cam_rd_addr[11]),
-        .O(cam_fb_reg_mux_sel_b_pos_0__4_i_1_1));
-  LUT3 #(
-    .INIT(8'h02)) 
-    cam_fb_reg_4_4_i_1
-       (.I0(cam_rd_addr[10]),
-        .I1(cam_rd_addr[9]),
-        .I2(cam_rd_addr[11]),
-        .O(cam_fb_reg_mux_sel_b_pos_0__4_i_1_2));
-  LUT3 #(
-    .INIT(8'h40)) 
-    cam_fb_reg_6_4_i_1
-       (.I0(cam_rd_addr[11]),
-        .I1(cam_rd_addr[9]),
-        .I2(cam_rd_addr[10]),
-        .O(cam_fb_reg_mux_sel_b_pos_0__4_i_1_3));
+        .DI({Q[2:0],1'b0}),
+        .O({cam_fb_reg_0_0_i_6_n_4,O}),
+        .S({cam_fb_reg_0_0,Q[1]}));
   (* ADDER_THRESHOLD = "35" *) 
-  CARRY4 cam_fb_reg_mux_sel_b_pos_0__4_i_1
-       (.CI(cam_fb_reg_0_4_i_3_n_0),
-        .CO({NLW_cam_fb_reg_mux_sel_b_pos_0__4_i_1_CO_UNCONNECTED[3],cam_fb_reg_mux_sel_b_pos_0__4_i_1_n_1,cam_fb_reg_mux_sel_b_pos_0__4_i_1_n_2,cam_fb_reg_mux_sel_b_pos_0__4_i_1_n_3}),
+  CARRY4 cam_fb_reg_mux_sel_b_pos_0_i_1
+       (.CI(cam_fb_reg_0_0_i_3_n_0),
+        .CO({NLW_cam_fb_reg_mux_sel_b_pos_0_i_1_CO_UNCONNECTED[3:2],cam_fb_reg_mux_sel_b_pos_0_i_1_n_2,cam_fb_reg_mux_sel_b_pos_0_i_1_n_3}),
         .CYINIT(1'b0),
         .DI({1'b0,1'b0,1'b0,1'b0}),
-        .O(cam_rd_addr[11:8]),
-        .S({cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_5,cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_6,cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_7,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_4}));
+        .O({NLW_cam_fb_reg_mux_sel_b_pos_0_i_1_O_UNCONNECTED[3],cam_rd_addr[10:8]}),
+        .S({1'b0,cam_fb_reg_mux_sel_b_pos_0_i_2_n_6,cam_fb_reg_mux_sel_b_pos_0_i_2_n_7,cam_fb_reg_mux_sel_b_pos_0_i_3_n_4}));
   (* ADDER_THRESHOLD = "35" *) 
-  CARRY4 cam_fb_reg_mux_sel_b_pos_0__4_i_2
-       (.CI(cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_0),
-        .CO({NLW_cam_fb_reg_mux_sel_b_pos_0__4_i_2_CO_UNCONNECTED[3:2],cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_2,cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_3}),
+  CARRY4 cam_fb_reg_mux_sel_b_pos_0_i_2
+       (.CI(cam_fb_reg_mux_sel_b_pos_0_i_3_n_0),
+        .CO({NLW_cam_fb_reg_mux_sel_b_pos_0_i_2_CO_UNCONNECTED[3:1],cam_fb_reg_mux_sel_b_pos_0_i_2_n_3}),
         .CYINIT(1'b0),
-        .DI({1'b0,1'b0,1'b0,Q[6]}),
-        .O({NLW_cam_fb_reg_mux_sel_b_pos_0__4_i_2_O_UNCONNECTED[3],cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_5,cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_6,cam_fb_reg_mux_sel_b_pos_0__4_i_2_n_7}),
-        .S({1'b0,Q[8:7],cam_fb_reg_mux_sel_b_pos_0__4_0}));
+        .DI({1'b0,1'b0,1'b0,1'b0}),
+        .O({NLW_cam_fb_reg_mux_sel_b_pos_0_i_2_O_UNCONNECTED[3:2],cam_fb_reg_mux_sel_b_pos_0_i_2_n_6,cam_fb_reg_mux_sel_b_pos_0_i_2_n_7}),
+        .S({1'b0,1'b0,p_0_in[8:7]}));
   (* ADDER_THRESHOLD = "35" *) 
-  CARRY4 cam_fb_reg_mux_sel_b_pos_0__4_i_3
-       (.CI(cam_fb_reg_0_4_i_6_n_0),
-        .CO({cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_0,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_1,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_2,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_3}),
+  CARRY4 cam_fb_reg_mux_sel_b_pos_0_i_3
+       (.CI(cam_fb_reg_0_0_i_6_n_0),
+        .CO({cam_fb_reg_mux_sel_b_pos_0_i_3_n_0,cam_fb_reg_mux_sel_b_pos_0_i_3_n_1,cam_fb_reg_mux_sel_b_pos_0_i_3_n_2,cam_fb_reg_mux_sel_b_pos_0_i_3_n_3}),
         .CYINIT(1'b0),
-        .DI(Q[5:2]),
-        .O({cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_4,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_5,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_6,cam_fb_reg_mux_sel_b_pos_0__4_i_3_n_7}),
-        .S(cam_fb_reg_mux_sel_b_pos_0__4));
+        .DI({p_0_in[6],Q[4],DI[0],Q[3]}),
+        .O({cam_fb_reg_mux_sel_b_pos_0_i_3_n_4,cam_fb_reg_mux_sel_b_pos_0_i_3_n_5,cam_fb_reg_mux_sel_b_pos_0_i_3_n_6,cam_fb_reg_mux_sel_b_pos_0_i_3_n_7}),
+        .S({cam_fb_mux_sel_b_pos_0_i_4_n_0,cam_fb_mux_sel_b_pos_0_i_5_n_0,cam_fb_mux_sel_b_pos_0_i_6_n_0,cam_fb_reg_mux_sel_b_pos_0}));
   LUT2 #(
     .INIT(4'h2)) 
     \frame_counter[0]_i_1 
        (.I0(vsync),
         .I1(vsync_p),
-        .O(vs_reg_0));
-  (* SOFT_HLUTNM = "soft_lutpair65" *) 
+        .O(frame_counter0));
   LUT1 #(
     .INIT(2'h1)) 
     \hc[0]_i_1 
-       (.I0(drawX),
+       (.I0(\hc_reg[9]_0 [0]),
         .O(hc[0]));
-  LUT1 #(
-    .INIT(2'h1)) 
-    \hc[0]_rep__0_i_1 
-       (.I0(drawX),
-        .O(\hc[0]_rep__0_i_1_n_0 ));
-  LUT1 #(
-    .INIT(2'h1)) 
-    \hc[0]_rep_i_1 
-       (.I0(drawX),
-        .O(\hc[0]_rep_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair63" *) 
+  (* SOFT_HLUTNM = "soft_lutpair60" *) 
   LUT2 #(
     .INIT(4'h6)) 
     \hc[1]_i_1 
-       (.I0(drawX),
-        .I1(\hc_reg[9]_0 [0]),
-        .O(hc[1]));
-  LUT2 #(
-    .INIT(4'h6)) 
-    \hc[1]_rep_i_1 
-       (.I0(drawX),
-        .I1(\hc_reg[9]_0 [0]),
-        .O(\hc[1]_rep_i_1_n_0 ));
-  LUT3 #(
-    .INIT(8'h78)) 
-    \hc[2]_i_1 
        (.I0(\hc_reg[9]_0 [0]),
-        .I1(drawX),
-        .I2(\hc_reg[9]_0 [1]),
-        .O(hc[2]));
+        .I1(\hc_reg[9]_0 [1]),
+        .O(hc[1]));
+  (* SOFT_HLUTNM = "soft_lutpair60" *) 
   LUT3 #(
-    .INIT(8'h78)) 
-    \hc[2]_rep_i_1 
-       (.I0(ADDRBWRADDR[1]),
-        .I1(drawX),
-        .I2(\hc_reg[9]_0 [1]),
-        .O(\hc[2]_rep_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair65" *) 
-  LUT4 #(
-    .INIT(16'h7F80)) 
-    \hc[3]_i_1 
-       (.I0(ADDRBWRADDR[2]),
-        .I1(drawX),
-        .I2(ADDRBWRADDR[1]),
-        .I3(\hc_reg[9]_0 [2]),
-        .O(hc[3]));
-  LUT4 #(
-    .INIT(16'h7F80)) 
-    \hc[3]_rep_i_1 
-       (.I0(\hc_reg[9]_0 [1]),
-        .I1(ADDRBWRADDR[0]),
+    .INIT(8'h6A)) 
+    \hc[2]_i_1 
+       (.I0(\hc_reg[9]_0 [2]),
+        .I1(\hc_reg[9]_0 [1]),
         .I2(\hc_reg[9]_0 [0]),
-        .I3(\hc_reg[9]_0 [2]),
-        .O(\hc[3]_rep_i_1_n_0 ));
+        .O(hc[2]));
+  (* SOFT_HLUTNM = "soft_lutpair58" *) 
+  LUT4 #(
+    .INIT(16'h6AAA)) 
+    \hc[3]_i_1 
+       (.I0(\hc_reg[9]_0 [3]),
+        .I1(\hc_reg[9]_0 [2]),
+        .I2(\hc_reg[9]_0 [0]),
+        .I3(\hc_reg[9]_0 [1]),
+        .O(hc[3]));
+  (* SOFT_HLUTNM = "soft_lutpair53" *) 
   LUT5 #(
-    .INIT(32'h7FFF8000)) 
+    .INIT(32'h6AAAAAAA)) 
     \hc[4]_i_1 
-       (.I0(\hc_reg[9]_0 [2]),
-        .I1(ADDRBWRADDR[1]),
-        .I2(\hc_reg[6]_rep_0 [0]),
-        .I3(\hc_reg[9]_0 [1]),
-        .I4(\hc_reg[6]_rep_0 [2]),
+       (.I0(\hc_reg[9]_0 [4]),
+        .I1(\hc_reg[9]_0 [3]),
+        .I2(\hc_reg[9]_0 [1]),
+        .I3(\hc_reg[9]_0 [0]),
+        .I4(\hc_reg[9]_0 [2]),
         .O(hc[4]));
-  LUT5 #(
-    .INIT(32'h7FFF8000)) 
-    \hc[4]_rep_i_1 
-       (.I0(\hc_reg[9]_0 [2]),
-        .I1(\hc_reg[9]_0 [0]),
-        .I2(ADDRBWRADDR[0]),
-        .I3(\hc_reg[9]_0 [1]),
-        .I4(\hc_reg[6]_rep_0 [2]),
-        .O(\hc[4]_rep_i_1_n_0 ));
   LUT6 #(
-    .INIT(64'hAAAAAAAA55515555)) 
+    .INIT(64'hAAAAAAAA54555555)) 
     \hc[5]_i_1 
        (.I0(\hc[9]_i_2_n_0 ),
-        .I1(\hc_reg[9]_0 [7]),
-        .I2(\hc_reg[9]_0 [6]),
-        .I3(\hc_reg[9]_0 [5]),
-        .I4(\hc_reg[9]_0 [8]),
-        .I5(\hc_reg[9]_0 [4]),
+        .I1(ADDRBWRADDR[1]),
+        .I2(\hc_reg[9]_0 [5]),
+        .I3(\hc_reg[9]_0 [6]),
+        .I4(\hc_reg[9]_0 [7]),
+        .I5(ADDRBWRADDR[0]),
         .O(hc[5]));
-  LUT6 #(
-    .INIT(64'hAAAAAAAA55515555)) 
-    \hc[5]_rep_i_1 
-       (.I0(\hc[9]_i_2_n_0 ),
-        .I1(\hc_reg[9]_0 [7]),
-        .I2(\hc_reg[9]_0 [6]),
-        .I3(\hc_reg[9]_0 [5]),
-        .I4(\hc_reg[9]_0 [8]),
-        .I5(\hc_reg[9]_0 [4]),
-        .O(\hc[5]_rep_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair64" *) 
-  LUT3 #(
-    .INIT(8'hD2)) 
-    \hc[6]_i_1 
-       (.I0(\hc_reg[9]_0 [4]),
-        .I1(\hc[9]_i_2_n_0 ),
-        .I2(\hc_reg[9]_0 [5]),
-        .O(hc[6]));
-  LUT3 #(
-    .INIT(8'hD2)) 
-    \hc[6]_rep_i_1 
-       (.I0(\hc_reg[9]_0 [4]),
-        .I1(\hc[9]_i_2_n_0 ),
-        .I2(\hc_reg[9]_0 [5]),
-        .O(\hc[6]_rep_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair64" *) 
+  (* SOFT_HLUTNM = "soft_lutpair56" *) 
   LUT4 #(
-    .INIT(16'hDF20)) 
+    .INIT(16'h9AAA)) 
+    \hc[6]_i_1 
+       (.I0(ADDRBWRADDR[1]),
+        .I1(\hc[7]_i_2_n_0 ),
+        .I2(\hc_reg[9]_0 [4]),
+        .I3(ADDRBWRADDR[0]),
+        .O(hc[6]));
+  (* SOFT_HLUTNM = "soft_lutpair56" *) 
+  LUT5 #(
+    .INIT(32'hAA6AAAAA)) 
     \hc[7]_i_1 
        (.I0(\hc_reg[9]_0 [5]),
-        .I1(\hc[9]_i_2_n_0 ),
-        .I2(ADDRBWRADDR[3]),
-        .I3(\hc_reg[9]_0 [6]),
+        .I1(ADDRBWRADDR[0]),
+        .I2(\hc_reg[9]_0 [4]),
+        .I3(\hc[7]_i_2_n_0 ),
+        .I4(ADDRBWRADDR[1]),
         .O(hc[7]));
+  (* SOFT_HLUTNM = "soft_lutpair58" *) 
+  LUT4 #(
+    .INIT(16'h7FFF)) 
+    \hc[7]_i_2 
+       (.I0(\hc_reg[9]_0 [2]),
+        .I1(\hc_reg[9]_0 [0]),
+        .I2(\hc_reg[9]_0 [1]),
+        .I3(\hc_reg[9]_0 [3]),
+        .O(\hc[7]_i_2_n_0 ));
   LUT6 #(
-    .INIT(64'hCCCCCCCC3CCCCCC4)) 
+    .INIT(64'hF0F0F0F05AF0F0B0)) 
     \hc[8]_i_1 
-       (.I0(\hc_reg[9]_0 [8]),
+       (.I0(ADDRBWRADDR[0]),
         .I1(\hc_reg[9]_0 [7]),
-        .I2(ADDRBWRADDR[3]),
+        .I2(\hc_reg[9]_0 [6]),
         .I3(\hc_reg[9]_0 [5]),
-        .I4(\hc_reg[9]_0 [6]),
+        .I4(ADDRBWRADDR[1]),
         .I5(\hc[9]_i_2_n_0 ),
         .O(hc[8]));
   LUT6 #(
-    .INIT(64'hA6AAAAAAAAAAAAA2)) 
+    .INIT(64'hBFFF4000FEFF0000)) 
     \hc[9]_i_1 
-       (.I0(\hc_reg[9]_0 [8]),
-        .I1(\hc_reg[9]_0 [7]),
-        .I2(\hc[9]_i_2_n_0 ),
-        .I3(ADDRBWRADDR[3]),
-        .I4(\hc_reg[9]_0 [6]),
-        .I5(\hc_reg[9]_0 [5]),
+       (.I0(\hc[9]_i_2_n_0 ),
+        .I1(ADDRBWRADDR[1]),
+        .I2(\hc_reg[9]_0 [5]),
+        .I3(\hc_reg[9]_0 [6]),
+        .I4(\hc_reg[9]_0 [7]),
+        .I5(ADDRBWRADDR[0]),
         .O(hc[9]));
+  (* SOFT_HLUTNM = "soft_lutpair53" *) 
   LUT5 #(
     .INIT(32'h7FFFFFFF)) 
     \hc[9]_i_2 
-       (.I0(\hc_reg[9]_0 [2]),
-        .I1(ADDRBWRADDR[1]),
-        .I2(ADDRBWRADDR[0]),
-        .I3(\hc_reg[9]_0 [1]),
-        .I4(\hc_reg[9]_0 [3]),
+       (.I0(\hc_reg[9]_0 [3]),
+        .I1(\hc_reg[9]_0 [1]),
+        .I2(\hc_reg[9]_0 [0]),
+        .I3(\hc_reg[9]_0 [2]),
+        .I4(\hc_reg[9]_0 [4]),
         .O(\hc[9]_i_2_n_0 ));
-  (* ORIG_CELL_NAME = "hc_reg[0]" *) 
   FDCE \hc_reg[0] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[0]),
-        .Q(drawX));
-  (* ORIG_CELL_NAME = "hc_reg[0]" *) 
-  FDCE \hc_reg[0]_rep 
-       (.C(clk_out1),
-        .CE(1'b1),
-        .CLR(reset_ah),
-        .D(\hc[0]_rep_i_1_n_0 ),
-        .Q(ADDRBWRADDR[0]));
-  (* ORIG_CELL_NAME = "hc_reg[0]" *) 
-  FDCE \hc_reg[0]_rep__0 
-       (.C(clk_out1),
-        .CE(1'b1),
-        .CLR(reset_ah),
-        .D(\hc[0]_rep__0_i_1_n_0 ),
-        .Q(\hc_reg[6]_rep_0 [0]));
-  (* ORIG_CELL_NAME = "hc_reg[1]" *) 
+        .Q(\hc_reg[9]_0 [0]));
   FDCE \hc_reg[1] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[1]),
-        .Q(\hc_reg[9]_0 [0]));
-  (* ORIG_CELL_NAME = "hc_reg[1]" *) 
-  FDCE \hc_reg[1]_rep 
-       (.C(clk_out1),
-        .CE(1'b1),
-        .CLR(reset_ah),
-        .D(\hc[1]_rep_i_1_n_0 ),
-        .Q(ADDRBWRADDR[1]));
-  (* ORIG_CELL_NAME = "hc_reg[2]" *) 
+        .Q(\hc_reg[9]_0 [1]));
   FDCE \hc_reg[2] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[2]),
-        .Q(\hc_reg[9]_0 [1]));
-  (* ORIG_CELL_NAME = "hc_reg[2]" *) 
-  FDCE \hc_reg[2]_rep 
-       (.C(clk_out1),
-        .CE(1'b1),
-        .CLR(reset_ah),
-        .D(\hc[2]_rep_i_1_n_0 ),
-        .Q(ADDRBWRADDR[2]));
-  (* ORIG_CELL_NAME = "hc_reg[3]" *) 
+        .Q(\hc_reg[9]_0 [2]));
   FDCE \hc_reg[3] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[3]),
-        .Q(\hc_reg[9]_0 [2]));
-  (* ORIG_CELL_NAME = "hc_reg[3]" *) 
-  FDCE \hc_reg[3]_rep 
-       (.C(clk_out1),
-        .CE(1'b1),
-        .CLR(reset_ah),
-        .D(\hc[3]_rep_i_1_n_0 ),
-        .Q(\hc_reg[6]_rep_0 [1]));
-  (* ORIG_CELL_NAME = "hc_reg[4]" *) 
+        .Q(\hc_reg[9]_0 [3]));
   FDCE \hc_reg[4] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[4]),
-        .Q(\hc_reg[9]_0 [3]));
-  (* ORIG_CELL_NAME = "hc_reg[4]" *) 
-  FDCE \hc_reg[4]_rep 
-       (.C(clk_out1),
-        .CE(1'b1),
-        .CLR(reset_ah),
-        .D(\hc[4]_rep_i_1_n_0 ),
-        .Q(\hc_reg[6]_rep_0 [2]));
-  (* ORIG_CELL_NAME = "hc_reg[5]" *) 
+        .Q(\hc_reg[9]_0 [4]));
   FDCE \hc_reg[5] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[5]),
-        .Q(\hc_reg[9]_0 [4]));
-  (* ORIG_CELL_NAME = "hc_reg[5]" *) 
-  FDCE \hc_reg[5]_rep 
-       (.C(clk_out1),
-        .CE(1'b1),
-        .CLR(reset_ah),
-        .D(\hc[5]_rep_i_1_n_0 ),
-        .Q(ADDRBWRADDR[3]));
-  (* ORIG_CELL_NAME = "hc_reg[6]" *) 
+        .Q(ADDRBWRADDR[0]));
   FDCE \hc_reg[6] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[6]),
-        .Q(\hc_reg[9]_0 [5]));
-  (* ORIG_CELL_NAME = "hc_reg[6]" *) 
-  FDCE \hc_reg[6]_rep 
-       (.C(clk_out1),
-        .CE(1'b1),
-        .CLR(reset_ah),
-        .D(\hc[6]_rep_i_1_n_0 ),
-        .Q(\hc_reg[6]_rep_0 [3]));
+        .Q(ADDRBWRADDR[1]));
   FDCE \hc_reg[7] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[7]),
-        .Q(\hc_reg[9]_0 [6]));
+        .Q(\hc_reg[9]_0 [5]));
   FDCE \hc_reg[8] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[8]),
-        .Q(\hc_reg[9]_0 [7]));
+        .Q(\hc_reg[9]_0 [6]));
   FDCE \hc_reg[9] 
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hc[9]),
-        .Q(\hc_reg[9]_0 [8]));
+        .Q(\hc_reg[9]_0 [7]));
   LUT6 #(
-    .INIT(64'hFFFFFFFF81FFFFFF)) 
+    .INIT(64'hFEEEFEEEEEEFFEEE)) 
     hs_i_1
-       (.I0(\hc_reg[9]_0 [5]),
-        .I1(ADDRBWRADDR[3]),
-        .I2(hs_i_2_n_0),
-        .I3(\hc_reg[9]_0 [6]),
-        .I4(\hc_reg[9]_0 [8]),
-        .I5(\hc_reg[9]_0 [7]),
-        .O(hs_i_1_n_0));
-  LUT5 #(
-    .INIT(32'hEAAAAAAA)) 
-    hs_i_2
-       (.I0(\hc_reg[9]_0 [3]),
-        .I1(\hc_reg[6]_rep_0 [1]),
+       (.I0(hs_i_2_n_0),
+        .I1(hs_i_3_n_0),
         .I2(ADDRBWRADDR[1]),
-        .I3(\hc_reg[6]_rep_0 [0]),
-        .I4(ADDRBWRADDR[2]),
+        .I3(ADDRBWRADDR[0]),
+        .I4(\hc[7]_i_2_n_0 ),
+        .I5(\hc_reg[9]_0 [4]),
+        .O(hs_i_1_n_0));
+  (* SOFT_HLUTNM = "soft_lutpair52" *) 
+  LUT2 #(
+    .INIT(4'hB)) 
+    hs_i_2
+       (.I0(\hc_reg[9]_0 [6]),
+        .I1(\hc_reg[9]_0 [5]),
         .O(hs_i_2_n_0));
+  LUT6 #(
+    .INIT(64'h5595555555555555)) 
+    hs_i_3
+       (.I0(\hc_reg[9]_0 [7]),
+        .I1(\hc_reg[9]_0 [5]),
+        .I2(ADDRBWRADDR[0]),
+        .I3(\hc[9]_i_2_n_0 ),
+        .I4(ADDRBWRADDR[1]),
+        .I5(\hc_reg[9]_0 [6]),
+        .O(hs_i_3_n_0));
   FDCE hs_reg
        (.C(clk_out1),
         .CE(1'b1),
         .CLR(reset_ah),
         .D(hs_i_1_n_0),
         .Q(hsync));
+  LUT5 #(
+    .INIT(32'h00007FFF)) 
+    in_cam_region_r_i_1
+       (.I0(Q[4]),
+        .I1(p_0_in[7]),
+        .I2(p_0_in[6]),
+        .I3(DI[0]),
+        .I4(in_cam_region_r_i_2_n_0),
+        .O(in_cam_region));
   LUT6 #(
-    .INIT(64'h0000FFFF0000DFFF)) 
+    .INIT(64'hFFFEFFFEFFFEFEFE)) 
+    in_cam_region_r_i_2
+       (.I0(\hc_reg[9]_0 [7]),
+        .I1(p_0_in[8]),
+        .I2(char_y),
+        .I3(\hc_reg[9]_0 [6]),
+        .I4(ADDRBWRADDR[1]),
+        .I5(\hc_reg[9]_0 [5]),
+        .O(in_cam_region_r_i_2_n_0));
+  (* SOFT_HLUTNM = "soft_lutpair54" *) 
+  LUT4 #(
+    .INIT(16'h00BF)) 
     \vc[0]_i_1 
-       (.I0(Q[8]),
-        .I1(\vc[3]_i_2_n_0 ),
+       (.I0(\vc[9]_i_3_n_0 ),
+        .I1(char_y),
         .I2(Q[2]),
-        .I3(Q[1]),
-        .I4(DI[0]),
-        .I5(Q[0]),
+        .I3(Q[0]),
         .O(\vc[0]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair62" *) 
+  (* SOFT_HLUTNM = "soft_lutpair61" *) 
   LUT2 #(
     .INIT(4'h6)) 
     \vc[1]_i_1 
-       (.I0(DI[0]),
-        .I1(Q[0]),
-        .O(\vc[1]_i_1_n_0 ));
-  LUT6 #(
-    .INIT(64'h3333CCCCCCCCC4CC)) 
-    \vc[2]_i_1 
-       (.I0(Q[2]),
+       (.I0(Q[0]),
         .I1(Q[1]),
-        .I2(\vc[3]_i_2_n_0 ),
-        .I3(Q[8]),
-        .I4(Q[0]),
-        .I5(DI[0]),
+        .O(\vc[1]_i_1_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair54" *) 
+  LUT5 #(
+    .INIT(32'h0FB0F0B0)) 
+    \vc[2]_i_1 
+       (.I0(\vc[9]_i_3_n_0 ),
+        .I1(char_y),
+        .I2(Q[2]),
+        .I3(Q[0]),
+        .I4(Q[1]),
         .O(\vc[2]_i_1_n_0 ));
   LUT6 #(
-    .INIT(64'h6666CCCCCCCCC4CC)) 
+    .INIT(64'h0FF0B0F0F0F0B0F0)) 
     \vc[3]_i_1 
-       (.I0(Q[1]),
-        .I1(Q[2]),
-        .I2(\vc[3]_i_2_n_0 ),
-        .I3(Q[8]),
+       (.I0(\vc[9]_i_3_n_0 ),
+        .I1(char_y),
+        .I2(Q[3]),
+        .I3(Q[2]),
         .I4(Q[0]),
-        .I5(DI[0]),
+        .I5(Q[1]),
         .O(\vc[3]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair60" *) 
-  LUT5 #(
-    .INIT(32'hFFFFFFFE)) 
-    \vc[3]_i_2 
-       (.I0(Q[3]),
-        .I1(Q[6]),
-        .I2(Q[7]),
-        .I3(Q[5]),
-        .I4(Q[4]),
-        .O(\vc[3]_i_2_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair59" *) 
+  (* SOFT_HLUTNM = "soft_lutpair57" *) 
   LUT5 #(
     .INIT(32'h7FFF8000)) 
     \vc[4]_i_1 
-       (.I0(Q[1]),
-        .I1(Q[2]),
-        .I2(DI[0]),
-        .I3(Q[0]),
-        .I4(Q[3]),
+       (.I0(Q[3]),
+        .I1(Q[1]),
+        .I2(Q[0]),
+        .I3(Q[2]),
+        .I4(DI[0]),
         .O(\vc[4]_i_1_n_0 ));
   LUT6 #(
     .INIT(64'h7FFFFFFF80000000)) 
     \vc[5]_i_1 
-       (.I0(Q[3]),
-        .I1(Q[0]),
-        .I2(DI[0]),
-        .I3(Q[2]),
-        .I4(Q[1]),
+       (.I0(DI[0]),
+        .I1(Q[2]),
+        .I2(Q[0]),
+        .I3(Q[1]),
+        .I4(Q[3]),
         .I5(Q[4]),
         .O(\vc[5]_i_1_n_0 ));
-  LUT3 #(
-    .INIT(8'hD2)) 
-    \vc[6]_i_1 
-       (.I0(Q[4]),
-        .I1(\vc[8]_i_2_n_0 ),
-        .I2(Q[5]),
-        .O(\vc[6]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair61" *) 
-  LUT4 #(
-    .INIT(16'hF708)) 
-    \vc[7]_i_1 
-       (.I0(Q[4]),
-        .I1(Q[5]),
-        .I2(\vc[8]_i_2_n_0 ),
-        .I3(Q[6]),
-        .O(\vc[7]_i_1_n_0 ));
-  (* SOFT_HLUTNM = "soft_lutpair61" *) 
-  LUT5 #(
-    .INIT(32'hFF7F0080)) 
-    \vc[8]_i_1 
-       (.I0(Q[5]),
-        .I1(Q[4]),
-        .I2(Q[6]),
-        .I3(\vc[8]_i_2_n_0 ),
-        .I4(Q[7]),
-        .O(\vc[8]_i_1_n_0 ));
   (* SOFT_HLUTNM = "soft_lutpair59" *) 
+  LUT3 #(
+    .INIT(8'h9A)) 
+    \vc[6]_i_1 
+       (.I0(p_0_in[6]),
+        .I1(\vc[9]_i_4_n_0 ),
+        .I2(Q[4]),
+        .O(\vc[6]_i_1_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair59" *) 
+  LUT4 #(
+    .INIT(16'hA6AA)) 
+    \vc[7]_i_1 
+       (.I0(p_0_in[7]),
+        .I1(Q[4]),
+        .I2(\vc[9]_i_4_n_0 ),
+        .I3(p_0_in[6]),
+        .O(\vc[7]_i_1_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair55" *) 
   LUT5 #(
-    .INIT(32'h7FFFFFFF)) 
-    \vc[8]_i_2 
-       (.I0(Q[1]),
-        .I1(Q[2]),
-        .I2(DI[0]),
-        .I3(Q[0]),
-        .I4(Q[3]),
-        .O(\vc[8]_i_2_n_0 ));
+    .INIT(32'h9AAAAAAA)) 
+    \vc[8]_i_1 
+       (.I0(p_0_in[8]),
+        .I1(\vc[9]_i_4_n_0 ),
+        .I2(Q[4]),
+        .I3(p_0_in[7]),
+        .I4(p_0_in[6]),
+        .O(\vc[8]_i_1_n_0 ));
   LUT6 #(
-    .INIT(64'h0000000000040000)) 
+    .INIT(64'h0000000000000040)) 
     \vc[9]_i_1 
-       (.I0(ADDRBWRADDR[3]),
-        .I1(\hc_reg[9]_0 [8]),
-        .I2(\hc_reg[9]_0 [5]),
-        .I3(\hc_reg[9]_0 [6]),
-        .I4(\hc_reg[9]_0 [7]),
+       (.I0(ADDRBWRADDR[0]),
+        .I1(\hc_reg[9]_0 [7]),
+        .I2(\hc_reg[9]_0 [6]),
+        .I3(\hc_reg[9]_0 [5]),
+        .I4(ADDRBWRADDR[1]),
         .I5(\hc[9]_i_2_n_0 ),
         .O(vc));
   LUT6 #(
-    .INIT(64'hBFAAFFAAFFAABFAA)) 
+    .INIT(64'hEF00EF00EF0000FF)) 
     \vc[9]_i_2 
        (.I0(\vc[9]_i_3_n_0 ),
-        .I1(Q[2]),
-        .I2(Q[1]),
-        .I3(Q[8]),
-        .I4(DI[0]),
-        .I5(Q[0]),
+        .I1(Q[0]),
+        .I2(Q[2]),
+        .I3(char_y),
+        .I4(vga_to_hdmi_i_36_n_0),
+        .I5(\vc[9]_i_4_n_0 ),
         .O(\vc[9]_i_2_n_0 ));
-  LUT6 #(
-    .INIT(64'hF0FF0505CCCC0505)) 
+  (* SOFT_HLUTNM = "soft_lutpair61" *) 
+  LUT2 #(
+    .INIT(4'hE)) 
     \vc[9]_i_3 
-       (.I0(\vc[8]_i_2_n_0 ),
-        .I1(\vc[3]_i_2_n_0 ),
-        .I2(vga_to_hdmi_i_11_n_0),
-        .I3(Q[3]),
-        .I4(Q[8]),
-        .I5(DI[0]),
+       (.I0(\vc[9]_i_5_n_0 ),
+        .I1(Q[1]),
         .O(\vc[9]_i_3_n_0 ));
+  (* SOFT_HLUTNM = "soft_lutpair57" *) 
+  LUT5 #(
+    .INIT(32'h7FFFFFFF)) 
+    \vc[9]_i_4 
+       (.I0(Q[3]),
+        .I1(Q[1]),
+        .I2(Q[0]),
+        .I3(Q[2]),
+        .I4(DI[0]),
+        .O(\vc[9]_i_4_n_0 ));
+  LUT6 #(
+    .INIT(64'hFFFFFFFFFFFEFFFF)) 
+    \vc[9]_i_5 
+       (.I0(p_0_in[7]),
+        .I1(p_0_in[8]),
+        .I2(DI[0]),
+        .I3(Q[4]),
+        .I4(Q[3]),
+        .I5(p_0_in[6]),
+        .O(\vc[9]_i_5_n_0 ));
   FDCE \vc_reg[0] 
        (.C(clk_out1),
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[0]_i_1_n_0 ),
-        .Q(DI[0]));
+        .Q(Q[0]));
   FDCE \vc_reg[1] 
        (.C(clk_out1),
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[1]_i_1_n_0 ),
-        .Q(Q[0]));
+        .Q(Q[1]));
   FDCE \vc_reg[2] 
        (.C(clk_out1),
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[2]_i_1_n_0 ),
-        .Q(Q[1]));
+        .Q(Q[2]));
   FDCE \vc_reg[3] 
        (.C(clk_out1),
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[3]_i_1_n_0 ),
-        .Q(Q[2]));
+        .Q(Q[3]));
   FDCE \vc_reg[4] 
        (.C(clk_out1),
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[4]_i_1_n_0 ),
-        .Q(Q[3]));
+        .Q(DI[0]));
   FDCE \vc_reg[5] 
        (.C(clk_out1),
         .CE(vc),
@@ -12679,61 +15468,116 @@ module mb_usb_hdmi_text_controller_0_2_vga_controller
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[6]_i_1_n_0 ),
-        .Q(Q[5]));
+        .Q(p_0_in[6]));
   FDCE \vc_reg[7] 
        (.C(clk_out1),
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[7]_i_1_n_0 ),
-        .Q(Q[6]));
+        .Q(p_0_in[7]));
   FDCE \vc_reg[8] 
        (.C(clk_out1),
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[8]_i_1_n_0 ),
-        .Q(Q[7]));
+        .Q(p_0_in[8]));
   FDCE \vc_reg[9] 
        (.C(clk_out1),
         .CE(vc),
         .CLR(reset_ah),
         .D(\vc[9]_i_2_n_0 ),
-        .Q(Q[8]));
-  (* SOFT_HLUTNM = "soft_lutpair60" *) 
+        .Q(char_y));
+  (* SOFT_HLUTNM = "soft_lutpair52" *) 
+  LUT5 #(
+    .INIT(32'h04040444)) 
+    vga_to_hdmi_i_26
+       (.I0(char_y),
+        .I1(vga_to_hdmi_i_36_n_0),
+        .I2(\hc_reg[9]_0 [7]),
+        .I3(\hc_reg[9]_0 [5]),
+        .I4(\hc_reg[9]_0 [6]),
+        .O(vde));
+  (* SOFT_HLUTNM = "soft_lutpair55" *) 
   LUT4 #(
     .INIT(16'h7FFF)) 
-    vga_to_hdmi_i_11
-       (.I0(Q[6]),
-        .I1(Q[4]),
-        .I2(Q[5]),
-        .I3(Q[7]),
-        .O(vga_to_hdmi_i_11_n_0));
-  LUT5 #(
-    .INIT(32'h01550000)) 
-    vga_to_hdmi_i_6
-       (.I0(Q[8]),
-        .I1(\hc_reg[9]_0 [7]),
-        .I2(\hc_reg[9]_0 [6]),
-        .I3(\hc_reg[9]_0 [8]),
-        .I4(vga_to_hdmi_i_11_n_0),
-        .O(vde));
-  LUT6 #(
-    .INIT(64'hFFFFFFFEFFFEFFFF)) 
-    vs_i_1
-       (.I0(Q[1]),
-        .I1(vs_i_2_n_0),
-        .I2(Q[8]),
-        .I3(Q[3]),
-        .I4(Q[0]),
-        .I5(DI[0]),
-        .O(vs_i_1_n_0));
-  LUT5 #(
-    .INIT(32'h7FFFFFFF)) 
-    vs_i_2
-       (.I0(Q[7]),
-        .I1(Q[5]),
+    vga_to_hdmi_i_36
+       (.I0(p_0_in[6]),
+        .I1(p_0_in[7]),
         .I2(Q[4]),
-        .I3(Q[6]),
-        .I4(Q[2]),
+        .I3(p_0_in[8]),
+        .O(vga_to_hdmi_i_36_n_0));
+  (* ADDER_THRESHOLD = "35" *) 
+  CARRY4 vram_reg_i_11
+       (.CI(vram_reg_i_12_n_0),
+        .CO({NLW_vram_reg_i_11_CO_UNCONNECTED[3],vram_reg_i_11_n_1,vram_reg_i_11_n_2,vram_reg_i_11_n_3}),
+        .CYINIT(1'b0),
+        .DI({1'b0,1'b0,1'b0,1'b0}),
+        .O(ADDRBWRADDR[9:6]),
+        .S(char_index0[11:8]));
+  (* ADDER_THRESHOLD = "35" *) 
+  CARRY4 vram_reg_i_12
+       (.CI(1'b0),
+        .CO({vram_reg_i_12_n_0,vram_reg_i_12_n_1,vram_reg_i_12_n_2,vram_reg_i_12_n_3}),
+        .CYINIT(1'b0),
+        .DI({1'b0,DI}),
+        .O(ADDRBWRADDR[5:2]),
+        .S({char_index0[7],S}));
+  CARRY4 vram_reg_i_26
+       (.CI(vram_reg_i_27_n_0),
+        .CO({NLW_vram_reg_i_26_CO_UNCONNECTED[3:2],vram_reg_i_26_n_2,vram_reg_i_26_n_3}),
+        .CYINIT(1'b0),
+        .DI({1'b0,1'b0,1'b0,p_0_in[7]}),
+        .O({NLW_vram_reg_i_26_O_UNCONNECTED[3],char_index0[11:9]}),
+        .S({1'b0,char_y,p_0_in[8],vram_reg_i_32_n_0}));
+  CARRY4 vram_reg_i_27
+       (.CI(1'b0),
+        .CO({vram_reg_i_27_n_0,vram_reg_i_27_n_1,vram_reg_i_27_n_2,vram_reg_i_27_n_3}),
+        .CYINIT(1'b0),
+        .DI({p_0_in[6],Q[4],DI[0],1'b0}),
+        .O({char_index0[8:7],DI[2:1]}),
+        .S({vram_reg_i_33_n_0,vram_reg_i_34_n_0,vram_reg_i_35_n_0,Q[4]}));
+  LUT2 #(
+    .INIT(4'h6)) 
+    vram_reg_i_32
+       (.I0(p_0_in[7]),
+        .I1(char_y),
+        .O(vram_reg_i_32_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    vram_reg_i_33
+       (.I0(p_0_in[6]),
+        .I1(p_0_in[8]),
+        .O(vram_reg_i_33_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    vram_reg_i_34
+       (.I0(Q[4]),
+        .I1(p_0_in[7]),
+        .O(vram_reg_i_34_n_0));
+  LUT2 #(
+    .INIT(4'h6)) 
+    vram_reg_i_35
+       (.I0(DI[0]),
+        .I1(p_0_in[6]),
+        .O(vram_reg_i_35_n_0));
+  LUT5 #(
+    .INIT(32'hFFFFFFD7)) 
+    vs_i_1
+       (.I0(Q[3]),
+        .I1(Q[0]),
+        .I2(Q[1]),
+        .I3(char_y),
+        .I4(vs_i_2_n_0),
+        .O(vs_i_1_n_0));
+  LUT6 #(
+    .INIT(64'hEFFFFFFFFFFFFFFF)) 
+    vs_i_2
+       (.I0(DI[0]),
+        .I1(Q[2]),
+        .I2(p_0_in[8]),
+        .I3(Q[4]),
+        .I4(p_0_in[7]),
+        .I5(p_0_in[6]),
         .O(vs_i_2_n_0));
   FDCE vs_reg
        (.C(clk_out1),

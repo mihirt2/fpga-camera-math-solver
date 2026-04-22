@@ -1,7 +1,7 @@
 -- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2022.2 (win64) Build 3671981 Fri Oct 14 05:00:03 MDT 2022
--- Date        : Tue Apr 21 16:06:28 2026
+-- Date        : Tue Apr 21 20:04:39 2026
 -- Host        : Levono_MihirT running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub
 --               c:/Users/ishur/final_project/final_project.gen/sources_1/bd/mb_usb/ip/mb_usb_camera_controller_0_2/mb_usb_camera_controller_0_2_stub.vhdl
@@ -45,7 +45,7 @@ entity mb_usb_camera_controller_0_2 is
     cam_pwdn : out STD_LOGIC;
     cam_reset_n : out STD_LOGIC;
     bram_addr : out STD_LOGIC_VECTOR ( 16 downto 0 );
-    bram_wrdata : out STD_LOGIC_VECTOR ( 15 downto 0 );
+    bram_wrdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
     bram_we : out STD_LOGIC
   );
 
@@ -55,7 +55,7 @@ architecture stub of mb_usb_camera_controller_0_2 is
 attribute syn_black_box : boolean;
 attribute black_box_pad_pin : string;
 attribute syn_black_box of stub : architecture is true;
-attribute black_box_pad_pin of stub : architecture is "s00_axi_aclk,s00_axi_aresetn,s00_axi_awaddr[4:0],s00_axi_awprot[2:0],s00_axi_awvalid,s00_axi_awready,s00_axi_wdata[31:0],s00_axi_wstrb[3:0],s00_axi_wvalid,s00_axi_wready,s00_axi_bresp[1:0],s00_axi_bvalid,s00_axi_bready,s00_axi_araddr[4:0],s00_axi_arprot[2:0],s00_axi_arvalid,s00_axi_arready,s00_axi_rdata[31:0],s00_axi_rresp[1:0],s00_axi_rvalid,s00_axi_rready,cam_sda,cam_scl,cam_pclk,cam_vsync,cam_href,cam_d[7:0],cam_pclk_out,cam_pwdn,cam_reset_n,bram_addr[16:0],bram_wrdata[15:0],bram_we";
+attribute black_box_pad_pin of stub : architecture is "s00_axi_aclk,s00_axi_aresetn,s00_axi_awaddr[4:0],s00_axi_awprot[2:0],s00_axi_awvalid,s00_axi_awready,s00_axi_wdata[31:0],s00_axi_wstrb[3:0],s00_axi_wvalid,s00_axi_wready,s00_axi_bresp[1:0],s00_axi_bvalid,s00_axi_bready,s00_axi_araddr[4:0],s00_axi_arprot[2:0],s00_axi_arvalid,s00_axi_arready,s00_axi_rdata[31:0],s00_axi_rresp[1:0],s00_axi_rvalid,s00_axi_rready,cam_sda,cam_scl,cam_pclk,cam_vsync,cam_href,cam_d[7:0],cam_pclk_out,cam_pwdn,cam_reset_n,bram_addr[16:0],bram_wrdata[7:0],bram_we";
 attribute X_CORE_INFO : string;
 attribute X_CORE_INFO of stub : architecture is "camera_controller_v1_0,Vivado 2022.2";
 begin

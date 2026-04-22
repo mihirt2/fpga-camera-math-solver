@@ -1,7 +1,7 @@
 // Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2022.2 (win64) Build 3671981 Fri Oct 14 05:00:03 MDT 2022
-// Date        : Tue Apr 21 15:57:16 2026
+// Date        : Tue Apr 21 20:36:46 2026
 // Host        : Levono_MihirT running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode synth_stub
 //               c:/Users/ishur/final_project/final_project.gen/sources_1/bd/mb_usb/ip/mb_usb_hdmi_text_controller_0_2/mb_usb_hdmi_text_controller_0_2_stub.v
@@ -19,7 +19,7 @@ module mb_usb_hdmi_text_controller_0_2(hdmi_clk_n, hdmi_clk_p, hdmi_tx_n, hdmi_t
   axi_wvalid, axi_wready, axi_bresp, axi_bvalid, axi_bready, axi_araddr, axi_arprot, axi_arvalid, 
   axi_arready, axi_rdata, axi_rresp, axi_rvalid, axi_rready, cam_pclk, cam_wr_addr, cam_wr_data, 
   cam_we)
-/* synthesis syn_black_box black_box_pad_pin="hdmi_clk_n,hdmi_clk_p,hdmi_tx_n[2:0],hdmi_tx_p[2:0],axi_aclk,axi_aresetn,axi_awaddr[15:0],axi_awprot[2:0],axi_awvalid,axi_awready,axi_wdata[31:0],axi_wstrb[3:0],axi_wvalid,axi_wready,axi_bresp[1:0],axi_bvalid,axi_bready,axi_araddr[15:0],axi_arprot[2:0],axi_arvalid,axi_arready,axi_rdata[31:0],axi_rresp[1:0],axi_rvalid,axi_rready,cam_pclk,cam_wr_addr[16:0],cam_wr_data[15:0],cam_we" */;
+/* synthesis syn_black_box black_box_pad_pin="hdmi_clk_n,hdmi_clk_p,hdmi_tx_n[2:0],hdmi_tx_p[2:0],axi_aclk,axi_aresetn,axi_awaddr[15:0],axi_awprot[2:0],axi_awvalid,axi_awready,axi_wdata[31:0],axi_wstrb[3:0],axi_wvalid,axi_wready,axi_bresp[1:0],axi_bvalid,axi_bready,axi_araddr[15:0],axi_arprot[2:0],axi_arvalid,axi_arready,axi_rdata[31:0],axi_rresp[1:0],axi_rvalid,axi_rready,cam_pclk,cam_wr_addr[16:0],cam_wr_data[7:0],cam_we" */;
   output hdmi_clk_n;
   output hdmi_clk_p;
   output [2:0]hdmi_tx_n;
@@ -47,6 +47,6 @@ module mb_usb_hdmi_text_controller_0_2(hdmi_clk_n, hdmi_clk_p, hdmi_tx_n, hdmi_t
   input axi_rready;
   input cam_pclk;
   input [16:0]cam_wr_addr;
-  input [15:0]cam_wr_data;
+  input [7:0]cam_wr_data;
   input cam_we;
 endmodule
