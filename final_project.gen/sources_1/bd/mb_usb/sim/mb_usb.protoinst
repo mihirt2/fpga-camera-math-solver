@@ -1,9 +1,0 @@
-{
-	"version": "1.0",
-	"modules": {
-		"mb_usb": {
-			"proto_instances": {
-			}
-		}
-	}
-}

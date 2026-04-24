@@ -4,7 +4,7 @@
     "xci_name": "mb_usb_camera_controller_0_2",
     "cell_name": "camera_controller_0",
     "component_reference": "xilinx.com:user:camera_controller:1.0",
-    "ip_revision": "25",
+    "ip_revision": "26",
     "gen_directory": "../../../../../../final_project.gen/sources_1/bd/mb_usb/ip/mb_usb_camera_controller_0_2",
     "parameters": {
       "component_parameters": {
@@ -35,7 +35,7 @@
       },
       "runtime_parameters": {
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
-        "IPREVISION": [ { "value": "25" } ],
+        "IPREVISION": [ { "value": "26" } ],
         "MANAGED": [ { "value": "TRUE" } ],
         "OUTPUTDIR": [ { "value": "../../../../../../final_project.gen/sources_1/bd/mb_usb/ip/mb_usb_camera_controller_0_2" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],

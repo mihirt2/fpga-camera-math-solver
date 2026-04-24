@@ -1,7 +1,7 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0xA0890B1B4F86CEA4",
+      "boundary_crc": "0x508B47B6FF284B39",
       "device": "xc7s50csga324-1",
       "gen_directory": "../../../../final_project.gen/sources_1/bd/mb_usb",
       "name": "mb_usb",
@@ -13,10 +13,10 @@
     "design_tree": {
       "clk_wiz_1": "",
       "rst_clk_wiz_1_100M": "",
-      "camera_controller_0": "",
-      "hdmi_text_controller_0": "",
       "xlconstant_0": "",
-      "xlconstant_1": ""
+      "xlconstant_1": "",
+      "camera_controller_0": "",
+      "hdmi_text_controller_0": ""
     },
     "interface_ports": {
       "HDMI_0": {
@@ -137,6 +137,39 @@
         "direction": "I",
         "left": "7",
         "right": "0"
+      },
+      "ocr_bboxes_flat_0": {
+        "direction": "I",
+        "left": "1151",
+        "right": "0"
+      },
+      "ocr_num_chars_0": {
+        "direction": "I",
+        "left": "4",
+        "right": "0"
+      },
+      "ocr_result_chars_flat_0": {
+        "direction": "I",
+        "left": "255",
+        "right": "0"
+      },
+      "ocr_result_len_0": {
+        "direction": "I",
+        "left": "5",
+        "right": "0"
+      },
+      "ocr_rd_addr_0": {
+        "direction": "I",
+        "left": "16",
+        "right": "0"
+      },
+      "ocr_rd_en_0": {
+        "direction": "I"
+      },
+      "ocr_rd_data_0": {
+        "direction": "O",
+        "left": "7",
+        "right": "0"
       }
     },
     "components": {
@@ -193,18 +226,6 @@
         "xci_path": "ip\\mb_usb_rst_clk_wiz_1_100M_1\\mb_usb_rst_clk_wiz_1_100M_1.xci",
         "inst_hier_path": "rst_clk_wiz_1_100M"
       },
-      "camera_controller_0": {
-        "vlnv": "xilinx.com:user:camera_controller:1.0",
-        "xci_name": "mb_usb_camera_controller_0_2",
-        "xci_path": "ip\\mb_usb_camera_controller_0_2\\mb_usb_camera_controller_0_2.xci",
-        "inst_hier_path": "camera_controller_0"
-      },
-      "hdmi_text_controller_0": {
-        "vlnv": "xilinx.com:user:hdmi_text_controller:1.0",
-        "xci_name": "mb_usb_hdmi_text_controller_0_2",
-        "xci_path": "ip\\mb_usb_hdmi_text_controller_0_2\\mb_usb_hdmi_text_controller_0_2.xci",
-        "inst_hier_path": "hdmi_text_controller_0"
-      },
       "xlconstant_0": {
         "vlnv": "xilinx.com:ip:xlconstant:1.1",
         "xci_name": "mb_usb_xlconstant_0_0",
@@ -221,6 +242,18 @@
         "xci_name": "mb_usb_xlconstant_1_0",
         "xci_path": "ip\\mb_usb_xlconstant_1_0\\mb_usb_xlconstant_1_0.xci",
         "inst_hier_path": "xlconstant_1"
+      },
+      "camera_controller_0": {
+        "vlnv": "xilinx.com:user:camera_controller:1.0",
+        "xci_name": "mb_usb_camera_controller_0_2",
+        "xci_path": "ip\\mb_usb_camera_controller_0_2\\mb_usb_camera_controller_0_2.xci",
+        "inst_hier_path": "camera_controller_0"
+      },
+      "hdmi_text_controller_0": {
+        "vlnv": "xilinx.com:user:hdmi_text_controller:1.0",
+        "xci_name": "mb_usb_hdmi_text_controller_0_2",
+        "xci_path": "ip\\mb_usb_hdmi_text_controller_0_2\\mb_usb_hdmi_text_controller_0_2.xci",
+        "inst_hier_path": "hdmi_text_controller_0"
       }
     },
     "interface_nets": {
@@ -322,6 +355,12 @@
           "rst_clk_wiz_1_100M/dcm_locked"
         ]
       },
+      "hdmi_text_controller_0_ocr_rd_data": {
+        "ports": [
+          "hdmi_text_controller_0/ocr_rd_data",
+          "ocr_rd_data_0"
+        ]
+      },
       "mdm_1_debug_sys_rst": {
         "ports": [
           "xlconstant_0/dout",
@@ -335,6 +374,42 @@
           "rst_clk_wiz_1_100M/slowest_sync_clk",
           "camera_controller_0/s00_axi_aclk",
           "hdmi_text_controller_0/axi_aclk"
+        ]
+      },
+      "ocr_bboxes_flat_0_1": {
+        "ports": [
+          "ocr_bboxes_flat_0",
+          "hdmi_text_controller_0/ocr_bboxes_flat"
+        ]
+      },
+      "ocr_num_chars_0_1": {
+        "ports": [
+          "ocr_num_chars_0",
+          "hdmi_text_controller_0/ocr_num_chars"
+        ]
+      },
+      "ocr_rd_addr_0_1": {
+        "ports": [
+          "ocr_rd_addr_0",
+          "hdmi_text_controller_0/ocr_rd_addr"
+        ]
+      },
+      "ocr_rd_en_0_1": {
+        "ports": [
+          "ocr_rd_en_0",
+          "hdmi_text_controller_0/ocr_rd_en"
+        ]
+      },
+      "ocr_result_chars_flat_0_1": {
+        "ports": [
+          "ocr_result_chars_flat_0",
+          "hdmi_text_controller_0/ocr_result_chars_flat"
+        ]
+      },
+      "ocr_result_len_0_1": {
+        "ports": [
+          "ocr_result_len_0",
+          "hdmi_text_controller_0/ocr_result_len"
         ]
       },
       "reset_rtl_0_1": {

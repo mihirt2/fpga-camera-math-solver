@@ -1,10 +1,10 @@
 // Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2022.2 (win64) Build 3671981 Fri Oct 14 05:00:03 MDT 2022
-// Date        : Tue Mar 31 15:02:45 2026
+// Date        : Thu Apr 23 11:56:49 2026
 // Host        : Levono_MihirT running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode synth_stub
-//               c:/Users/ishur/Lab_7/Lab_7.gen/sources_1/ip/hdmi_tx_0/hdmi_tx_0_stub.v
+//               c:/Users/ishur/final_project/final_project.gen/sources_1/ip/hdmi_tx_0/hdmi_tx_0_stub.v
 // Design      : hdmi_tx_0
 // Purpose     : Stub declaration of top-level module interface
 // Device      : xc7s50csga324-1
@@ -17,14 +17,14 @@
 module hdmi_tx_0(pix_clk, pix_clkx5, pix_clk_locked, rst, red, 
   green, blue, hsync, vsync, vde, aux0_din, aux1_din, aux2_din, ade, TMDS_CLK_P, TMDS_CLK_N, TMDS_DATA_P, 
   TMDS_DATA_N)
-/* synthesis syn_black_box black_box_pad_pin="pix_clk,pix_clkx5,pix_clk_locked,rst,red[3:0],green[3:0],blue[3:0],hsync,vsync,vde,aux0_din[3:0],aux1_din[3:0],aux2_din[3:0],ade,TMDS_CLK_P,TMDS_CLK_N,TMDS_DATA_P[2:0],TMDS_DATA_N[2:0]" */;
+/* synthesis syn_black_box black_box_pad_pin="pix_clk,pix_clkx5,pix_clk_locked,rst,red[7:0],green[7:0],blue[7:0],hsync,vsync,vde,aux0_din[3:0],aux1_din[3:0],aux2_din[3:0],ade,TMDS_CLK_P,TMDS_CLK_N,TMDS_DATA_P[2:0],TMDS_DATA_N[2:0]" */;
   input pix_clk;
   input pix_clkx5;
   input pix_clk_locked;
   input rst;
-  input [3:0]red;
-  input [3:0]green;
-  input [3:0]blue;
+  input [7:0]red;
+  input [7:0]green;
+  input [7:0]blue;
   input hsync;
   input vsync;
   input vde;

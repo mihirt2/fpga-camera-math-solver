@@ -4,7 +4,7 @@
     "xci_name": "mb_usb_hdmi_text_controller_0_2",
     "cell_name": "hdmi_text_controller_0",
     "component_reference": "xilinx.com:user:hdmi_text_controller:1.0",
-    "ip_revision": "35",
+    "ip_revision": "41",
     "gen_directory": "../../../../../../final_project.gen/sources_1/bd/mb_usb/ip/mb_usb_hdmi_text_controller_0_2",
     "parameters": {
       "component_parameters": {
@@ -35,7 +35,7 @@
       },
       "runtime_parameters": {
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
-        "IPREVISION": [ { "value": "35" } ],
+        "IPREVISION": [ { "value": "41" } ],
         "MANAGED": [ { "value": "TRUE" } ],
         "OUTPUTDIR": [ { "value": "../../../../../../final_project.gen/sources_1/bd/mb_usb/ip/mb_usb_hdmi_text_controller_0_2" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
@@ -74,7 +74,14 @@
         "cam_pclk": [ { "direction": "in" } ],
         "cam_wr_addr": [ { "direction": "in", "size_left": "16", "size_right": "0" } ],
         "cam_wr_data": [ { "direction": "in", "size_left": "7", "size_right": "0", "driver_value": "0" } ],
-        "cam_we": [ { "direction": "in" } ]
+        "cam_we": [ { "direction": "in" } ],
+        "ocr_rd_addr": [ { "direction": "in", "size_left": "16", "size_right": "0" } ],
+        "ocr_rd_data": [ { "direction": "out", "size_left": "7", "size_right": "0" } ],
+        "ocr_rd_en": [ { "direction": "in" } ],
+        "ocr_bboxes_flat": [ { "direction": "in", "size_left": "1151", "size_right": "0" } ],
+        "ocr_num_chars": [ { "direction": "in", "size_left": "4", "size_right": "0" } ],
+        "ocr_result_chars_flat": [ { "direction": "in", "size_left": "255", "size_right": "0" } ],
+        "ocr_result_len": [ { "direction": "in", "size_left": "5", "size_right": "0" } ]
       },
       "interfaces": {
         "AXI": {
@@ -106,8 +113,8 @@
             "HAS_WSTRB": [ { "value": "1", "value_src": "constant", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
             "HAS_BRESP": [ { "value": "1", "value_src": "constant", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
             "HAS_RRESP": [ { "value": "1", "value_src": "constant", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
-            "NUM_READ_OUTSTANDING": [ { "value": "2", "value_src": "default_prop", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
-            "NUM_WRITE_OUTSTANDING": [ { "value": "2", "value_src": "default_prop", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "NUM_READ_OUTSTANDING": [ { "value": "1", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "NUM_WRITE_OUTSTANDING": [ { "value": "1", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
             "MAX_BURST_LENGTH": [ { "value": "1", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
             "PHASE": [ { "value": "0.0", "value_src": "ip_propagated", "value_permission": "bd", "resolve_type": "generated", "format": "float", "is_ips_inferred": true, "is_static_object": false } ],
             "CLK_DOMAIN": [ { "value": "/clk_wiz_1_clk_out1", "value_src": "ip_propagated", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
