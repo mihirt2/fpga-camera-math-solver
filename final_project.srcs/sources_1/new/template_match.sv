@@ -2,21 +2,11 @@
 //==============================================================================
 // template_match
 //
-// Compares a normalized CHAR_W x CHAR_H bitmap against all templates stored
-// in font_rom_16x32_digits using IoU:
-//      IoU = intersection / union
+// IoU-based template matching with ±1 pixel shift tolerance.
+// Compares by cross-multiplication (no division).
+// Includes ink-count rejection for noise blobs.
 //
-// Adds shift tolerance by testing each template shifted by:
-//      dx, dy in {-1, 0, +1}
-//
-// No division is used. Scores are compared by cross multiplication:
-//      a/b > c/d  <=>  a*d > c*b
-//
-// best_dist is kept for interface compatibility.
-// It now reports foreground disagreement for the winning match:
-//      best_dist = best_union - best_intersection
-//
-// Timing: about 32 rows x 9 shifts x 16 templates = 4608 row comparisons.
+// Timing: ~32 rows × 9 shifts × 16 templates ? 4608 row reads.
 //==============================================================================
 
 module template_match
@@ -32,44 +22,38 @@ module template_match
     output logic                       done
 );
 
-    localparam int NUM_TMPL   = 16;
-    localparam int NUM_SHIFTS = 9;
+    // -- Config -----------------------------------------------------------
+    localparam int NUM_TMPL       = 16;
+    localparam int NUM_SHIFTS     = 9;
+    localparam int MIN_INK_PIXELS = 15;
+    localparam int REJECT_CODE    = 15;   // ')' - skipped by parser
 
+    // -- Helpers ----------------------------------------------------------
     function automatic logic [6:0] tmpl_ascii(input logic [3:0] idx);
         case (idx)
-            4'd0:    return 7'h30;
-            4'd1:    return 7'h31;
-            4'd2:    return 7'h32;
-            4'd3:    return 7'h33;
-            4'd4:    return 7'h34;
-            4'd5:    return 7'h35;
-            4'd6:    return 7'h36;
-            4'd7:    return 7'h37;
-            4'd8:    return 7'h38;
-            4'd9:    return 7'h39;
-            4'd10:   return 7'h2B;
-            4'd11:   return 7'h2D;
-            4'd12:   return 7'h2A;
-            4'd13:   return 7'h3D;
-            4'd14:   return 7'h28;
-            4'd15:   return 7'h29;
+            4'd0:  return 7'h30;  4'd1:  return 7'h31;
+            4'd2:  return 7'h32;  4'd3:  return 7'h33;
+            4'd4:  return 7'h34;  4'd5:  return 7'h35;
+            4'd6:  return 7'h36;  4'd7:  return 7'h37;
+            4'd8:  return 7'h38;  4'd9:  return 7'h39;
+            4'd10: return 7'h2B;  4'd11: return 7'h2D;
+            4'd12: return 7'h2A;  4'd13: return 7'h3D;
+            4'd14: return 7'h28;  4'd15: return 7'h29;
             default: return 7'h30;
         endcase
     endfunction
 
     function automatic logic signed [1:0] shift_dx(input logic [3:0] idx);
         case (idx % 3)
-            0: return -1;
-            1: return  0;
-            2: return  1;
+            0: return -1;  1: return 0;  2: return 1;
+            default: return 0;
         endcase
     endfunction
 
     function automatic logic signed [1:0] shift_dy(input logic [3:0] idx);
         case (idx / 3)
-            0: return -1;
-            1: return  0;
-            2: return  1;
+            0: return -1;  1: return 0;  2: return 1;
+            default: return 0;
         endcase
     endfunction
 
@@ -81,40 +65,25 @@ module template_match
         return cnt;
     endfunction
 
-    function automatic logic [15:0] shift_row(
+    function automatic logic [15:0] shift_row_h(
         input logic [15:0] row,
         input logic signed [1:0] dx
     );
-        if (dx < 0)
-            return row << 1;
-        else if (dx > 0)
-            return row >> 1;
-        else
-            return row;
+        if (dx == -1)     return row << 1;
+        else if (dx == 1) return row >> 1;
+        else              return row;
     endfunction
 
     function automatic logic iou_better(
-        input logic [9:0] cand_inter,
-        input logic [9:0] cand_union,
-        input logic [9:0] best_inter,
-        input logic [9:0] best_union
+        input logic [9:0] ci, input logic [9:0] cu,
+        input logic [9:0] bi, input logic [9:0] bu
     );
-        logic [19:0] lhs;
-        logic [19:0] rhs;
-        begin
-            if (cand_union == 0 && best_union == 0)
-                return 1'b0;
-            else if (cand_union == 0)
-                return 1'b0;
-            else if (best_union == 0)
-                return 1'b1;
-
-            lhs = cand_inter * best_union;
-            rhs = best_inter  * cand_union;
-            return lhs > rhs;
-        end
+        if (cu == 0) return 1'b0;
+        if (bu == 0) return 1'b1;
+        return (ci * bu) > (bi * cu);
     endfunction
 
+    // -- Font ROM ---------------------------------------------------------
     logic [6:0]  rom_char;
     logic [4:0]  rom_row;
     logic [15:0] rom_bits;
@@ -126,8 +95,10 @@ module template_match
         .bits      (rom_bits)
     );
 
-    typedef enum logic [1:0] {
+    // -- FSM --------------------------------------------------------------
+    typedef enum logic [2:0] {
         S_IDLE,
+        S_COUNT_INK,
         S_COMPARE,
         S_EVAL_SHIFT,
         S_DONE
@@ -135,72 +106,91 @@ module template_match
 
     state_t state;
 
+    // -- Ink counting -----------------------------------------------------
+    logic [4:0]  ink_row;
+    logic [9:0]  ink_total;
+    logic        ink_reject;
+
+    logic [15:0] ink_chunk;
+    assign ink_chunk = input_char[TEMPLATE_BITS - 1 - ink_row * CHAR_W -: CHAR_W];
+
+    // -- Counters ---------------------------------------------------------
     logic [3:0] tmpl_idx;
     logic [3:0] shift_idx;
     logic [4:0] row_cnt;
-
-    logic rd_valid;
+    logic       rd_valid;
     logic [4:0] row_cnt_d;
     logic [3:0] shift_idx_d;
 
-    logic [9:0] accum_inter;
-    logic [9:0] accum_union;
-
-    logic [9:0] tmpl_best_inter;
-    logic [9:0] tmpl_best_union;
-
-    logic [9:0] global_best_inter;
-    logic [9:0] global_best_union;
-
+    // -- Accumulators -----------------------------------------------------
+    logic [9:0] accum_inter, accum_union;
+    logic [9:0] tmpl_best_inter, tmpl_best_union;
+    logic [9:0] global_best_inter, global_best_union;
     logic [CHAR_CODE_WIDTH-1:0] best_code_r;
-    logic [9:0]                 best_dist_r;
+    logic [9:0] best_dist_r;
 
+    // -- ROM address (combinational) --------------------------------------
     logic signed [6:0] src_row_signed;
-    logic [4:0]        src_row;
-
-    assign src_row_signed = $signed({1'b0, row_cnt}) - shift_dy(shift_idx);
-    assign src_row = src_row_signed[4:0];
+    assign src_row_signed = $signed({2'b0, row_cnt}) - $signed(shift_dy(shift_idx));
 
     always_comb begin
         rom_char = tmpl_ascii(tmpl_idx);
-
         if (src_row_signed < 0 || src_row_signed >= CHAR_H)
-            rom_row = '0;
+            rom_row = 5'd0;  // don't care - zeroed by shifted_rom_bits
         else
-            rom_row = src_row;
+            rom_row = src_row_signed[4:0];
     end
 
+    // -- Pipeline stage: extract and shift (uses delayed indices) ----------
     logic [15:0] input_row;
     assign input_row = input_char[TEMPLATE_BITS - 1 - row_cnt_d * CHAR_W -: CHAR_W];
 
-    logic signed [1:0] dx_d;
-    logic signed [1:0] dy_d;
-    assign dx_d = shift_dx(shift_idx_d);
-    assign dy_d = shift_dy(shift_idx_d);
+    logic signed [6:0] src_row_d_signed;
+    assign src_row_d_signed = $signed({2'b0, row_cnt_d}) - $signed(shift_dy(shift_idx_d));
 
     logic [15:0] shifted_rom_bits;
     always_comb begin
-        if (($signed({1'b0, row_cnt_d}) - dy_d) < 0 ||
-            ($signed({1'b0, row_cnt_d}) - dy_d) >= CHAR_H)
+        if (src_row_d_signed < 0 || src_row_d_signed >= CHAR_H)
             shifted_rom_bits = 16'b0;
         else
-            shifted_rom_bits = shift_row(rom_bits, dx_d);
+            shifted_rom_bits = shift_row_h(rom_bits, shift_dx(shift_idx_d));
     end
 
-    logic [15:0] row_inter_bits;
-    logic [15:0] row_union_bits;
-    logic [4:0]  row_inter;
-    logic [4:0]  row_union;
+    logic [4:0] row_inter, row_union;
+    assign row_inter = popcount16(input_row & shifted_rom_bits);
+    assign row_union = popcount16(input_row | shifted_rom_bits);
 
-    assign row_inter_bits = input_row & shifted_rom_bits;
-    assign row_union_bits = input_row | shifted_rom_bits;
-    assign row_inter      = popcount16(row_inter_bits);
-    assign row_union      = popcount16(row_union_bits);
+    // -- S_EVAL_SHIFT: final values (combinational) -----------------------
+    logic [9:0] eval_final_inter, eval_final_union;
+    always_comb begin
+        if (rd_valid) begin
+            eval_final_inter = accum_inter + {5'b0, row_inter};
+            eval_final_union = accum_union + {5'b0, row_union};
+        end else begin
+            eval_final_inter = accum_inter;
+            eval_final_union = accum_union;
+        end
+    end
 
+    // Best of this template (comparing final shift vs tmpl_best)
+    logic [9:0] chosen_inter, chosen_union;
+    always_comb begin
+        if (iou_better(eval_final_inter, eval_final_union,
+                       tmpl_best_inter, tmpl_best_union)) begin
+            chosen_inter = eval_final_inter;
+            chosen_union = eval_final_union;
+        end else begin
+            chosen_inter = tmpl_best_inter;
+            chosen_union = tmpl_best_union;
+        end
+    end
+
+    // -- Outputs ----------------------------------------------------------
     assign best_code = best_code_r;
     assign best_dist = best_dist_r;
     assign done      = (state == S_DONE);
 
+    // -- Sequential -------------------------------------------------------
     always_ff @(posedge clk) begin
         if (reset) begin
             state             <= S_IDLE;
@@ -210,102 +200,105 @@ module template_match
             rd_valid          <= 1'b0;
             row_cnt_d         <= '0;
             shift_idx_d       <= '0;
-
             accum_inter       <= '0;
             accum_union       <= '0;
             tmpl_best_inter   <= '0;
             tmpl_best_union   <= '0;
             global_best_inter <= '0;
             global_best_union <= '0;
-
-            best_code_r       <= '0;
+            best_code_r       <= REJECT_CODE;
             best_dist_r       <= 10'h3FF;
+            ink_row           <= '0;
+            ink_total         <= '0;
+            ink_reject        <= 1'b0;
         end else begin
+            // ROM pipeline tracking
             rd_valid    <= (state == S_COMPARE);
             row_cnt_d   <= row_cnt;
             shift_idx_d <= shift_idx;
 
             case (state)
+                // =========================================================
                 S_IDLE: begin
                     if (start) begin
                         tmpl_idx          <= '0;
                         shift_idx         <= '0;
                         row_cnt           <= '0;
                         rd_valid          <= 1'b0;
-
                         accum_inter       <= '0;
                         accum_union       <= '0;
                         tmpl_best_inter   <= '0;
                         tmpl_best_union   <= '0;
                         global_best_inter <= '0;
                         global_best_union <= '0;
-
-                        best_code_r       <= '0;
+                        best_code_r       <= REJECT_CODE;
                         best_dist_r       <= 10'h3FF;
-
-                        state             <= S_COMPARE;
+                        ink_row           <= '0;
+                        ink_total         <= '0;
+                        ink_reject        <= 1'b0;
+                        state             <= S_COUNT_INK;
                     end
                 end
 
+                // =========================================================
+                S_COUNT_INK: begin
+                    if (ink_row < CHAR_H) begin
+                        ink_total <= ink_total + {5'b0, popcount16(ink_chunk)};
+                        ink_row   <= ink_row + 1;
+                    end else begin
+                        if (ink_total < MIN_INK_PIXELS) begin
+                            ink_reject <= 1'b1;
+                            state      <= S_DONE;
+                        end else begin
+                            state <= S_COMPARE;
+                        end
+                    end
+                end
+
+                // =========================================================
                 S_COMPARE: begin
                     if (rd_valid) begin
                         accum_inter <= accum_inter + {5'b0, row_inter};
                         accum_union <= accum_union + {5'b0, row_union};
                     end
 
-                    if (row_cnt < CHAR_H - 1) begin
+                    if (row_cnt < CHAR_H - 1)
                         row_cnt <= row_cnt + 1;
-                    end else begin
+                    else
                         state <= S_EVAL_SHIFT;
-                    end
                 end
 
+                // =========================================================
                 S_EVAL_SHIFT: begin
-                    logic [9:0] final_inter;
-                    logic [9:0] final_union;
-
-                    final_inter = accum_inter;
-                    final_union = accum_union;
-
-                    if (rd_valid) begin
-                        final_inter = accum_inter + {5'b0, row_inter};
-                        final_union = accum_union + {5'b0, row_union};
-                    end
-
-                    if (iou_better(final_inter, final_union,
+                    // Update tmpl_best with this shift's result
+                    if (iou_better(eval_final_inter, eval_final_union,
                                    tmpl_best_inter, tmpl_best_union)) begin
-                        tmpl_best_inter <= final_inter;
-                        tmpl_best_union <= final_union;
+                        tmpl_best_inter <= eval_final_inter;
+                        tmpl_best_union <= eval_final_union;
                     end
 
+                    // Reset accumulators for next shift/template
                     accum_inter <= '0;
                     accum_union <= '0;
                     row_cnt     <= '0;
 
                     if (shift_idx < NUM_SHIFTS - 1) begin
+                        // More shifts to try for this template
                         shift_idx <= shift_idx + 1;
                         state     <= S_COMPARE;
                     end else begin
-                        logic [9:0] chosen_inter;
-                        logic [9:0] chosen_union;
-
-                        chosen_inter = tmpl_best_inter;
-                        chosen_union = tmpl_best_union;
-
-                        if (iou_better(final_inter, final_union,
-                                       tmpl_best_inter, tmpl_best_union)) begin
-                            chosen_inter = final_inter;
-                            chosen_union = final_union;
-                        end
-
+                        // All shifts done - compare best shift vs global best
+                        // chosen_inter/union picks the better of eval_final
+                        // vs tmpl_best (computed combinationally above)
                         if (iou_better(chosen_inter, chosen_union,
                                        global_best_inter, global_best_union)) begin
                             global_best_inter <= chosen_inter;
                             global_best_union <= chosen_union;
-                            best_code_r <= tmpl_idx;
+                            best_code_r       <= tmpl_idx;
                             best_dist_r       <= chosen_union - chosen_inter;
                         end
 
+                        // Reset for next template
                         tmpl_best_inter <= '0;
                         tmpl_best_union <= '0;
                         shift_idx       <= '0;
@@ -314,11 +307,12 @@ module template_match
                             tmpl_idx <= tmpl_idx + 1;
                             state    <= S_COMPARE;
                         end else begin
-                            state    <= S_DONE;
+                            state <= S_DONE;
                         end
                     end
                 end
 
+                // =========================================================
                 S_DONE: begin
                     state <= S_IDLE;
                 end

@@ -36,7 +36,7 @@ module top_level (
     // -- Threshold from switches ----------------------------------------------
     logic [7:0] threshold;
     assign threshold = sw[7:0];
-
+    
     // =========================================================================
     // CAMERA XCLK GENERATION (~25MHz from 100MHz)
     // OV7670 accepts 10-48MHz. 100/4 = 25MHz.
