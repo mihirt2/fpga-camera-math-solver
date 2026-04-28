@@ -32,7 +32,8 @@ module ocr_parser_top
 
     // debug binary image read port (for HDMI display)
     input  logic [13:0]                bin_dbg_raddr,
-    output logic [31:0]                bin_dbg_rdata
+    output logic [31:0]                bin_dbg_rdata,
+    output logic [TEMPLATE_BITS-1:0] dbg_normalized_char
 );
 
     //==========================================================================
@@ -222,7 +223,7 @@ module ocr_parser_top
     end
 
     assign bbox_raddr = (stage == S_COPY_BBOX) ? bbox_copy_idx : char_idx;
-
+    
     //==========================================================================
     // STAGE 3: NORMALIZE (CHAR_W x CHAR_H output)
     //==========================================================================
@@ -239,11 +240,23 @@ module ocr_parser_top
 
     logic [TEMPLATE_BITS-1:0] normalized_char;
 
+    // NEW - holds last character for debug display
+    logic norm_started;
     always_ff @(posedge clk) begin
-        if (reset || stage == S_NEXT_CHAR)
+        if (reset) begin
             normalized_char <= '0;
-        else if (norm_we)
-            normalized_char[TEMPLATE_BITS - 1 - norm_waddr * CHAR_W -: CHAR_W] <= norm_wdata;
+            norm_started <= 1'b0;
+        end else begin
+            if (stage != S_NORMALIZE)
+                norm_started <= 1'b0;
+            else if (!norm_started) begin
+                normalized_char <= '0;
+                norm_started <= 1'b1;
+            end
+
+            if (norm_we)
+                normalized_char[TEMPLATE_BITS - 1 - norm_waddr * CHAR_W -: CHAR_W] <= norm_wdata;
+        end
     end
 
     normalize u_normalize (
@@ -265,6 +278,8 @@ module ocr_parser_top
 
         .done       (normalize_done)
     );
+    
+    assign dbg_normalized_char = normalized_char;
 
     //==========================================================================
     // STAGE 4: TEMPLATE MATCH

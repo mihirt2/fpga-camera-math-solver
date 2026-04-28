@@ -51,7 +51,9 @@ input  logic        ocr_rd_en,      // was cam_rd_en
 input logic [1151:0] ocr_bboxes_flat,       // 32 × 36 = 1152 bits
 input logic [4:0]    ocr_num_chars,
 input logic [255:0]  ocr_result_chars_flat,  // 32 × 8  = 256 bits
-input logic [5:0]    ocr_result_len
+input logic [5:0]    ocr_result_len,
+
+input logic [TEMPLATE_BITS-1:0] dbg_normalized_char
 );
 
 localparam int TEXT_Y_START = IMG_H - CHAR_H;  // 208
@@ -274,6 +276,16 @@ logic [2:0] font_col_r;
 logic [3:0] font_row_r;
 logic [1:0] byte_index_r;
 logic       vde_r;
+logic in_norm_region_r;
+logic norm_dbg_pixel;
+
+always_ff @(posedge clk_25MHz) begin
+    in_norm_region_r <= (drawX >= 300) && (drawX < 316) && (drawY < 32);
+end
+
+// Use drawX_r/drawY_r (delayed) for pixel extraction
+assign norm_dbg_pixel = dbg_normalized_char[
+    TEMPLATE_BITS - 1 - drawY_r[4:0] * CHAR_W - (drawX_r - 10'd300)];
 
 always_ff @(posedge clk_25MHz) begin
     font_col_r   <= font_col;
@@ -422,6 +434,11 @@ always_comb begin
         // text bar background: black
         red   = 8'h00;
         green = 8'h00;
+        blue  = 8'h00;
+    end
+    else if (in_norm_region_r) begin
+        red   = norm_dbg_pixel ? 8'h00 : 8'h40;
+        green = norm_dbg_pixel ? 8'hFF : 8'h40;
         blue  = 8'h00;
     end
     else if (on_bbox_edge) begin
