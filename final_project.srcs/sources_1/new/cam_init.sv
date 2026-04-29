@@ -33,14 +33,17 @@ module cam_init(
     logic [2:0] write_bit_counter, write_bit_counter_next;
     logic [1:0] write_phase_counter, write_phase_counter_next;
 
-    logic hi_z, hi_z_next, scl_next, sda_drive_low_next;
+    logic scl_next, sda_drive_low_next;
 
     localparam int SCL_DIV = 1120;                               
     logic [$clog2(SCL_DIV)-1:0] scl_div_cnt;
+    localparam int STARTUP_DELAY_CYCLES = 5_000_000;  // 50 ms at 100 MHz
+    logic [$clog2(STARTUP_DELAY_CYCLES+1)-1:0] startup_cnt;
+    wire startup_done = (startup_cnt == STARTUP_DELAY_CYCLES);
+    wire init_start = start_fsm && startup_done && !write_flag;
 
-    // ROM depth: 31 entries (addresses 0-30)
-    // UPDATE THIS IF YOU ADD/REMOVE ROM ENTRIES
-    localparam logic [7:0] ROM_LAST_ADDR = 8'd44;
+    // ROM_LAST_ADDR must match the last valid OV7670_config_rom address.
+    localparam logic [7:0] ROM_LAST_ADDR = 8'd38;
 
 
     OV7670_config_rom camera_rom(
@@ -51,7 +54,8 @@ module cam_init(
 
     logic sda_drive_low;    
 
-    assign sda = (hi_z) ? (sda_drive_low ? 1'b0 : 1'bz) : (sda_drive_low ? 1'b0 : 1'b1); 
+    // SCCB/I2C SDA is open-drain: drive low or release to pullup.
+    assign sda = sda_drive_low ? 1'b0 : 1'bz;
     
     always_comb
     begin
@@ -63,15 +67,12 @@ module cam_init(
 
         scl_next = scl;
         sda_drive_low_next = sda_drive_low;
-        hi_z_next = hi_z;
-
         unique case(curr_state)
             s_start: begin
                 scl_next = 1'b1;
                 sda_drive_low_next = 1'b1;
             end
             s_stop: begin
-                hi_z_next = 1'b0;
                 scl_next = 1'b1;
                 sda_drive_low_next = 1'b0;
                 rom_addr_counter_next = rom_addr_counter + 8'd1;
@@ -85,7 +86,6 @@ module cam_init(
                         write_phase_counter_next = 2'd1;
                     end
                     2'd1: begin
-                        hi_z_next = 1'b1;
                         sda_drive_low_next = 1'b0;
                         write_phase_counter_next = 2'd2;
                     end
@@ -107,7 +107,6 @@ module cam_init(
                         write_phase_counter_next = 2'd1;
                     end
                     2'd1: begin
-                        hi_z_next = 1'b0;
                         case (write_byte_counter)
                             2'd0: sda_drive_low_next = ~addr_42[write_bit_counter];
                             2'd1: sda_drive_low_next = ~reg_addr[write_bit_counter];
@@ -127,10 +126,10 @@ module cam_init(
                 endcase
             end
             s_idle: begin
-                hi_z_next = 1'b0;
                 scl_next = 1'b1;
                 sda_drive_low_next = 1'b0;
-                rom_addr_counter_next = 8'd0;
+                if (!write_flag)
+                    rom_addr_counter_next = 8'd0;
                 write_byte_counter_next = 2'd0;
                 write_bit_counter_next = 3'd7;
                 write_phase_counter_next = 2'd0;
@@ -138,7 +137,7 @@ module cam_init(
         endcase
 
         case (curr_state)
-            s_idle:  next_state = start_fsm ? s_start : s_idle;
+            s_idle:  next_state = init_start ? s_start : s_idle;
             s_start: next_state = s_write;
             s_write: next_state = (write_bit_counter == 3'd0 && write_phase_counter == 2'd3) ? s_ack : s_write;
             s_ack: begin
@@ -167,11 +166,14 @@ module cam_init(
             write_bit_counter <= 3'd7;
             write_phase_counter <= 2'd0;
             scl_div_cnt <= '0;
+            startup_cnt <= '0;
             write_flag <= 1'b0;
             sda_drive_low <= 1'b0;
             scl <= 1'b1;
-            hi_z <= 1'b0;
         end else begin
+            if (!startup_done)
+                startup_cnt <= startup_cnt + 1'b1;
+
             if (scl_div_cnt == SCL_DIV-1) begin   
                 scl_div_cnt <= '0;        
                 curr_state <= next_state;
@@ -181,7 +183,6 @@ module cam_init(
                 write_phase_counter <= write_phase_counter_next; 
                 sda_drive_low <= sda_drive_low_next;
                 scl <= scl_next;
-                hi_z <= hi_z_next;
             end else begin
                 scl_div_cnt <= scl_div_cnt + 1'b1;
             end
