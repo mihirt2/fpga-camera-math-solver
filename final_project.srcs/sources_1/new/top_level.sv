@@ -24,6 +24,7 @@ module top_level (
 
     // Camera XCLK (~25MHz)
     output logic        clk_out2_0,
+    
 
     // Button
     input  logic        capture
@@ -36,7 +37,7 @@ module top_level (
     // -- Threshold from switches ----------------------------------------------
     logic [7:0] threshold;
     assign threshold = sw[7:0];
-    
+    logic [TEMPLATE_BITS-1:0] dbg_normalized_char;
     // =========================================================================
     // CAMERA XCLK GENERATION (~25MHz from 100MHz)
     // OV7670 accepts 10-48MHz. 100/4 = 25MHz.
@@ -165,7 +166,9 @@ module top_level (
         // Debug binary image
         .bin_dbg_en          (sw[8]),
         .bin_dbg_raddr       (bin_dbg_raddr),
-        .bin_dbg_rdata       (bin_dbg_rdata)
+        .bin_dbg_rdata       (bin_dbg_rdata),
+        // debug char
+        .dbg_normalized_char (dbg_normalized_char)
     );
 
     // =========================================================================
@@ -193,18 +196,25 @@ module top_level (
         .dbg_num_chars (dbg_num_chars),
 
         .bin_dbg_raddr (bin_dbg_raddr),
-        .bin_dbg_rdata (bin_dbg_rdata)
+        .bin_dbg_rdata (bin_dbg_rdata),
+        .dbg_char_sel  ({2'b00, sw[13:11]}),
+        .dbg_normalized_char (dbg_normalized_char)
     );
 
     // =========================================================================
     // LED DEBUG MUX
     // =========================================================================
+        logic norm_any_pixel;
+
+        assign norm_any_pixel = |dbg_normalized_char;
+
     always_comb begin
         case (sw[15:14])
             2'd0: led = {12'd0, stage_dbg};
             2'd1: led = {11'd0, dbg_num_chars};
             2'd2: led = dbg_bboxes[0][35:20];
-            2'd3: led = {cam_init_done, cam_frame_done, busy, result_valid, 4'd0, threshold};
+            2'd3: led = {cam_init_done, cam_frame_done, busy, result_valid,
+             norm_any_pixel, 3'd0, threshold};
         endcase
     end
 

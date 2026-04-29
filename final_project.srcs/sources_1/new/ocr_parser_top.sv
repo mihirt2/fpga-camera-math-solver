@@ -15,8 +15,7 @@ module ocr_parser_top
     output logic [16:0]                cam_rd_addr,
     input  logic [7:0]                 cam_rd_data,
     output logic                       cam_rd_en,
-    input  logic        adaptive,
-
+    input  logic                       adaptive,
     input  logic [7:0]                 threshold,
 
     output logic [7:0]                 result_chars [0:31],
@@ -26,14 +25,16 @@ module ocr_parser_top
     output logic [3:0]                 stage_dbg,
     output logic                       busy,
 
-    // debug bounding boxes for HDMI overlay
+    // Debug bounding boxes for HDMI overlay
     output logic [35:0]                   dbg_bboxes [0:MAX_CHARS-1],
     output logic [$clog2(MAX_CHARS)-1:0]  dbg_num_chars,
 
-    // debug binary image read port (for HDMI display)
+    // Debug binary image read port for HDMI display
     input  logic [13:0]                bin_dbg_raddr,
     output logic [31:0]                bin_dbg_rdata,
-    output logic [TEMPLATE_BITS-1:0] dbg_normalized_char
+
+    input  logic [4:0]                 dbg_char_sel,
+    output logic [TEMPLATE_BITS-1:0]   dbg_normalized_char
 );
 
     //==========================================================================
@@ -44,6 +45,7 @@ module ocr_parser_top
         S_BINARIZE,
         S_SEGMENT,
         S_COPY_BBOX,
+        S_LOAD_BBOX,
         S_NORMALIZE,
         S_MATCH,
         S_NEXT_CHAR,
@@ -55,6 +57,7 @@ module ocr_parser_top
 
     logic trigger_prev;
     wire trigger_edge = trigger & ~trigger_prev;
+
     always_ff @(posedge clk) begin
         if (reset)
             trigger_prev <= 1'b0;
@@ -78,45 +81,14 @@ module ocr_parser_top
     // BBOX COPY LOGIC
     //==========================================================================
     logic [$clog2(MAX_CHARS)-1:0] bbox_copy_idx;
-    logic                          bbox_copy_done;
-    logic                          bbox_copy_valid;
+    logic                         bbox_copy_done;
+    logic                         bbox_copy_valid;
+    logic [TEMPLATE_BITS-1:0]     norm_history [0:7];
 
     assign bbox_copy_done = bbox_copy_valid && (bbox_copy_idx == num_chars);
 
     //==========================================================================
-    // TOP-LEVEL FSM TRANSITIONS
-    //==========================================================================
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            stage    <= S_IDLE;
-            char_idx <= '0;
-        end else begin
-            stage <= stage_next;
-            if (stage == S_NEXT_CHAR)
-                char_idx <= char_idx + 1;
-            else if (stage == S_IDLE || stage == S_SEGMENT)
-                char_idx <= '0;
-        end
-    end
-
-    always_comb begin
-        stage_next = stage;
-        unique case (stage)
-            S_IDLE:      if (trigger_edge)    stage_next = S_BINARIZE;
-            S_BINARIZE:  if (binarize_done)   stage_next = S_SEGMENT;
-            S_SEGMENT:   if (segment_done)    stage_next = (num_chars == 0) ? S_IDLE : S_COPY_BBOX;
-            S_COPY_BBOX: if (bbox_copy_done)  stage_next = S_NORMALIZE;
-            S_NORMALIZE: if (normalize_done)  stage_next = S_MATCH;
-            S_MATCH:     if (match_done)      stage_next = S_NEXT_CHAR;
-            S_NEXT_CHAR: stage_next = (char_idx + 1 >= num_chars) ? S_PARSE : S_NORMALIZE;
-            S_PARSE:     if (parse_done)      stage_next = S_DONE;
-            S_DONE:      stage_next = S_IDLE;
-            default:     stage_next = S_IDLE;
-        endcase
-    end
-
-    //==========================================================================
-    // BINARY FRAME BUFFER (with debug read port)
+    // BINARY FRAME BUFFER
     //==========================================================================
     logic        bin_we;
     logic [13:0] bin_waddr;
@@ -149,7 +121,7 @@ module ocr_parser_top
         .reset     (reset),
         .start     (stage == S_BINARIZE),
         .threshold (threshold),
-        .adaptive (adaptive),
+        .adaptive  (adaptive),
         .cam_addr  (bin_cam_addr),
         .cam_data  (cam_rd_data),
         .cam_en    (bin_cam_en),
@@ -167,25 +139,25 @@ module ocr_parser_top
     logic [13:0] seg_bin_raddr;
 
     logic [$clog2(MAX_CHARS)-1:0] bbox_waddr;
-    logic                          bbox_we;
-    logic [35:0]                   bbox_wdata;
+    logic                         bbox_we;
+    logic [35:0]                  bbox_wdata;
     logic [$clog2(MAX_CHARS)-1:0] bbox_raddr;
-    logic [35:0]                   bbox_rdata;
+    logic [35:0]                  bbox_rdata;
 
     segment u_segment (
-        .clk       (clk),
-        .reset     (reset),
-        .start     (stage == S_SEGMENT),
+        .clk        (clk),
+        .reset      (reset),
+        .start      (stage == S_SEGMENT),
 
-        .bin_raddr (seg_bin_raddr),
-        .bin_rdata (bin_rdata),
+        .bin_raddr  (seg_bin_raddr),
+        .bin_rdata  (bin_rdata),
 
-        .bbox_waddr(bbox_waddr),
-        .bbox_wdata(bbox_wdata),
-        .bbox_we   (bbox_we),
+        .bbox_waddr (bbox_waddr),
+        .bbox_wdata (bbox_wdata),
+        .bbox_we    (bbox_we),
 
-        .num_chars (num_chars),
-        .done      (segment_done)
+        .num_chars  (num_chars),
+        .done       (segment_done)
     );
 
     bbox_storage u_bbox_storage (
@@ -198,13 +170,107 @@ module ocr_parser_top
     );
 
     //==========================================================================
-    // BBOX COPY (S_COPY_BBOX state)
+    // CURRENT BBOX SIGNALS
+    //==========================================================================
+    wire [9:0] cur_bbox_x_min = bbox_rdata[35:26];
+    wire [9:0] cur_bbox_x_max = bbox_rdata[25:16];
+    wire [7:0] cur_bbox_y_min = bbox_rdata[15:8];
+    wire [7:0] cur_bbox_y_max = bbox_rdata[7:0];
+
+    wire [9:0] bbox_width     = cur_bbox_x_max - cur_bbox_x_min;
+    wire [7:0] bbox_height    = cur_bbox_y_max - cur_bbox_y_min;
+    wire       bbox_too_small = (bbox_height < 8'd8) || (bbox_width < 10'd3);
+    wire       bbox_too_flat  = (bbox_height < 8'd4);
+
+    //==========================================================================
+    // TOP-LEVEL FSM STATE REGISTER
+    //==========================================================================
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            stage    <= S_IDLE;
+            char_idx <= '0;
+        end else begin
+            stage <= stage_next;
+
+            if (stage == S_NEXT_CHAR)
+                char_idx <= char_idx + 1;
+            else if (stage == S_IDLE || stage == S_SEGMENT)
+                char_idx <= '0;
+        end
+    end
+
+    //==========================================================================
+    // TOP-LEVEL FSM TRANSITIONS
+    //==========================================================================
+    always_comb begin
+        stage_next = stage;
+
+        unique case (stage)
+            S_IDLE: begin
+                if (trigger_edge)
+                    stage_next = S_BINARIZE;
+            end
+
+            S_BINARIZE: begin
+                if (binarize_done)
+                    stage_next = S_SEGMENT;
+            end
+
+            S_SEGMENT: begin
+                if (segment_done)
+                    stage_next = (num_chars == 0) ? S_DONE : S_COPY_BBOX;
+            end
+
+            S_COPY_BBOX: begin
+                if (bbox_copy_done)
+                    stage_next = S_LOAD_BBOX;
+            end
+
+            S_LOAD_BBOX: begin
+                stage_next = S_NORMALIZE;
+            end
+
+            S_NORMALIZE: begin
+                if (bbox_too_small || bbox_too_flat)
+                    stage_next = S_NEXT_CHAR;
+                else if (normalize_done)
+                    stage_next = S_MATCH;
+            end
+
+            S_MATCH: begin
+                if (match_done)
+                    stage_next = S_NEXT_CHAR;
+            end
+
+            S_NEXT_CHAR: begin
+                stage_next = (char_idx + 1 >= num_chars) ? S_PARSE : S_LOAD_BBOX;
+            end
+
+            S_PARSE: begin
+                if (parse_done)
+                    stage_next = S_DONE;
+            end
+
+            S_DONE: begin
+                if (trigger_edge)
+                    stage_next = S_BINARIZE;
+            end
+
+            default: begin
+                stage_next = S_IDLE;
+            end
+        endcase
+    end
+
+    //==========================================================================
+    // BBOX COPY
     //==========================================================================
     always_ff @(posedge clk) begin
         if (reset) begin
             bbox_copy_idx   <= '0;
             bbox_copy_valid <= 1'b0;
             dbg_num_chars   <= '0;
+
             for (int i = 0; i < MAX_CHARS; i++)
                 dbg_bboxes[i] <= '0;
         end else if (stage == S_SEGMENT && segment_done) begin
@@ -223,35 +289,32 @@ module ocr_parser_top
     end
 
     assign bbox_raddr = (stage == S_COPY_BBOX) ? bbox_copy_idx : char_idx;
-    
-    //==========================================================================
-    // STAGE 3: NORMALIZE (CHAR_W x CHAR_H output)
-    //==========================================================================
-    logic [13:0] norm_bin_raddr;
 
-    wire [9:0] cur_bbox_x_min = bbox_rdata[35:26];
-    wire [9:0] cur_bbox_x_max = bbox_rdata[25:16];
-    wire [7:0] cur_bbox_y_min = bbox_rdata[15:8];
-    wire [7:0] cur_bbox_y_max = bbox_rdata[7:0];
-
+    //==========================================================================
+    // STAGE 3: NORMALIZE
+    //==========================================================================
+    logic [13:0]        norm_bin_raddr;
     logic [4:0]         norm_waddr;
     logic [CHAR_W-1:0]  norm_wdata;
     logic               norm_we;
 
     logic [TEMPLATE_BITS-1:0] normalized_char;
-
-    // NEW - holds last character for debug display
     logic norm_started;
+    wire  normalize_start = (stage == S_NORMALIZE)
+                          && !norm_started
+                          && !bbox_too_small
+                          && !bbox_too_flat;
+
     always_ff @(posedge clk) begin
         if (reset) begin
             normalized_char <= '0;
-            norm_started <= 1'b0;
+            norm_started    <= 1'b0;
         end else begin
-            if (stage != S_NORMALIZE)
+            if (stage != S_NORMALIZE) begin
                 norm_started <= 1'b0;
-            else if (!norm_started) begin
+            end else if (!norm_started) begin
                 normalized_char <= '0;
-                norm_started <= 1'b1;
+                norm_started    <= 1'b1;
             end
 
             if (norm_we)
@@ -262,7 +325,7 @@ module ocr_parser_top
     normalize u_normalize (
         .clk        (clk),
         .reset      (reset),
-        .start      (stage == S_NORMALIZE),
+        .start      (normalize_start),
 
         .bbox_x_min (cur_bbox_x_min),
         .bbox_x_max (cur_bbox_x_max),
@@ -278,19 +341,41 @@ module ocr_parser_top
 
         .done       (normalize_done)
     );
-    
-    assign dbg_normalized_char = normalized_char;
+
+    always_ff @(posedge clk) begin
+        if (reset || stage == S_BINARIZE) begin
+            for (int i = 0; i < 8; i++)
+                norm_history[i] <= '0;
+        end else if (stage == S_NORMALIZE && normalize_done && char_idx < 8) begin
+            norm_history[char_idx] <= normalized_char;
+        end
+    end
+
+    assign dbg_normalized_char = norm_history[dbg_char_sel[2:0]];
 
     //==========================================================================
     // STAGE 4: TEMPLATE MATCH
     //==========================================================================
     logic [CHAR_CODE_WIDTH-1:0] matched_char;
     logic [9:0]                 match_distance;
+    logic                       match_started;
+    wire                        match_start = (stage == S_MATCH) && !match_started;
+
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            match_started <= 1'b0;
+        end else begin
+            if (stage != S_MATCH)
+                match_started <= 1'b0;
+            else if (!match_started)
+                match_started <= 1'b1;
+        end
+    end
 
     template_match u_match (
         .clk         (clk),
         .reset       (reset),
-        .start       (stage == S_MATCH),
+        .start       (match_start),
         .input_char  (normalized_char),
 
         .best_code   (matched_char),
@@ -328,10 +413,24 @@ module ocr_parser_top
     //==========================================================================
     // STAGE 6: RESULT FORMATTING
     //==========================================================================
+    logic format_started;
+    wire  format_start = (stage == S_DONE) && !format_started;
+
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            format_started <= 1'b0;
+        end else begin
+            if (stage != S_DONE)
+                format_started <= 1'b0;
+            else if (!format_started)
+                format_started <= 1'b1;
+        end
+    end
+
     int_to_ascii u_formatter (
         .clk           (clk),
         .reset         (reset),
-        .start         (stage == S_DONE),
+        .start         (format_start),
         .value         (parse_value),
         .char_codes    (char_codes),
         .num_chars     (num_chars),

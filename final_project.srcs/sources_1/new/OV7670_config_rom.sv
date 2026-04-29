@@ -48,7 +48,7 @@ always_ff @(posedge clk) begin
         23: dout <= 16'h73_F1;   // SCALING_PCLK_DIV - DSP clock /2
         24: dout <= 16'hA2_02;   // SCALING_PCLK_DELAY - default
 
-        // ---------- Window (QVGA 320×240) ----------
+        // ---------- Window (QVGA 320x240) ----------
         25: dout <= 16'h17_16;   // HSTART - bumped from 0x13 to 0x16
         26: dout <= 16'h18_04;   // HSTOP  - bumped from 0x01 to 0x04
         27: dout <= 16'h32_80;   // HREF   - no edge offset
@@ -58,7 +58,7 @@ always_ff @(posedge clk) begin
 
         // ---------- Auto-exposure / AGC / AWB ----------
         31: dout <= 16'h13_E7;   // COM8   - AGC, AWB, AEC on
-        32: dout <= 16'h14_18;   // COM9   - 4× AGC ceiling
+        32: dout <= 16'h14_18;   // COM9   - 4x AGC ceiling
         33: dout <= 16'h24_95;   // AEW    - AGC/AEC upper limit
         34: dout <= 16'h25_33;   // AEB    - AGC/AEC lower limit
         35: dout <= 16'h26_E3;   // VPT    - AGC/AEC fast zone

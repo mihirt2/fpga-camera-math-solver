@@ -38,6 +38,7 @@ module segment
     localparam int MIN_CHAR_W     = 3;
     localparam int MIN_GAP        = 5;
     localparam int MIN_COL_PIXELS = 3;  // noise threshold per column
+    localparam int MIN_ROW_PIXELS = 3;  // reject isolated specks in bbox row scan
 
     // Restrict vertical range for column scan (reject top/bottom noise)
     localparam int ROW_MIN = 20;
@@ -87,7 +88,13 @@ module segment
     logic [9:0]  record_x_min, record_x_max;
 
     // Column occupied test
-    wire col_occupied = (col_count[col_idx] >= MIN_COL_PIXELS);
+    wire [7:0] col_count_cur  = (col_idx < IMG_W) ? col_count[col_idx] : 8'd0;
+    wire [7:0] col_count_prev = (col_idx == 0 || col_idx > IMG_W) ? 8'd0 : col_count[col_idx - 1];
+    wire [7:0] col_count_next = (col_idx >= IMG_W - 1) ? 8'd0 : col_count[col_idx + 1];
+    wire col_occupied = (col_count_cur >= MIN_COL_PIXELS);
+    wire col_prev_occupied = (col_count_prev >= MIN_COL_PIXELS);
+    wire col_next_occupied = (col_count_next >= MIN_COL_PIXELS);
+    wire col_supported = col_occupied && (col_prev_occupied || col_next_occupied);
 
     // -- Row scan registers -----------------------------------------------
     logic [$clog2(MAX_CHARS)-1:0] char_idx, char_idx_next;
@@ -98,18 +105,24 @@ module segment
     logic [$clog2(WORDS_PER_ROW)-1:0] rs_word_d;
     logic        rs_valid;
     logic        rs_row_has_pixel, rs_row_has_pixel_next;
+    logic [7:0]  rs_row_pixel_count, rs_row_pixel_count_next;
 
     logic [$clog2(IMG_H)-1:0] cur_y_min, cur_y_max;
     logic        found_y_min;
 
     // -- Row scan: check if BRAM word has any pixel in [x_min, x_max] -----
     logic rs_word_hit;
+    logic [5:0] rs_word_pixel_count;
     always_comb begin
         rs_word_hit = 1'b0;
+        rs_word_pixel_count = '0;
         for (int b = 0; b < 32; b++) begin
             if ((rs_word_d * 32 + b) >= char_x_min[char_idx] &&
-                (rs_word_d * 32 + b) <= char_x_max[char_idx])
+                (rs_word_d * 32 + b) <= char_x_max[char_idx] &&
+                bin_rdata[b]) begin
                 rs_word_hit = rs_word_hit | bin_rdata[b];
+                rs_word_pixel_count = rs_word_pixel_count + 6'd1;
+            end
         end
     end
 
@@ -142,6 +155,7 @@ module segment
         row_idx_next          = row_idx;
         word_in_row_next      = word_in_row;
         rs_row_has_pixel_next = rs_row_has_pixel;
+        rs_row_pixel_count_next = rs_row_pixel_count;
 
         bbox_we    = 1'b0;
         bbox_waddr = '0;
@@ -172,7 +186,7 @@ module segment
             // =============================================================
             S_FIND_COLS: begin
                 if (col_idx < IMG_W) begin
-                    if (col_occupied) begin
+                    if (col_supported) begin
                         gap_count_next = 0;
                         if (!in_run)
                             in_run_next = 1'b1;
@@ -212,6 +226,7 @@ module segment
                 row_idx_next          = '0;
                 word_in_row_next      = char_x_min[char_idx][9:5];
                 rs_row_has_pixel_next = 1'b0;
+                rs_row_pixel_count_next = '0;
                 state_next            = S_RS_READ;
             end
 
@@ -219,8 +234,11 @@ module segment
             S_RS_READ: begin
                 bin_raddr = row_idx * WORDS_PER_ROW + word_in_row;
 
-                if (rs_valid)
+                if (rs_valid) begin
                     rs_row_has_pixel_next = rs_row_has_pixel | rs_word_hit;
+                    rs_row_pixel_count_next = rs_row_pixel_count
+                                            + {2'b0, rs_word_pixel_count};
+                end
 
                 if (word_in_row < rs_last_word)
                     word_in_row_next = word_in_row + 1;
@@ -230,8 +248,11 @@ module segment
 
             // =============================================================
             S_RS_DRAIN: begin
-                if (rs_valid)
+                if (rs_valid) begin
                     rs_row_has_pixel_next = rs_row_has_pixel | rs_word_hit;
+                    rs_row_pixel_count_next = rs_row_pixel_count
+                                            + {2'b0, rs_word_pixel_count};
+                end
 
                 if (row_idx < IMG_H - 1) begin
                     row_idx_next     = row_idx + 1;
@@ -283,6 +304,7 @@ module segment
             rs_valid         <= 1'b0;
             rs_word_d        <= '0;
             rs_row_has_pixel <= 1'b0;
+            rs_row_pixel_count <= '0;
             cur_y_min        <= '0;
             cur_y_max        <= '0;
             found_y_min      <= 1'b0;
@@ -303,6 +325,7 @@ module segment
             row_idx          <= row_idx_next;
             word_in_row      <= word_in_row_next;
             rs_row_has_pixel <= rs_row_has_pixel_next;
+            rs_row_pixel_count <= rs_row_pixel_count_next;
 
             // BRAM latency tracking
             scan_valid  <= (state == S_COL_SCAN);
@@ -333,6 +356,7 @@ module segment
                 rs_valid         <= 1'b0;
                 rs_word_d        <= '0;
                 rs_row_has_pixel <= 1'b0;
+                rs_row_pixel_count <= '0;
                 cur_y_min        <= '0;
                 cur_y_max        <= '0;
                 found_y_min      <= 1'b0;
@@ -343,7 +367,7 @@ module segment
             end
 
             // -- FIND_COLS: latch run_start --
-            if (state == S_FIND_COLS && col_idx < IMG_W && col_occupied && !in_run)
+            if (state == S_FIND_COLS && col_idx < IMG_W && col_supported && !in_run)
                 run_start <= col_idx;
 
             // -- FIND_COLS: record character --
@@ -358,6 +382,7 @@ module segment
                 cur_y_min   <= '0;
                 cur_y_max   <= '0;
                 found_y_min <= 1'b0;
+                rs_row_pixel_count <= '0;
             end
 
             if (state == S_RS_INIT) begin
@@ -367,15 +392,17 @@ module segment
 
             // -- RS_DRAIN: update y bounds then clear for next row --
             if (state == S_RS_DRAIN) begin
-                if (rs_row_has_pixel_next) begin
+                if (rs_row_pixel_count_next >= MIN_ROW_PIXELS) begin
                     if (!found_y_min) begin
                         cur_y_min   <= row_idx;
                         found_y_min <= 1'b1;
                     end
                     cur_y_max <= row_idx;
                 end
-                if (row_idx < IMG_H - 1)
+                if (row_idx < IMG_H - 1) begin
                     rs_row_has_pixel <= 1'b0;
+                    rs_row_pixel_count <= '0;
+                end
             end
 
             // -- Outputs --

@@ -48,9 +48,9 @@ input  logic [16:0] ocr_rd_addr,    // was cam_rd_addr
 output logic [7:0]  ocr_rd_data,    // was cam_rd_data
 input  logic        ocr_rd_en,      // was cam_rd_en
 
-input logic [1151:0] ocr_bboxes_flat,       // 32 × 36 = 1152 bits
+input logic [1151:0] ocr_bboxes_flat,       // 32 x 36 = 1152 bits
 input logic [4:0]    ocr_num_chars,
-input logic [255:0]  ocr_result_chars_flat,  // 32 × 8  = 256 bits
+input logic [255:0]  ocr_result_chars_flat,  // 32 x 8  = 256 bits
 input logic [5:0]    ocr_result_len,
 
 input logic [TEMPLATE_BITS-1:0] dbg_normalized_char
@@ -437,9 +437,9 @@ always_comb begin
         blue  = 8'h00;
     end
     else if (in_norm_region_r) begin
-        red   = norm_dbg_pixel ? 8'h00 : 8'h40;
-        green = norm_dbg_pixel ? 8'hFF : 8'h40;
-        blue  = 8'h00;
+        red   = norm_dbg_pixel ? 8'h00 : 8'h08;
+        green = norm_dbg_pixel ? 8'hFF : 8'h08;
+        blue  = norm_dbg_pixel ? 8'h00 : 8'h08;
     end
     else if (on_bbox_edge) begin
         // bounding box edges: red
