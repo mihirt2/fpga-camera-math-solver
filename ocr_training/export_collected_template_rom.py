@@ -8,6 +8,7 @@ from PIL import Image
 IMG_W = 16
 IMG_H = 32
 MAX_SAMPLES = 10
+PREFER_NEWEST_LABELS = {"5"}
 
 ROOT = Path("ocr_training/data/normalized_chars/labeled")
 OUT_SV = Path("final_project.srcs/sources_1/new/font_rom_16x32.sv")
@@ -56,6 +57,8 @@ def class_files(label: str) -> list[Path]:
     files: list[Path] = []
     for suffix in ("*.png", "*.pbm", "*.jpg", "*.jpeg"):
         files.extend(class_dir.glob(suffix))
+    if label in PREFER_NEWEST_LABELS:
+        return sorted(files, key=lambda p: (p.stat().st_mtime, p.name), reverse=True)[:MAX_SAMPLES]
     return sorted(files)[:MAX_SAMPLES]
 
 
