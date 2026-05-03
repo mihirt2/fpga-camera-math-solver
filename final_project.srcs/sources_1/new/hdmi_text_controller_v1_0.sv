@@ -418,19 +418,28 @@ end
 localparam int TEXT_MAX_CHARS = IMG_W / CHAR_W;  // 20
 
 // ?? Stage 0: compute text position, issue font ROM read ??????????????
+logic [4:0]  ocr_text_start_slot;
+logic [4:0]  ocr_visible_len;
+logic [4:0]  ocr_slot_abs;
 logic [4:0]  ocr_char_slot;    // which character in result (0..19)
 logic [3:0]  ocr_char_col;     // pixel column within glyph (0..15)
 logic [4:0]  ocr_char_row;     // pixel row within glyph (0..31)
 logic        ocr_in_text;      // pixel is in text bar AND has a character
 logic        ocr_in_bar;       // pixel is in the text bar background
 
-assign ocr_char_slot = drawX[8:4];                    // drawX / 16
+assign ocr_visible_len = (ocr_result_len > TEXT_MAX_CHARS) ? TEXT_MAX_CHARS[4:0]
+                                                            : ocr_result_len[4:0];
+assign ocr_text_start_slot = TEXT_MAX_CHARS[4:0] - ocr_visible_len;
+assign ocr_slot_abs  = drawX[8:4];                    // drawX / 16
+assign ocr_char_slot = ocr_slot_abs - ocr_text_start_slot;
 assign ocr_char_col  = drawX[3:0];                    // drawX % 16
 assign ocr_char_row  = drawY[4:0] - TEXT_Y_START[4:0]; // row within glyph
 
 assign ocr_in_bar  = (drawY >= TEXT_Y_START) && (drawY < IMG_H)
                    && (drawX < IMG_W);
-assign ocr_in_text = ocr_in_bar && (ocr_char_slot < ocr_result_len);
+assign ocr_in_text = ocr_in_bar
+                  && (ocr_slot_abs >= ocr_text_start_slot)
+                  && (ocr_char_slot < ocr_visible_len);
 
 // font ROM for OCR result text (16x32 glyphs)
 logic [6:0]  ocr_rom_char;

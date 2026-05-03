@@ -439,17 +439,40 @@ module ocr_parser_top
     //==========================================================================
     // STAGE 5: PARSE
     //==========================================================================
-    logic signed [31:0] parse_value;
+    logic [CHAR_CODE_WIDTH-1:0] solver_char_codes [0:MAX_CHARS-1];
+    logic [$clog2(MAX_CHARS+1)-1:0] solver_num_chars;
+    logic                            parse_valid;
+    logic                            parse_error;
+    poly_pkg::polynomial_t           parse_poly;
 
-    expr_parser u_parser (
+    always_comb begin
+        solver_num_chars = $clog2(MAX_CHARS + 1)'(num_chars);
+        for (int i = 0; i < MAX_CHARS; i++) begin
+            unique case (char_codes[i])
+                4'd10:   solver_char_codes[i] = 4'd10; // '+'
+                4'd11:   solver_char_codes[i] = 4'd13; // 'x'
+                4'd12:   solver_char_codes[i] = 4'd12; // '*'
+                4'd13:   solver_char_codes[i] = 4'd11; // '=' -> '-'
+                4'd14:   solver_char_codes[i] = 4'd14; // '('
+                4'd15:   solver_char_codes[i] = 4'd15; // ')'
+                default: solver_char_codes[i] = char_codes[i];
+            endcase
+        end
+    end
+
+    parser #(
+        .MAX_CHARS       (MAX_CHARS),
+        .CHAR_CODE_WIDTH (CHAR_CODE_WIDTH)
+    ) u_parser (
         .clk        (clk),
         .reset      (reset),
         .start      (stage == S_PARSE),
-        .char_codes (char_codes),
-        .num_chars  (num_chars),
-
-        .value      (parse_value),
-        .done       (parse_done)
+        .char_codes (solver_char_codes),
+        .num_chars  (solver_num_chars),
+        .done       (parse_done),
+        .valid      (parse_valid),
+        .error      (parse_error),
+        .poly       (parse_poly)
     );
 
     //==========================================================================
@@ -469,13 +492,13 @@ module ocr_parser_top
         end
     end
 
-    int_to_ascii u_formatter (
+    coeff_to_ascii u_formatter (
         .clk           (clk),
         .reset         (reset),
         .start         (format_start),
-        .value         (parse_value),
-        .char_codes    (char_codes),
-        .num_chars     (num_chars),
+        .parse_valid   (parse_valid),
+        .parse_error   (parse_error),
+        .poly          (parse_poly),
         .result_chars  (result_chars),
         .result_len    (result_len),
         .result_valid  (result_valid)
