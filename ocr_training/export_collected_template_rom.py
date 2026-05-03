@@ -1,0 +1,135 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from PIL import Image
+
+
+IMG_W = 16
+IMG_H = 32
+MAX_SAMPLES = 10
+
+ROOT = Path("ocr_training/data/normalized_chars/labeled")
+OUT_SV = Path("final_project.srcs/sources_1/new/font_rom_16x32.sv")
+
+CLASSES = [
+    ("0", 0),
+    ("1", 1),
+    ("2", 2),
+    ("3", 3),
+    ("4", 4),
+    ("5", 5),
+    ("6", 6),
+    ("7", 7),
+    ("8", 8),
+    ("9", 9),
+    ("plus", 10),
+    ("x", 11),
+    ("times", 12),
+    ("equals", 13),
+    ("open_paren", 14),
+    ("close_paren", 15),
+]
+
+START = "// BEGIN GENERATED COLLECTED NORMALIZED TEMPLATE ROM"
+END = "// END GENERATED COLLECTED NORMALIZED TEMPLATE ROM"
+
+
+def image_rows(path: Path) -> list[int]:
+    img = Image.open(path).convert("L")
+    if img.size != (IMG_W, IMG_H):
+        img = img.resize((IMG_W, IMG_H), Image.Resampling.NEAREST)
+
+    rows: list[int] = []
+    pixels = img.load()
+    for y in range(IMG_H):
+        word = 0
+        for x in range(IMG_W):
+            if pixels[x, y] < 128:
+                word |= 1 << (IMG_W - 1 - x)
+        rows.append(word)
+    return rows
+
+
+def class_files(label: str) -> list[Path]:
+    class_dir = ROOT / label
+    files: list[Path] = []
+    for suffix in ("*.png", "*.pbm", "*.jpg", "*.jpeg"):
+        files.extend(class_dir.glob(suffix))
+    return sorted(files)[:MAX_SAMPLES]
+
+
+def build_module() -> tuple[str, list[tuple[str, int, int]]]:
+    lines: list[str] = [
+        START,
+        "",
+        "module collected_norm_template_rom (",
+        "    input  logic        clk,",
+        "    input  logic [3:0]  class_idx,",
+        "    input  logic [3:0]  sample_idx,",
+        "    input  logic [4:0]  row,",
+        "    output logic [15:0] bits",
+        ");",
+        "",
+        "    (* rom_style = \"block\" *) logic [15:0] rom [0:15][0:9][0:31];",
+        "",
+        "    initial begin : init_collected_norm_template_rom",
+        "        integer c, s, r;",
+        "        for (c = 0; c < 16; c = c + 1)",
+        "            for (s = 0; s < 10; s = s + 1)",
+        "                for (r = 0; r < 32; r = r + 1)",
+        "                    rom[c][s][r] = 16'h0000;",
+        "",
+    ]
+
+    summary: list[tuple[str, int, int]] = []
+    for label, code in CLASSES:
+        files = class_files(label)
+        if not files:
+            raise SystemExit(f"No images found for label {label!r} in {ROOT / label}")
+        summary.append((label, code, len(files)))
+        lines.append(f"        // class {code}: {label}, {len(files)} sample(s)")
+        for sample_idx, path in enumerate(files):
+            rows = image_rows(path)
+            lines.append(f"        // sample {sample_idx}: {path.as_posix()}")
+            for row_idx, word in enumerate(rows):
+                lines.append(
+                    f"        rom[4'd{code}][4'd{sample_idx}][5'd{row_idx}] = 16'h{word:04X};"
+                )
+            lines.append("")
+
+    lines.extend(
+        [
+            "    end",
+            "",
+            "    always_ff @(posedge clk) begin",
+            "        bits <= rom[class_idx][sample_idx][row];",
+            "    end",
+            "",
+            "endmodule",
+            "",
+            END,
+            "",
+        ]
+    )
+    return "\n".join(lines), summary
+
+
+def main() -> None:
+    module_text, summary = build_module()
+    original = OUT_SV.read_text(encoding="utf-8")
+
+    if START in original and END in original:
+        before = original.split(START, 1)[0]
+        after = original.split(END, 1)[1]
+        updated = before.rstrip() + "\n\n" + module_text.rstrip() + "\n" + after
+    else:
+        updated = original.rstrip() + "\n\n" + module_text
+
+    OUT_SV.write_text(updated, encoding="utf-8", newline="\n")
+    for label, code, count in summary:
+        print(f"class {code:2d} {label:11s}: {count} sample(s)")
+
+
+if __name__ == "__main__":
+    main()

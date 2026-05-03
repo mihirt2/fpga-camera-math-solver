@@ -13,6 +13,9 @@ module top_level (
     output logic [2:0]  HDMI_0_tmds_data_n,
     output logic [2:0]  HDMI_0_tmds_data_p,
 
+    // USB UART normalized-character dump
+    output logic        uart_rtl_0_txd,
+
     // Camera
     inout  wire         cam_sda_0,
     output logic        cam_scl_0,
@@ -38,6 +41,10 @@ module top_level (
     logic [7:0] threshold;
     assign threshold = sw[7:0];
     logic [TEMPLATE_BITS-1:0] dbg_normalized_char;
+    logic [MAX_CHARS*TEMPLATE_BITS-1:0] dbg_norm_chars_flat;
+    logic result_valid_d;
+    logic uart_dump_start;
+    logic uart_dump_busy;
     // =========================================================================
     // CAMERA XCLK GENERATION (~25MHz from 100MHz)
     // OV7670 accepts 10-48MHz. 100/4 = 25MHz.
@@ -49,7 +56,10 @@ module top_level (
         else
             xclk_div <= xclk_div + 2'd1;
     end
-    assign clk_out2_0 = xclk_div[1];   // 25MHz
+
+    logic cam_xclk;
+    assign cam_xclk   = xclk_div[1];   // 25MHz
+    assign clk_out2_0 = cam_xclk;
 
     // =========================================================================
     // CAMERA CONTROLLER (I2C init + OV7670 capture)
@@ -61,7 +71,7 @@ module top_level (
     logic        cam_frame_done;
 
     camera_controller u_cam (
-        .clk_25      (clk_out2_0),
+        .clk_25      (cam_xclk),
         .clk_100     (clk_100MHz),
         .reset       (reset_ah),
         .cam_sda     (cam_sda_0),
@@ -87,6 +97,17 @@ module top_level (
     logic [1151:0] ocr_bboxes_flat;
     logic [255:0]  ocr_result_chars_flat;
 
+    // -- OCR result signals ---------------------------------------------------
+    logic [7:0]  result_chars [0:31];
+    logic [5:0]  result_len;
+    logic        result_valid;
+    logic [3:0]  stage_dbg;
+    logic        busy;
+
+    // -- Debug bbox signals ---------------------------------------------------
+    logic [35:0]                   dbg_bboxes [0:MAX_CHARS-1];
+    logic [$clog2(MAX_CHARS)-1:0]  dbg_num_chars;
+
     always_comb begin
         for (int i = 0; i < 32; i++) begin
             ocr_bboxes_flat[i*36 +: 36]      = dbg_bboxes[i];
@@ -102,17 +123,6 @@ module top_level (
     logic [16:0] cam_rd_addr;
     logic [7:0]  cam_rd_data;
     logic        cam_rd_en;
-
-    // -- OCR result signals ---------------------------------------------------
-    logic [7:0]  result_chars [0:31];
-    logic [5:0]  result_len;
-    logic        result_valid;
-    logic [3:0]  stage_dbg;
-    logic        busy;
-
-    // -- Debug bbox signals ---------------------------------------------------
-    logic [35:0]                   dbg_bboxes [0:MAX_CHARS-1];
-    logic [$clog2(MAX_CHARS)-1:0]  dbg_num_chars;
 
     hdmi_text_controller_v1_0 u_hdmi (
         // HDMI outputs
@@ -168,13 +178,18 @@ module top_level (
         .bin_dbg_raddr       (bin_dbg_raddr),
         .bin_dbg_rdata       (bin_dbg_rdata),
         // debug char
-        .dbg_normalized_char (dbg_normalized_char)
+        .dbg_normalized_char (dbg_normalized_char),
+        .dbg_norm_chars_flat (dbg_norm_chars_flat)
     );
 
     // =========================================================================
     // OCR PIPELINE
     // =========================================================================
-    ocr_parser_top u_ocr (
+    ocr_parser_top #(
+        // Keep the CNN out of the hardware build; the collected-template IoU
+        // matcher is now the active recognizer.
+        .USE_CNN_MATCH(1'b0)
+    ) u_ocr (
         .clk           (clk_100MHz),
         .reset         (reset_ah),
         .trigger       (capture),
@@ -198,7 +213,30 @@ module top_level (
         .bin_dbg_raddr (bin_dbg_raddr),
         .bin_dbg_rdata (bin_dbg_rdata),
         .dbg_char_sel  ({2'b00, sw[13:11]}),
-        .dbg_normalized_char (dbg_normalized_char)
+        .dbg_normalized_char (dbg_normalized_char),
+        .dbg_norm_chars_flat (dbg_norm_chars_flat)
+    );
+
+    always_ff @(posedge clk_100MHz) begin
+        if (reset_ah)
+            result_valid_d <= 1'b0;
+        else
+            result_valid_d <= result_valid;
+    end
+
+    assign uart_dump_start = result_valid && !result_valid_d;
+
+    norm_uart_dump #(
+        .CLK_HZ (100_000_000),
+        .BAUD   (115200)
+    ) u_norm_uart_dump (
+        .clk             (clk_100MHz),
+        .reset           (reset_ah),
+        .start           (uart_dump_start),
+        .num_chars       (dbg_num_chars),
+        .norm_chars_flat (dbg_norm_chars_flat),
+        .tx              (uart_rtl_0_txd),
+        .busy            (uart_dump_busy)
     );
 
     // =========================================================================
@@ -214,7 +252,7 @@ module top_level (
             2'd1: led = {11'd0, dbg_num_chars};
             2'd2: led = dbg_bboxes[0][35:20];
             2'd3: led = {cam_init_done, cam_frame_done, busy, result_valid,
-             norm_any_pixel, 3'd0, threshold};
+             uart_dump_busy, norm_any_pixel, 2'd0, threshold};
         endcase
     end
 

@@ -6,6 +6,18 @@
 
 module ocr_parser_top
     import ocr_pkg::*;
+#(
+    parameter bit USE_CNN_MATCH = 1'b0,
+
+    parameter string CNN_CONV1_W_FILE    = "vivado_q8_8/conv1_weight.mem",
+    parameter string CNN_CONV2_W_FILE    = "vivado_q8_8/conv2_weight.mem",
+    parameter string CNN_CONV3_W_FILE    = "vivado_q8_8/conv3_weight.mem",
+    parameter string CNN_FC1_W_FILE      = "vivado_q8_8/fc1_weight.mem",
+    parameter string CNN_FC1_B_FILE      = "vivado_q8_8/fc1_bias.mem",
+    parameter string CNN_FC2_W_FILE      = "vivado_q8_8/fc2_weight.mem",
+    parameter string CNN_FC2_B_FILE      = "vivado_q8_8/fc2_bias.mem",
+    parameter string CNN_CLASS_CODE_FILE = "vivado_q8_8/class_code.mem"
+)
 (
     input  logic                       clk,
     input  logic                       reset,
@@ -34,7 +46,8 @@ module ocr_parser_top
     output logic [31:0]                bin_dbg_rdata,
 
     input  logic [4:0]                 dbg_char_sel,
-    output logic [TEMPLATE_BITS-1:0]   dbg_normalized_char
+    output logic [TEMPLATE_BITS-1:0]   dbg_normalized_char,
+    output logic [MAX_CHARS*TEMPLATE_BITS-1:0] dbg_norm_chars_flat
 );
 
     //==========================================================================
@@ -83,7 +96,7 @@ module ocr_parser_top
     logic [$clog2(MAX_CHARS)-1:0] bbox_copy_idx;
     logic                         bbox_copy_done;
     logic                         bbox_copy_valid;
-    logic [TEMPLATE_BITS-1:0]     norm_history [0:7];
+    logic [TEMPLATE_BITS-1:0]     norm_history [0:MAX_CHARS-1];
 
     assign bbox_copy_done = bbox_copy_valid && (bbox_copy_idx == num_chars);
 
@@ -344,14 +357,19 @@ module ocr_parser_top
 
     always_ff @(posedge clk) begin
         if (reset || stage == S_BINARIZE) begin
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < MAX_CHARS; i++)
                 norm_history[i] <= '0;
-        end else if (stage == S_NORMALIZE && normalize_done && char_idx < 8) begin
+        end else if (stage == S_NORMALIZE && normalize_done && char_idx < MAX_CHARS) begin
             norm_history[char_idx] <= normalized_char;
         end
     end
 
-    assign dbg_normalized_char = norm_history[dbg_char_sel[2:0]];
+    assign dbg_normalized_char = norm_history[dbg_char_sel];
+
+    always_comb begin
+        for (int i = 0; i < MAX_CHARS; i++)
+            dbg_norm_chars_flat[i*TEMPLATE_BITS +: TEMPLATE_BITS] = norm_history[i];
+    end
 
     //==========================================================================
     // STAGE 4: TEMPLATE MATCH
@@ -372,16 +390,40 @@ module ocr_parser_top
         end
     end
 
-    template_match u_match (
-        .clk         (clk),
-        .reset       (reset),
-        .start       (match_start),
-        .input_char  (normalized_char),
+    generate
+        if (USE_CNN_MATCH) begin : g_cnn_match
+            tiny_math_cnn_match #(
+                .CONV1_W_FILE    (CNN_CONV1_W_FILE),
+                .CONV2_W_FILE    (CNN_CONV2_W_FILE),
+                .CONV3_W_FILE    (CNN_CONV3_W_FILE),
+                .FC1_W_FILE      (CNN_FC1_W_FILE),
+                .FC1_B_FILE      (CNN_FC1_B_FILE),
+                .FC2_W_FILE      (CNN_FC2_W_FILE),
+                .FC2_B_FILE      (CNN_FC2_B_FILE),
+                .CLASS_CODE_FILE (CNN_CLASS_CODE_FILE)
+            ) u_match (
+                .clk         (clk),
+                .reset       (reset),
+                .start       (match_start),
+                .input_char  (normalized_char),
 
-        .best_code   (matched_char),
-        .best_dist   (match_distance),
-        .done        (match_done)
-    );
+                .best_code   (matched_char),
+                .best_dist   (match_distance),
+                .done        (match_done)
+            );
+        end else begin : g_iou_match
+            template_match u_match (
+                .clk         (clk),
+                .reset       (reset),
+                .start       (match_start),
+                .input_char  (normalized_char),
+
+                .best_code   (matched_char),
+                .best_dist   (match_distance),
+                .done        (match_done)
+            );
+        end
+    endgenerate
 
     logic [CHAR_CODE_WIDTH-1:0] char_codes [0:MAX_CHARS-1];
 

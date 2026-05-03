@@ -4,10 +4,35 @@
 # allow directories
 !*/
 
-# allow source RTL only
+# keep generated Vivado output ignored
+final_project.cache/**
+final_project.gen/**
+final_project.hw/**
+final_project.ip_user_files/**
+final_project.runs/**
+final_project.sim/**
+final_project.tmp/**
+
+# allow source/project files
 !*.sv
 !*.vh
 !*.svh
+!*.xpr
+!*.xci
+!*.xcix
+!*.xdc
+!*.ipynb
+!*.mem
+!*.py
+!*.md
+
+# keep local OCR training data and training runs out of git
+ocr_training/data/**
+ocr_training/runs/**
+ocr_training/__pycache__/**
 
 # allow this ignore file if you decide to commit it
 !.gitignore
+
+# keep submodule metadata tracked
+!.gitmodules

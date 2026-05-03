@@ -27,6 +27,6 @@ package ocr_pkg;
     parameter int CHAR_W          = 16;
     parameter int CHAR_H          = 32;
     parameter int TEMPLATE_BITS   = CHAR_W * CHAR_H;   // 512
-    parameter int NUM_TEMPLATES   = 16;                 // 0-9, +, -, *, /, (, )
+    parameter int NUM_TEMPLATES   = 16;                 // 0-9, +, x, *, =, (, )
     parameter int CHAR_CODE_WIDTH = $clog2(NUM_TEMPLATES);  // 4
 endpackage

@@ -21,6 +21,9 @@ module tb_ocr_parser_top
     import ocr_pkg::*;
 ();
 
+    localparam bit USE_CNN_MATCH = 1'b1;
+    localparam string CNN_WEIGHT_DIR = "../../../../vivado_q8_8";
+
     localparam byte CH_1    = 8'h31;
     localparam byte CH_5    = 8'h35;
     localparam byte CH_PLUS = 8'h2B;
@@ -28,8 +31,8 @@ module tb_ocr_parser_top
     localparam byte CH_7    = 8'h37;
 
     localparam bit ENABLE_NOISE = 1'b1;
-    localparam int PEPPER_PER_CHAR = 50;  // remove this many ink pixels per char cell
-    localparam int SALT_PER_CHAR   = 50;  // add this many isolated black pixels nearby
+    localparam int PEPPER_PER_CHAR = 2;  // remove this many ink pixels per char cell
+    localparam int SALT_PER_CHAR   = 2;  // add this many isolated black pixels nearby
 
     logic clk;
     logic reset;
@@ -56,6 +59,7 @@ module tb_ocr_parser_top
 
     logic [4:0]               dbg_char_sel;
     logic [TEMPLATE_BITS-1:0] dbg_normalized_char;
+    logic [MAX_CHARS*TEMPLATE_BITS-1:0] dbg_norm_chars_flat;
 
     logic [7:0] cam_mem [0:IMG_W*IMG_H-1];
 
@@ -76,7 +80,17 @@ module tb_ocr_parser_top
         .bits      (font_bits)
     );
 
-    ocr_parser_top dut (
+    ocr_parser_top #(
+        .USE_CNN_MATCH        (USE_CNN_MATCH),
+        .CNN_CONV1_W_FILE     ({CNN_WEIGHT_DIR, "/conv1_weight.mem"}),
+        .CNN_CONV2_W_FILE     ({CNN_WEIGHT_DIR, "/conv2_weight.mem"}),
+        .CNN_CONV3_W_FILE     ({CNN_WEIGHT_DIR, "/conv3_weight.mem"}),
+        .CNN_FC1_W_FILE       ({CNN_WEIGHT_DIR, "/fc1_weight.mem"}),
+        .CNN_FC1_B_FILE       ({CNN_WEIGHT_DIR, "/fc1_bias.mem"}),
+        .CNN_FC2_W_FILE       ({CNN_WEIGHT_DIR, "/fc2_weight.mem"}),
+        .CNN_FC2_B_FILE       ({CNN_WEIGHT_DIR, "/fc2_bias.mem"}),
+        .CNN_CLASS_CODE_FILE  ({CNN_WEIGHT_DIR, "/class_code.mem"})
+    ) dut (
         .clk                 (clk),
         .reset               (reset),
         .trigger             (trigger),
@@ -101,7 +115,8 @@ module tb_ocr_parser_top
         .bin_dbg_rdata       (bin_dbg_rdata),
 
         .dbg_char_sel        (dbg_char_sel),
-        .dbg_normalized_char (dbg_normalized_char)
+        .dbg_normalized_char (dbg_normalized_char),
+        .dbg_norm_chars_flat (dbg_norm_chars_flat)
     );
 
     initial begin
@@ -151,12 +166,25 @@ module tb_ocr_parser_top
                 4'd8:  code_to_ascii = 8'h38;
                 4'd9:  code_to_ascii = 8'h39;
                 4'd10: code_to_ascii = 8'h2B;
-                4'd11: code_to_ascii = 8'h2D;
+                4'd11: code_to_ascii = 8'h78;
                 4'd12: code_to_ascii = 8'h2A;
                 4'd13: code_to_ascii = 8'h3D;
                 4'd14: code_to_ascii = 8'h28;
                 4'd15: code_to_ascii = 8'h29;
                 default: code_to_ascii = 8'h3F;
+            endcase
+        end
+    endfunction
+
+    function automatic string expected_label_name(input int idx);
+        begin
+            case (idx)
+                0: expected_label_name = "1";
+                1: expected_label_name = "5";
+                2: expected_label_name = "plus";
+                3: expected_label_name = "6";
+                4: expected_label_name = "7";
+                default: expected_label_name = "unlabeled";
             endcase
         end
     endfunction
@@ -264,6 +292,34 @@ module tb_ocr_parser_top
         end
     endtask
 
+    task automatic require_weight_file(input string path);
+        integer fd;
+        begin
+            fd = $fopen(path, "r");
+            if (fd == 0) begin
+                $fatal(1,
+                       "Missing CNN weight file '%s'. Run tiny_math_cnn(3).ipynb export cell first.",
+                       path);
+            end
+            $fclose(fd);
+        end
+    endtask
+
+    task automatic check_cnn_weight_files();
+        begin
+            if (USE_CNN_MATCH) begin
+                require_weight_file({CNN_WEIGHT_DIR, "/conv1_weight.mem"});
+                require_weight_file({CNN_WEIGHT_DIR, "/conv2_weight.mem"});
+                require_weight_file({CNN_WEIGHT_DIR, "/conv3_weight.mem"});
+                require_weight_file({CNN_WEIGHT_DIR, "/fc1_weight.mem"});
+                require_weight_file({CNN_WEIGHT_DIR, "/fc1_bias.mem"});
+                require_weight_file({CNN_WEIGHT_DIR, "/fc2_weight.mem"});
+                require_weight_file({CNN_WEIGHT_DIR, "/fc2_bias.mem"});
+                require_weight_file({CNN_WEIGHT_DIR, "/class_code.mem"});
+            end
+        end
+    endtask
+
     task automatic render_rom_char(input byte ch, input int x0, input int y0);
         logic [15:0] row_bits;
         begin
@@ -363,6 +419,42 @@ module tb_ocr_parser_top
         end
     endtask
 
+    task automatic write_normalized_pbm(input int idx);
+        int fd;
+        string filename;
+        logic [TEMPLATE_BITS-1:0] bits;
+        begin
+            if (idx < 0 || idx >= MAX_CHARS)
+                return;
+
+            bits = dbg_norm_chars_flat[idx*TEMPLATE_BITS +: TEMPLATE_BITS];
+            filename = $sformatf("norm_capture_%0d_%s.pbm",
+                                 idx, expected_label_name(idx));
+
+            fd = $fopen(filename, "w");
+            if (fd == 0) begin
+                $warning("Could not write %s", filename);
+                return;
+            end
+
+            // ASCII PBM: 1 = black ink, 0 = white background.
+            $fdisplay(fd, "P1");
+            $fdisplay(fd, "# idx=%0d label=%s", idx, expected_label_name(idx));
+            $fdisplay(fd, "%0d %0d", CHAR_W, CHAR_H);
+            for (int row = 0; row < CHAR_H; row++) begin
+                for (int col = 0; col < CHAR_W; col++) begin
+                    $fwrite(fd, "%0d ",
+                            bits[TEMPLATE_BITS - 1 - row * CHAR_W - col]);
+                end
+                $fwrite(fd, "\n");
+            end
+            $fclose(fd);
+
+            $display("Wrote normalized PBM: %s", filename);
+            $fdisplay(dump_fd, "Wrote normalized PBM: %s", filename);
+        end
+    endtask
+
     task automatic print_matched_codes();
         begin
             $display("");
@@ -430,8 +522,10 @@ module tb_ocr_parser_top
                 $fdisplay(dump_fd, "No final result_valid; dumping partial debug state.");
             end
 
-            for (int i = 0; i < dbg_num_chars && i < 8; i++)
+            for (int i = 0; i < dbg_num_chars && i < MAX_CHARS; i++) begin
                 print_normalized_debug(i);
+                write_normalized_pbm(i);
+            end
         end
     endtask
 
@@ -488,6 +582,8 @@ module tb_ocr_parser_top
         dump_fd = $fopen("tb_ocr_parser_top_output.txt", "w");
         if (dump_fd == 0)
             $fatal(1, "Could not open tb_ocr_parser_top_output.txt");
+
+        check_cnn_weight_files();
 
         reset        = 1'b1;
         trigger      = 1'b0;

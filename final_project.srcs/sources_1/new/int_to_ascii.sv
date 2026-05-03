@@ -42,7 +42,7 @@ module int_to_ascii
             4'd8:    return 8'h38;
             4'd9:    return 8'h39;
             4'd10:   return 8'h2B;   // '+'
-            4'd11:   return 8'h2D;   // '-'
+            4'd11:   return 8'h78;   // 'x'
             4'd12:   return 8'h2A;   // '*'
             4'd13:   return 8'h3D;   // '='
             4'd14:   return 8'h28;   // '('

@@ -53,7 +53,8 @@ input logic [4:0]    ocr_num_chars,
 input logic [255:0]  ocr_result_chars_flat,  // 32 x 8  = 256 bits
 input logic [5:0]    ocr_result_len,
 
-input logic [TEMPLATE_BITS-1:0] dbg_normalized_char
+input logic [TEMPLATE_BITS-1:0]         dbg_normalized_char,
+input logic [MAX_CHARS*TEMPLATE_BITS-1:0] dbg_norm_chars_flat
 );
 
 localparam int TEXT_Y_START = IMG_H - CHAR_H;  // 208
@@ -118,6 +119,24 @@ hdmi_text_controller_v1_0_AXI # (
 logic cam_mode;
 assign cam_mode = 1'b1;
 
+logic clk_25MHz;
+logic clk_125MHz;
+logic locked;
+logic reset_ah;
+
+logic hsync;
+logic vsync;
+logic vde;
+
+logic [9:0] drawX;
+logic [9:0] drawY;
+logic [9:0] drawX_r;
+logic [9:0] drawY_r;
+
+logic [7:0] red;
+logic [7:0] green;
+logic [7:0] blue;
+
 // Camera read
 logic [16:0] cam_rd_addr;
 logic [7:0]  cam_pixel;
@@ -179,22 +198,6 @@ initial begin
     for (int i = 0; i < 600; i++)
         vram[i] = 32'h20202020;
 end
-
-logic clk_25MHz;
-logic clk_125MHz;
-logic locked;
-logic reset_ah;
-
-logic hsync;
-logic vsync;
-logic vde;
-
-logic [9:0] drawX;
-logic [9:0] drawY;
-
-logic [7:0] red;
-logic [7:0] green;
-logic [7:0] blue;
 
 assign reset_ah = ~axi_aresetn;
 
@@ -278,6 +281,54 @@ logic [1:0] byte_index_r;
 logic       vde_r;
 logic in_norm_region_r;
 logic norm_dbg_pixel;
+logic norm_strip_active;
+logic norm_strip_pixel;
+logic norm_strip_border;
+
+localparam int NORM_STRIP_X     = 336;
+localparam int NORM_STRIP_Y     = 48;
+localparam int NORM_STRIP_SCALE = 2;
+localparam int NORM_STRIP_W     = CHAR_W * NORM_STRIP_SCALE;
+localparam int NORM_STRIP_H     = CHAR_H * NORM_STRIP_SCALE;
+localparam int NORM_STRIP_PITCH = NORM_STRIP_W + 8;
+
+always_comb begin
+    int rel_x;
+    int rel_y;
+    int cell_x;
+    int cell_idx;
+    int pix_x;
+    int pix_y;
+    int bit_idx;
+
+    norm_strip_active = 1'b0;
+    norm_strip_pixel  = 1'b0;
+    norm_strip_border = 1'b0;
+
+    rel_x = int'(drawX_r) - NORM_STRIP_X;
+    rel_y = int'(drawY_r) - NORM_STRIP_Y;
+
+    if (rel_x >= 0 && rel_y >= 0 &&
+        rel_x < (8 * NORM_STRIP_PITCH) &&
+        rel_y < (NORM_STRIP_H + 2)) begin
+        cell_idx = rel_x / NORM_STRIP_PITCH;
+        cell_x   = rel_x - cell_idx * NORM_STRIP_PITCH;
+
+        if (cell_idx < 8 && cell_x < NORM_STRIP_W && cell_idx < ocr_num_chars) begin
+            norm_strip_active = 1'b1;
+            norm_strip_border = (cell_x == 0) || (cell_x == NORM_STRIP_W - 1) ||
+                                (rel_y == 0) || (rel_y == NORM_STRIP_H - 1);
+
+            if (rel_y < NORM_STRIP_H) begin
+                pix_x = cell_x / NORM_STRIP_SCALE;
+                pix_y = rel_y / NORM_STRIP_SCALE;
+                bit_idx = cell_idx * TEMPLATE_BITS
+                        + (TEMPLATE_BITS - 1 - pix_y * CHAR_W - pix_x);
+                norm_strip_pixel = dbg_norm_chars_flat[bit_idx];
+            end
+        end
+    end
+end
 
 always_ff @(posedge clk_25MHz) begin
     in_norm_region_r <= (drawX >= 300) && (drawX < 316) && (drawY < 32);
@@ -330,9 +381,6 @@ always_ff @(posedge axi_aclk) begin
         ocr_rd_data <= cam_fb[ocr_rd_addr];
 end
 // Delay drawX/drawY by 1 cycle to match cam_pixel / in_cam_region_r timing
-logic [9:0] drawX_r;
-logic [9:0] drawY_r;
-
 always_ff @(posedge clk_25MHz) begin
     drawX_r <= drawX;
     drawY_r <= drawY;
@@ -440,6 +488,12 @@ always_comb begin
         red   = norm_dbg_pixel ? 8'h00 : 8'h08;
         green = norm_dbg_pixel ? 8'hFF : 8'h08;
         blue  = norm_dbg_pixel ? 8'h00 : 8'h08;
+    end
+    else if (norm_strip_active) begin
+        // Capture strip: black ink on white, red border around each char.
+        red   = norm_strip_border ? 8'hFF : (norm_strip_pixel ? 8'h00 : 8'hFF);
+        green = norm_strip_border ? 8'h00 : (norm_strip_pixel ? 8'h00 : 8'hFF);
+        blue  = norm_strip_border ? 8'h00 : (norm_strip_pixel ? 8'h00 : 8'hFF);
     end
     else if (on_bbox_edge) begin
         // bounding box edges: red

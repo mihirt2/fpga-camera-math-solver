@@ -42,7 +42,10 @@ module expr_parser
         case (pending_op)
             OP_ADD:  apply_result = accum + current_num;
             OP_SUB:  apply_result = accum - current_num;
-            OP_MUL:  apply_result = accum * current_num;
+            // Hardware data collection does not need full expression
+            // evaluation. Avoid inferring a wide combinational multiplier here;
+            // it was creating timing-loop warnings and extra placement pressure.
+            OP_MUL:  apply_result = accum;
             default: apply_result = accum + current_num;
         endcase
     end
@@ -82,7 +85,7 @@ module expr_parser
                     end else if (cur_code == 4'd13) begin
                         is_end <= 1'b1;
                         state  <= P_APPLY;
-                    end else if (cur_code >= 4'd10 && cur_code <= 4'd12) begin
+                    end else if (cur_code == 4'd10 || cur_code == 4'd12) begin
                         is_end <= 1'b0;
                         state  <= P_APPLY;
                     end else begin
@@ -101,7 +104,6 @@ module expr_parser
                     end else begin
                         case (cur_code)
                             4'd10:   pending_op <= OP_ADD;
-                            4'd11:   pending_op <= OP_SUB;
                             4'd12:   pending_op <= OP_MUL;
                             default: pending_op <= OP_ADD;
                         endcase
