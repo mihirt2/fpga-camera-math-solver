@@ -29,6 +29,7 @@ module norm_uart_dump
     dump_state_t state;
 
     logic [5:0]                         num_latched;
+    logic [MAX_CHARS*TEMPLATE_BITS-1:0]   norm_chars_latched;
     logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] char_codes_latched;
     logic [MAX_CHARS*10-1:0]              match_dists_latched;
     logic [$clog2(MAX_CHARS)-1:0]       char_idx;
@@ -116,7 +117,7 @@ module norm_uart_dump
                     if (byte_pos < CHAR_W) begin
                         bit_idx = int'(char_idx) * TEMPLATE_BITS
                                 + (TEMPLATE_BITS - 1 - int'(row_idx) * CHAR_W - int'(byte_pos));
-                        current_byte = norm_chars_flat[bit_idx] ? "1" : "0";
+                        current_byte = norm_chars_latched[bit_idx] ? "1" : "0";
                     end else begin
                         current_byte = 8'h0A;
                     end
@@ -205,6 +206,7 @@ module norm_uart_dump
         if (reset) begin
             state          <= D_IDLE;
             num_latched    <= '0;
+            norm_chars_latched <= '0;
             char_idx       <= '0;
             row_idx        <= '0;
             byte_pos       <= '0;
@@ -220,6 +222,7 @@ module norm_uart_dump
             end else if (state == D_IDLE) begin
                 if (start) begin
                     num_latched   <= {1'b0, num_chars};
+                    norm_chars_latched <= norm_chars_flat;
                     char_codes_latched <= char_codes_flat;
                     match_dists_latched <= match_dists_flat;
                     char_idx      <= '0;

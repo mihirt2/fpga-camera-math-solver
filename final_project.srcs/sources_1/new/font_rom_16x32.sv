@@ -355,10 +355,10 @@ module font_rom_16x32_digits (
         font_rom[8'h2E][5'd24] = 16'h0000;
         font_rom[8'h2E][5'd25] = 16'h0000;
         font_rom[8'h2E][5'd26] = 16'h0000;
-        font_rom[8'h2E][5'd27] = 16'h0000;
-        font_rom[8'h2E][5'd28] = 16'h0180;
-        font_rom[8'h2E][5'd29] = 16'h0180;
-        font_rom[8'h2E][5'd30] = 16'h0180;
+        font_rom[8'h2E][5'd27] = 16'h03C0;
+        font_rom[8'h2E][5'd28] = 16'h07E0;
+        font_rom[8'h2E][5'd29] = 16'h07E0;
+        font_rom[8'h2E][5'd30] = 16'h03C0;
         font_rom[8'h2E][5'd31] = 16'h0000;
 
         // ASCII 0x30
@@ -957,27 +957,27 @@ module font_rom_16x32_digits (
         font_rom[8'h5E][5'd30] = 16'h0000;
         font_rom[8'h5E][5'd31] = 16'h0000;
 
-        // ASCII 0x58
+        // ASCII 0x58: standard capital X
         font_rom[8'h58][5'd0] = 16'h0000;
         font_rom[8'h58][5'd1] = 16'h0000;
         font_rom[8'h58][5'd2] = 16'h0000;
         font_rom[8'h58][5'd3] = 16'h0000;
         font_rom[8'h58][5'd4] = 16'h0000;
         font_rom[8'h58][5'd5] = 16'h0000;
-        font_rom[8'h58][5'd6] = 16'h6006;
-        font_rom[8'h58][5'd7] = 16'h700E;
-        font_rom[8'h58][5'd8] = 16'h381C;
-        font_rom[8'h58][5'd9] = 16'h1C38;
-        font_rom[8'h58][5'd10] = 16'h0E70;
-        font_rom[8'h58][5'd11] = 16'h07E0;
-        font_rom[8'h58][5'd12] = 16'h03C0;
-        font_rom[8'h58][5'd13] = 16'h03C0;
-        font_rom[8'h58][5'd14] = 16'h07E0;
-        font_rom[8'h58][5'd15] = 16'h0E70;
-        font_rom[8'h58][5'd16] = 16'h1C38;
-        font_rom[8'h58][5'd17] = 16'h381C;
-        font_rom[8'h58][5'd18] = 16'h700E;
-        font_rom[8'h58][5'd19] = 16'h6006;
+        font_rom[8'h58][5'd6] = 16'h300C;
+        font_rom[8'h58][5'd7] = 16'h381C;
+        font_rom[8'h58][5'd8] = 16'h1C38;
+        font_rom[8'h58][5'd9] = 16'h0E70;
+        font_rom[8'h58][5'd10] = 16'h07E0;
+        font_rom[8'h58][5'd11] = 16'h03C0;
+        font_rom[8'h58][5'd12] = 16'h0180;
+        font_rom[8'h58][5'd13] = 16'h0180;
+        font_rom[8'h58][5'd14] = 16'h03C0;
+        font_rom[8'h58][5'd15] = 16'h07E0;
+        font_rom[8'h58][5'd16] = 16'h0E70;
+        font_rom[8'h58][5'd17] = 16'h1C38;
+        font_rom[8'h58][5'd18] = 16'h381C;
+        font_rom[8'h58][5'd19] = 16'h300C;
         font_rom[8'h58][5'd20] = 16'h0000;
         font_rom[8'h58][5'd21] = 16'h0000;
         font_rom[8'h58][5'd22] = 16'h0000;

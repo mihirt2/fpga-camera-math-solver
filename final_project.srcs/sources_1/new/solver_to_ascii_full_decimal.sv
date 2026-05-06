@@ -310,7 +310,7 @@ module solver_to_ascii_full_decimal #(
                 end
 
                 S_ROOT_X: begin
-                    append_char("x");
+                    append_char("X");
                     state <= S_ROOT_EQUALS;
                 end
 

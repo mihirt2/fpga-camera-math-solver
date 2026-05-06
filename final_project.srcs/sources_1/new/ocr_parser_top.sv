@@ -219,9 +219,9 @@ module ocr_parser_top
     wire [7:0] bbox_height    = (cur_bbox_y_max >= cur_bbox_y_min)
                               ? (cur_bbox_y_max - cur_bbox_y_min + 8'd1)
                               : 8'd0;
-    wire       bbox_is_minus  = (bbox_width >= 10'd6)
-                              && (bbox_height <= 8'd10)
-                              && (bbox_width >= ({2'b0, bbox_height} * 10'd2));
+    wire       bbox_is_minus  = (bbox_width >= 10'd8)
+                              && (bbox_height <= 8'd18)
+                              && (bbox_width >= ({2'b0, bbox_height} * 10'd3));
     wire       bbox_too_small = !bbox_is_minus
                               && ((bbox_width < MIN_BBOX_W)
                                   || (bbox_height < MIN_BBOX_H));
