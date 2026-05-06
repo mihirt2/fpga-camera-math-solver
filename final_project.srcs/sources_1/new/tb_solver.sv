@@ -4,7 +4,7 @@ module tb_solver;
     localparam int MAX_CHARS = 10;
     localparam int CHAR_CODE_WIDTH = 8;
     localparam int MAX_SOLUTIONS = 5;
-    localparam int NUM_SAMPLES = 1000;
+    localparam int NUM_SAMPLES = 256;
     localparam int CLK_PERIOD = 10;
     localparam logic [CHAR_CODE_WIDTH-1:0] TOK_ADD = 8'd10;
     localparam logic [CHAR_CODE_WIDTH-1:0] TOK_SUB = 8'd11;
@@ -12,6 +12,7 @@ module tb_solver;
     localparam logic [CHAR_CODE_WIDTH-1:0] TOK_X   = 8'd13;
     localparam logic [CHAR_CODE_WIDTH-1:0] TOK_LPAREN = 8'd14;
     localparam logic [CHAR_CODE_WIDTH-1:0] TOK_RPAREN = 8'd15;
+    localparam logic [CHAR_CODE_WIDTH-1:0] TOK_POW = 8'd16;
 
     logic clk = 1'b0;
     logic reset = 1'b1;
@@ -205,6 +206,37 @@ module tb_solver;
             expect_root_close(1, 1, q16(1) / 200);
             $display(
                 "PASS: x*x-1 -> roots at %0f and %0f",
+                $itor(solutions[0]) / 65536.0,
+                $itor(solutions[1]) / 65536.0
+            );
+        end
+    endtask
+
+    task automatic run_case_x_power_2_minus_1;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_X;
+            char_codes[1] = TOK_POW;
+            char_codes[2] = 8'd2;
+            char_codes[3] = TOK_SUB;
+            char_codes[4] = 8'd1;
+            num_chars = 5;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected x^2-1 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected x^2-1 case to be non-constant");
+            end
+            if (num_solutions != 2) begin
+                $fatal(1, "Expected 2 roots for x^2-1, got %0d", num_solutions);
+            end
+            expect_root_close(0, -1, q16(1) / 200);
+            expect_root_close(1, 1, q16(1) / 200);
+            $display(
+                "PASS: x^2-1 -> roots at %0f and %0f",
                 $itor(solutions[0]) / 65536.0,
                 $itor(solutions[1]) / 65536.0
             );
@@ -449,6 +481,9 @@ module tb_solver;
         @(posedge clk);
 
         run_case_x_squared_minus_1();
+        @(posedge clk);
+
+        run_case_x_power_2_minus_1();
         @(posedge clk);
 
         run_case_constant();

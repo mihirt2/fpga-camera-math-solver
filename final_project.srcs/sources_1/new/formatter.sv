@@ -37,8 +37,8 @@ module text_overlay
     input  logic [8:0]  pixel_y,
     input  logic [23:0] pixel_rgb_in,
 
-    input  logic [7:0]  result_chars [0:31],
-    input  logic [5:0]  result_len,
+    input  logic [7:0]  result_chars [0:DISPLAY_CHARS-1],
+    input  logic [$clog2(DISPLAY_CHARS+1)-1:0] result_len,
 
     output logic [23:0] pixel_rgb_out
 );
@@ -47,7 +47,7 @@ module text_overlay
     localparam int TEXT_X_START = 0;
     localparam int TEXT_Y_START = IMG_H - CHAR_H;        // 240 - 32 = 208
     localparam int TEXT_Y_END   = IMG_H;                 // 240
-    localparam int MAX_DISPLAY  = IMG_W / CHAR_W;        // 320 / 16 = 20 chars
+    localparam int MAX_DISPLAY  = IMG_W / CHAR_W;
 
     localparam logic [23:0] TEXT_COLOR = 24'hFF_FF_FF;   // white text
     localparam logic [23:0] BG_COLOR   = 24'h00_00_00;   // black background

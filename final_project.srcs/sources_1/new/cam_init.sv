@@ -67,7 +67,7 @@ module cam_init(
 
         scl_next = scl;
         sda_drive_low_next = sda_drive_low;
-        unique case(curr_state)
+        case(curr_state)
             s_start: begin
                 scl_next = 1'b1;
                 sda_drive_low_next = 1'b1;

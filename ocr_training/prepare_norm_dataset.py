@@ -32,6 +32,7 @@ CLASS_NAMES = [
     "x",
     "times",
     "equals",
+    "caret",
     "open_paren",
     "close_paren",
 ]
@@ -55,6 +56,12 @@ LABEL_ALIASES = {
     "eq": "equals",
     "equal": "equals",
     "equals": "equals",
+    "^": "caret",
+    "caret": "caret",
+    "power": "caret",
+    "pow": "caret",
+    "exponent": "caret",
+    "exponentiation": "caret",
     "(": "open_paren",
     "lparen": "open_paren",
     "left_paren": "open_paren",
@@ -142,19 +149,52 @@ def read_ascii_pbm(path: Path) -> Image.Image:
     return Image.fromarray(arr)
 
 
-def normalize_image(path: Path) -> Image.Image:
+def normalize_image(path: Path, label: str | None = None) -> Image.Image:
     if path.suffix.lower() == ".pbm":
-        return read_ascii_pbm(path)
+        bw = np.array(read_ascii_pbm(path))
+    else:
+        img = Image.open(path).convert("L")
+        arr = np.array(img)
+        if arr.mean() < 127:
+            img = ImageOps.invert(img)
+        img = ImageOps.autocontrast(img)
+        arr = np.array(img)
+        bw = np.where(arr < 192, 0, 255).astype(np.uint8)
 
-    img = Image.open(path).convert("L")
-    arr = np.array(img)
-    if arr.mean() < 127:
-        img = ImageOps.invert(img)
-    img = ImageOps.autocontrast(img)
+    ink = bw == 0
+    ink_fraction = float(ink.mean())
+    if ink_fraction < 0.01:
+        raise ValueError("crop is blank/empty; do not train it as a character")
+    if ink_fraction > 0.85:
+        raise ValueError("crop is almost all black; do not train it as a character")
+
+    ys, xs = np.where(ink)
+    x_min = int(xs.min())
+    x_max = int(xs.max())
+    y_min = int(ys.min())
+    y_max = int(ys.max())
+    ink_w = x_max - x_min + 1
+    ink_h = y_max - y_min + 1
     resample = getattr(Image.Resampling, "NEAREST", Image.NEAREST)
-    img = img.resize((IMG_W, IMG_H), resample)
+
+    if ink_h <= 4 and ink_w >= ink_h * 3:
+        min_h = max(8, ink_h)
+        pad = max(0, min_h - ink_h)
+        y_min = max(0, y_min - pad // 2)
+        y_max = min(bw.shape[0] - 1, y_max + pad - (pad // 2))
+        if y_max - y_min + 1 < min_h:
+            y_min = max(0, y_max - min_h + 1)
+
+        crop = Image.fromarray(bw[y_min : y_max + 1, x_min : x_max + 1])
+        img = crop.resize((IMG_W, IMG_H), resample)
+        img = img.filter(ImageFilter.MinFilter(3))
+        arr = np.array(img)
+        bw = np.where(arr < 128, 0, 255).astype(np.uint8)
+        return Image.fromarray(bw)
+
+    img = Image.fromarray(bw).resize((IMG_W, IMG_H), resample)
     arr = np.array(img)
-    bw = np.where(arr < 192, 0, 255).astype(np.uint8)
+    bw = np.where(arr < 128, 0, 255).astype(np.uint8)
     return Image.fromarray(bw)
 
 
@@ -214,7 +254,7 @@ def cmd_ingest(args: argparse.Namespace) -> None:
     for path in files:
         try:
             label = normalize_label(args.label) if args.label != "auto" else infer_label(path)
-            img = normalize_image(path)
+            img = normalize_image(path, label)
             save_labeled_image(img, path, label, data_root, args.source)
             saved += 1
         except Exception as exc:

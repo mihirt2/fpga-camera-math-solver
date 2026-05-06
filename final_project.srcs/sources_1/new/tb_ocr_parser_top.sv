@@ -38,21 +38,21 @@ module tb_ocr_parser_top
     logic reset;
     logic trigger;
 
-    logic [16:0] cam_rd_addr;
+    logic [17:0] cam_rd_addr;
     logic [7:0]  cam_rd_data;
     logic        cam_rd_en;
     logic        adaptive;
     logic [7:0]  threshold;
 
-    logic [7:0] result_chars [0:31];
-    logic [5:0] result_len;
+    logic [7:0] result_chars [0:DISPLAY_CHARS-1];
+    logic [$clog2(DISPLAY_CHARS+1)-1:0] result_len;
     logic       result_valid;
 
     logic [3:0] stage_dbg;
     logic       busy;
 
     logic [35:0]                  dbg_bboxes [0:MAX_CHARS-1];
-    logic [$clog2(MAX_CHARS)-1:0] dbg_num_chars;
+    logic [$clog2(MAX_CHARS+1)-1:0] dbg_num_chars;
 
     logic [13:0] bin_dbg_raddr;
     logic [31:0] bin_dbg_rdata;

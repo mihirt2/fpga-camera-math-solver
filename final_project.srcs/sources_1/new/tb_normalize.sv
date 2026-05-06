@@ -85,9 +85,9 @@ module tb_normalize
         begin
             glyph_row = 5'b00000;
 
-            unique case (ch)
+            case (ch)
                 CH_1: begin
-                    unique case (row)
+                    case (row)
                         0: glyph_row = 5'b00100;
                         1: glyph_row = 5'b01100;
                         2: glyph_row = 5'b00100;
@@ -100,7 +100,7 @@ module tb_normalize
                 end
 
                 CH_5: begin
-                    unique case (row)
+                    case (row)
                         0: glyph_row = 5'b11111;
                         1: glyph_row = 5'b10000;
                         2: glyph_row = 5'b11110;
@@ -113,7 +113,7 @@ module tb_normalize
                 end
 
                 CH_PLUS: begin
-                    unique case (row)
+                    case (row)
                         0: glyph_row = 5'b00000;
                         1: glyph_row = 5'b00100;
                         2: glyph_row = 5'b00100;
@@ -126,7 +126,7 @@ module tb_normalize
                 end
 
                 CH_6: begin
-                    unique case (row)
+                    case (row)
                         0: glyph_row = 5'b01110;
                         1: glyph_row = 5'b10000;
                         2: glyph_row = 5'b10000;
@@ -139,7 +139,7 @@ module tb_normalize
                 end
 
                 CH_7: begin
-                    unique case (row)
+                    case (row)
                         0: glyph_row = 5'b11111;
                         1: glyph_row = 5'b00001;
                         2: glyph_row = 5'b00010;

@@ -118,7 +118,6 @@ logic  axi_awready;
 logic  axi_wready;
 logic  [1 : 0] 	axi_bresp;
 logic  axi_bvalid;
-logic  [C_S_AXI_ADDR_WIDTH-1 : 0] 	axi_araddr;
 logic  axi_arready;
 logic  [C_S_AXI_DATA_WIDTH-1 : 0] 	axi_rdata;
 logic  [1 : 0] 	axi_rresp;
@@ -312,15 +311,14 @@ end
 // axi_arready is asserted for one S_AXI_ACLK clock cycle when
 // S_AXI_ARVALID is asserted. axi_awready is 
 // de-asserted when reset (active low) is asserted. 
-// The read address is also latched when S_AXI_ARVALID is 
-// asserted. axi_araddr is reset to zero on reset assertion.
+// This design uses S_AXI_ARADDR directly for combinational read decode, so the
+// template read-address latch is intentionally omitted.
 
 always_ff @( posedge S_AXI_ACLK )
 begin
   if ( S_AXI_ARESETN == 1'b0 )
     begin
       axi_arready <= 1'b0;
-      axi_araddr  <= 0;
     end 
   else
     begin    
@@ -328,8 +326,6 @@ begin
         begin
           // indicates that the slave has acceped the valid read address
           axi_arready <= 1'b1;
-          // Read address latching
-          axi_araddr  <= S_AXI_ARADDR;
         end
       else
         begin

@@ -27,6 +27,12 @@ LABEL_ALIASES = {
     "times": "times",
     "=": "equals",
     "equals": "equals",
+    "^": "caret",
+    "caret": "caret",
+    "power": "caret",
+    "pow": "caret",
+    "exponent": "caret",
+    "exponentiation": "caret",
     "(": "open_paren",
     "open_paren": "open_paren",
     ")": "close_paren",
@@ -48,6 +54,10 @@ def parse_labels(text: str | None) -> list[str]:
         return []
     if "," in text:
         return [normalize_label(part) for part in text.split(",") if part.strip()]
+    try:
+        return [normalize_label(text)]
+    except ValueError:
+        pass
     labels: list[str] = []
     for ch in text:
         if not ch.isspace():
@@ -221,6 +231,9 @@ def main() -> None:
         help="Treat --labels as one class label and apply it to every character in each received frame.",
     )
     args = parser.parse_args()
+
+    if args.continuous and Path(args.output) == DEFAULT_DATA_ROOT:
+        args.output = str(DEFAULT_DATA_ROOT / "test")
 
     try:
         import serial

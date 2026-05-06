@@ -24,7 +24,7 @@ module bbox_overlay
     input  logic [8:0]                          pixel_y,
 
     input  logic [35:0]                         bboxes [0:MAX_CHARS-1],
-    input  logic [$clog2(MAX_CHARS)-1:0]        num_chars,
+    input  logic [$clog2(MAX_CHARS+1)-1:0]      num_chars,
 
     input  logic [23:0]                         pixel_rgb_in,   // {R,G,B} 8 bits each
     output logic [23:0]                         pixel_rgb_out

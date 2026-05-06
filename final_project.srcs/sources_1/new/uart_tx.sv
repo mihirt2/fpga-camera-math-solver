@@ -41,7 +41,7 @@ module uart_tx #(
         end else begin
             done <= 1'b0;
 
-            unique case (state)
+            case (state)
                 U_IDLE: begin
                     tx        <= 1'b1;
                     busy      <= 1'b0;

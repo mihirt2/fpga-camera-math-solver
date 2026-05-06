@@ -4,7 +4,7 @@ import poly_pkg::*;
 module solver #(
     parameter int MAX_CHARS       = 10,
     parameter int CHAR_CODE_WIDTH = 8,
-    parameter int NUM_SAMPLES     = 1000,
+    parameter int NUM_SAMPLES     = 256,
     parameter int MAX_SOLUTIONS   = 5
 )(
     input  logic                              clk,

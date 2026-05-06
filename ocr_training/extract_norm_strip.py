@@ -26,6 +26,12 @@ LABEL_ALIASES = {
     "times": "times",
     "=": "equals",
     "equals": "equals",
+    "^": "caret",
+    "caret": "caret",
+    "power": "caret",
+    "pow": "caret",
+    "exponent": "caret",
+    "exponentiation": "caret",
     "(": "open_paren",
     "open_paren": "open_paren",
     ")": "close_paren",
@@ -45,6 +51,10 @@ def normalize_label(label: str) -> str:
 def parse_labels(text: str) -> list[str]:
     if "," in text:
         return [normalize_label(part) for part in text.split(",") if part.strip()]
+    try:
+        return [normalize_label(text)]
+    except ValueError:
+        pass
 
     labels: list[str] = []
     index = 0

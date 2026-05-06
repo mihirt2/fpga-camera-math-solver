@@ -25,12 +25,10 @@ module ov7670_capture (
     logic        byte_toggle, byte_toggle_next;
     logic        we_next;
     logic        frame_done_next;
+    logic [5:0]  skip_count, skip_count_next;
 
-    // Skip leading junk bytes at the start of each row.
-    // SKIP_BYTES counts raw pclk bytes (Y and U/V both count).
-    // Increase if black column persists.
-    localparam logic [5:0] SKIP_BYTES =  6'd60;
-    logic [5:0] skip_count, skip_count_next;
+    // Skip leading row junk in the original QVGA path.
+    localparam logic [5:0] SKIP_BYTES = 6'd60;
 
     always_comb begin
         next_state       = curr_state;
@@ -41,14 +39,13 @@ module ov7670_capture (
         we_next          = 1'b0;
         frame_done_next  = 1'b0;
 
-        unique case (curr_state)
+        case (curr_state)
             s_idle: begin
                 byte_toggle_next = 1'b0;
             end
 
             s_write: begin
                 if (skip_count < SKIP_BYTES) begin
-                    // Still in skip zone - consume byte, don't write
                     skip_count_next  = skip_count + 6'd1;
                     byte_toggle_next = ~byte_toggle;
                 end else begin
@@ -118,7 +115,7 @@ module ov7670_capture (
         endcase
     end
 
-    always_ff @(posedge pclk or posedge reset) begin
+    always_ff @(posedge pclk) begin
         if (reset) begin
             curr_state  <= s_idle;
             x_coord     <= 10'd0;

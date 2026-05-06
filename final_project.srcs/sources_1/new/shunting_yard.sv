@@ -26,6 +26,7 @@ module shunting_yard #(
     localparam logic [CHAR_CODE_WIDTH-1:0] VAR_X  = 13;
     localparam logic [CHAR_CODE_WIDTH-1:0] LPAREN = 14;
     localparam logic [CHAR_CODE_WIDTH-1:0] RPAREN = 15;
+    localparam logic [CHAR_CODE_WIDTH-1:0] OP_POW = 16;
     localparam logic [$clog2(MAX_CHARS+1)-1:0] COUNT_LIMIT = $clog2(MAX_CHARS+1)'(MAX_CHARS);
 
     typedef enum logic [3:0] {
@@ -56,16 +57,32 @@ module shunting_yard #(
     endfunction
 
     function automatic logic is_operator(input logic [CHAR_CODE_WIDTH-1:0] token);
-        return ((token == OP_ADD) || (token == OP_SUB) || (token == OP_MUL));
+        return ((token == OP_ADD) || (token == OP_SUB) ||
+                (token == OP_MUL) || (token == OP_POW));
     endfunction
 
     function automatic logic [1:0] precedence(input logic [CHAR_CODE_WIDTH-1:0] token);
-        if (token == OP_MUL) begin
+        if (token == OP_POW) begin
+            return 3;
+        end else if (token == OP_MUL) begin
             return 2;
         end else if ((token == OP_ADD) || (token == OP_SUB)) begin
             return 1;
         end else begin
             return 0;
+        end
+    endfunction
+
+    function automatic logic should_pop_operator(
+        input logic [CHAR_CODE_WIDTH-1:0] stack_op,
+        input logic [CHAR_CODE_WIDTH-1:0] incoming_op
+    );
+        if (!is_operator(stack_op)) begin
+            return 1'b0;
+        end else if (incoming_op == OP_POW) begin
+            return precedence(stack_op) > precedence(incoming_op);
+        end else begin
+            return precedence(stack_op) >= precedence(incoming_op);
         end
     endfunction
 
@@ -231,8 +248,7 @@ module shunting_yard #(
 
                 POP_FOR_OPERATOR: begin
                     if ((op_top != 0) &&
-                        is_operator(op_stack[op_top - 1'b1]) &&
-                        (precedence(op_stack[op_top - 1'b1]) >= precedence(pending_op))) begin
+                        should_pop_operator(op_stack[op_top - 1'b1], pending_op)) begin
                         postfix_is_operator[out_idx] <= 1'b1;
                         postfix_operators[out_idx]   <= op_stack[op_top - 1'b1];
                         postfix_coeffs[out_idx]      <= '0;

@@ -4,7 +4,9 @@
 # allow directories
 !*/
 
-# keep generated Vivado output ignored
+# keep generated Vivado and simulator output ignored
+.Xil/**
+xsim.dir/**
 final_project.cache/**
 final_project.gen/**
 final_project.hw/**
@@ -12,6 +14,16 @@ final_project.ip_user_files/**
 final_project.runs/**
 final_project.sim/**
 final_project.tmp/**
+*.jou
+*.log
+*.pb
+*.str
+*.wdb
+*.xsa
+*.bit
+*.ltx
+*.rpt
+*.dcp
 
 # allow source/project files
 !*.sv
@@ -21,18 +33,22 @@ final_project.tmp/**
 !*.xci
 !*.xcix
 !*.xdc
-!*.ipynb
 !*.mem
+!*.pt
 !*.py
 !*.md
+!requirements.txt
 
 # keep local OCR training data and training runs out of git
 ocr_training/data/**
 ocr_training/runs/**
 ocr_training/__pycache__/**
+ocr_training/**/__pycache__/**
+
+# local/generated experiments that are not part of the Vivado project
+/ip_repo/
+/cnn_match_direct_tb.sv
+*.ipynb
 
 # allow this ignore file if you decide to commit it
 !.gitignore
-
-# keep submodule metadata tracked
-!.gitmodules

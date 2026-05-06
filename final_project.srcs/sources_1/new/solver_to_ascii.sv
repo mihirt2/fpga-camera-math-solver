@@ -1,0 +1,324 @@
+`timescale 1ns / 1ps
+
+module solver_to_ascii #(
+    parameter int MAX_CHARS       = 10,
+    parameter int CHAR_CODE_WIDTH = 8,
+    parameter int MAX_SOLUTIONS   = 5,
+    parameter int DISPLAY_CHARS   = 20
+)(
+    input  logic                              clk,
+    input  logic                              reset,
+    input  logic                              start,
+    input  logic [CHAR_CODE_WIDTH-1:0]        equation_chars [0:MAX_CHARS-1],
+    input  logic [$clog2(MAX_CHARS+1)-1:0]    equation_len,
+    input  logic                              solver_valid,
+    input  logic                              is_const,
+    input  logic [2:0]                        num_solutions,
+    input  logic signed [31:0]                value,
+    input  logic signed [31:0]                solutions [0:MAX_SOLUTIONS-1],
+
+    output logic [7:0]                        result_chars [0:DISPLAY_CHARS-1],
+    output logic [$clog2(DISPLAY_CHARS+1)-1:0] result_len,
+    output logic                              result_valid
+);
+
+    localparam int DISPLAY_MAX_CHARS = DISPLAY_CHARS;
+
+    typedef enum logic [4:0] {
+        S_IDLE,
+        S_EQUATION,
+        S_EQUATION_EQUALS,
+        S_STATUS,
+        S_CONST_PREFIX_VALUE,
+        S_CONST_PREFIX_EQUALS,
+        S_ROOT_PREFIX_X,
+        S_ROOT_PREFIX_EQUALS,
+        S_MSG,
+        S_NUMBER_INIT,
+        S_NUMBER_TENS,
+        S_NUMBER_ONES,
+        S_NUMBER_WRITE_TENS,
+        S_NUMBER_WRITE_ONES,
+        S_NUMBER_WRITE_DOT,
+        S_NUMBER_WRITE_FRAC,
+        S_NUMBER_WRITE_FRAC2,
+        S_AFTER_NUMBER,
+        S_FINISH
+    } state_t;
+
+    typedef enum logic [1:0] {
+        MSG_ERR,
+        MSG_NO_ROOT
+    } msg_t;
+
+    state_t state;
+    msg_t   msg_sel;
+
+    logic [5:0] pos;
+    logic [$clog2(MAX_CHARS+1)-1:0] eq_idx;
+    logic [3:0] msg_idx;
+    logic [1:0] number_idx;
+    logic signed [31:0] number_q;
+    logic [13:0] number_rem;
+    logic [3:0] tens_digit;
+    logic [3:0] ones_digit;
+    logic [3:0] frac_tens_digit;
+    logic       number_negative;
+
+    logic [31:0] number_abs;
+    logic [31:0] scaled_hundredths_full;
+    logic [13:0] scaled_hundredths;
+
+    always_comb begin
+        number_abs = number_q[31] ? (~number_q + 32'd1) : number_q;
+        scaled_hundredths_full = ((number_abs << 6)
+                                + (number_abs << 5)
+                                + (number_abs << 2)
+                                + 32'd32768) >> 16;
+        scaled_hundredths = (scaled_hundredths_full > 32'd9999) ? 14'd9999
+                                                                : scaled_hundredths_full[13:0];
+    end
+
+    function automatic logic [7:0] token_to_ascii(input logic [CHAR_CODE_WIDTH-1:0] token);
+        if (token == {CHAR_CODE_WIDTH{1'b1}}) begin
+            token_to_ascii = "?";
+        end else if (token <= 9) begin
+            token_to_ascii = 8'h30 + {4'd0, token[3:0]};
+        end else if (token == 16) begin
+            token_to_ascii = "^";
+        end else begin
+            case (token[3:0])
+                4'd10:   token_to_ascii = "+";
+                4'd11:   token_to_ascii = "X";
+                4'd12:   token_to_ascii = "*";
+                4'd13:   token_to_ascii = "-";
+                4'd14:   token_to_ascii = "(";
+                4'd15:   token_to_ascii = ")";
+                default: token_to_ascii = "?";
+            endcase
+        end
+    endfunction
+
+    function automatic logic [7:0] msg_char(input msg_t sel, input logic [3:0] idx);
+        case (sel)
+            MSG_ERR: begin
+                case (idx)
+                    4'd0:    msg_char = "I";
+                    4'd1:    msg_char = "N";
+                    4'd2:    msg_char = "V";
+                    4'd3:    msg_char = "A";
+                    4'd4:    msg_char = "L";
+                    4'd5:    msg_char = "I";
+                    4'd6:    msg_char = "D";
+                    default: msg_char = 8'h00;
+                endcase
+            end
+
+            default: begin
+                case (idx)
+                    4'd0:    msg_char = "N";
+                    4'd1:    msg_char = "O";
+                    4'd2:    msg_char = " ";
+                    4'd3:    msg_char = "R";
+                    4'd4:    msg_char = "O";
+                    4'd5:    msg_char = "O";
+                    4'd6:    msg_char = "T";
+                    default: msg_char = 8'h00;
+                endcase
+            end
+        endcase
+    endfunction
+
+    task automatic append_char(input logic [7:0] ch);
+        if (pos < DISPLAY_MAX_CHARS) begin
+            result_chars[pos] <= ch;
+            pos <= pos + 1'b1;
+        end
+    endtask
+
+    integer i;
+
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            state           <= S_IDLE;
+            result_len      <= '0;
+            result_valid    <= 1'b0;
+            pos             <= '0;
+            eq_idx          <= '0;
+            msg_idx         <= '0;
+            msg_sel         <= MSG_ERR;
+            number_idx      <= '0;
+            number_q        <= '0;
+            number_rem      <= '0;
+            tens_digit      <= '0;
+            ones_digit      <= '0;
+            frac_tens_digit <= '0;
+            number_negative <= 1'b0;
+
+            for (i = 0; i < DISPLAY_CHARS; i = i + 1)
+                result_chars[i] <= 8'h20;
+        end else begin
+            result_valid <= 1'b0;
+
+            case (state)
+                S_IDLE: begin
+                    if (start) begin
+                        pos        <= '0;
+                        eq_idx     <= '0;
+                        msg_idx    <= '0;
+                        number_idx <= '0;
+                        state      <= S_EQUATION;
+                    end
+                end
+
+                S_EQUATION: begin
+                    if ((eq_idx < equation_len) && (pos < DISPLAY_MAX_CHARS)) begin
+                        append_char(token_to_ascii(equation_chars[eq_idx]));
+                        eq_idx <= eq_idx + 1'b1;
+                    end else begin
+                        state <= S_EQUATION_EQUALS;
+                    end
+                end
+
+                S_EQUATION_EQUALS: begin
+                    if (equation_len != '0)
+                        append_char("=");
+                    state <= S_STATUS;
+                end
+
+                S_STATUS: begin
+                    if (!solver_valid) begin
+                        msg_sel <= MSG_ERR;
+                        msg_idx <= '0;
+                        state   <= S_MSG;
+                    end else if (is_const) begin
+                        state <= S_CONST_PREFIX_VALUE;
+                    end else if (num_solutions == 0) begin
+                        msg_sel <= MSG_NO_ROOT;
+                        msg_idx <= '0;
+                        state   <= S_MSG;
+                    end else begin
+                        state <= S_ROOT_PREFIX_X;
+                    end
+                end
+
+                S_CONST_PREFIX_VALUE: begin
+                    append_char("V");
+                    state <= S_CONST_PREFIX_EQUALS;
+                end
+
+                S_CONST_PREFIX_EQUALS: begin
+                    append_char("=");
+                    number_q   <= value;
+                    number_idx <= '0;
+                    state      <= S_NUMBER_INIT;
+                end
+
+                S_ROOT_PREFIX_X: begin
+                    append_char("X");
+                    state <= S_ROOT_PREFIX_EQUALS;
+                end
+
+                S_ROOT_PREFIX_EQUALS: begin
+                    append_char("=");
+                    number_q   <= solutions[0];
+                    number_idx <= '0;
+                    state      <= S_NUMBER_INIT;
+                end
+
+                S_MSG: begin
+                    if (msg_char(msg_sel, msg_idx) != 8'h00) begin
+                        append_char(msg_char(msg_sel, msg_idx));
+                        msg_idx <= msg_idx + 1'b1;
+                    end else begin
+                        state <= S_FINISH;
+                    end
+                end
+
+                S_NUMBER_INIT: begin
+                    number_negative <= number_q[31];
+                    number_rem      <= scaled_hundredths;
+                    tens_digit      <= '0;
+                    ones_digit      <= '0;
+                    frac_tens_digit <= '0;
+
+                    if (number_q[31])
+                        append_char("-");
+
+                    state <= S_NUMBER_TENS;
+                end
+
+                S_NUMBER_TENS: begin
+                    if (number_rem >= 14'd1000) begin
+                        number_rem <= number_rem - 14'd1000;
+                        tens_digit <= tens_digit + 1'b1;
+                    end else begin
+                        state <= S_NUMBER_ONES;
+                    end
+                end
+
+                S_NUMBER_ONES: begin
+                    if (number_rem >= 14'd100) begin
+                        number_rem <= number_rem - 14'd100;
+                        ones_digit <= ones_digit + 1'b1;
+                    end else begin
+                        state <= S_NUMBER_WRITE_TENS;
+                    end
+                end
+
+                S_NUMBER_WRITE_TENS: begin
+                    if (tens_digit != 0)
+                        append_char(8'h30 + {4'd0, tens_digit});
+                    state <= S_NUMBER_WRITE_ONES;
+                end
+
+                S_NUMBER_WRITE_ONES: begin
+                    append_char(8'h30 + {4'd0, ones_digit});
+                    state <= S_NUMBER_WRITE_DOT;
+                end
+
+                S_NUMBER_WRITE_DOT: begin
+                    append_char(".");
+                    state <= S_NUMBER_WRITE_FRAC;
+                end
+
+                S_NUMBER_WRITE_FRAC: begin
+                    if (number_rem >= 14'd10) begin
+                        number_rem      <= number_rem - 14'd10;
+                        frac_tens_digit <= frac_tens_digit + 1'b1;
+                    end else begin
+                        append_char(8'h30 + {4'd0, frac_tens_digit});
+                        state <= S_NUMBER_WRITE_FRAC2;
+                    end
+                end
+
+                S_NUMBER_WRITE_FRAC2: begin
+                    append_char(8'h30 + {4'd0, number_rem[3:0]});
+                    state <= S_AFTER_NUMBER;
+                end
+
+                S_AFTER_NUMBER: begin
+                    if (!is_const && (number_idx == 0) && (num_solutions > 1)) begin
+                        append_char(",");
+                        number_q   <= solutions[1];
+                        number_idx <= 2'd1;
+                        state      <= S_NUMBER_INIT;
+                    end else begin
+                        state <= S_FINISH;
+                    end
+                end
+
+                S_FINISH: begin
+                    result_len   <= $clog2(DISPLAY_CHARS+1)'(pos);
+                    result_valid <= 1'b1;
+                    state        <= S_IDLE;
+                end
+
+                default: begin
+                    state <= S_IDLE;
+                end
+            endcase
+        end
+    end
+
+endmodule

@@ -2,16 +2,10 @@
 //==============================================================================
 // segment.sv
 //
-// Column-projection segmentation for a horizontal line of characters.
-//   1) COL_SCAN   - read all packed pixels, count ink pixels per column
-//   2) FIND_COLS  - walk column counts to extract x_min/x_max pairs
-//   3) RS_*       - for each character, scan rows to find y_min/y_max
-//
-// Noise rejection:
-//   - Only rows in [ROW_MIN, ROW_MAX] contribute to column counts
-//   - A column must have >= MIN_COL_PIXELS ink pixels to count as occupied
-//   - A character must span >= MIN_CHAR_W columns
-//   - A gap must span >= MIN_GAP empty columns to split characters
+// Column-projection segmentation for one horizontal line of characters.
+// This version scans one column at a time instead of keeping a wide randomly
+// randomly indexed counter array. It is slower at runtime but much easier for
+// Vivado to optimize.
 //==============================================================================
 
 module segment
@@ -28,27 +22,33 @@ module segment
     output logic [35:0]                  bbox_wdata,
     output logic                         bbox_we,
 
-    output logic [$clog2(MAX_CHARS)-1:0] num_chars,
+    output logic [$clog2(MAX_CHARS+1)-1:0] num_chars,
     output logic                         done
 );
 
-    // -- Constants --------------------------------------------------------
-    localparam int WORDS_PER_ROW  = IMG_W / 32;          // 10
-    localparam int TOTAL_WORDS    = (IMG_W * IMG_H) / 32; // 2400
+    localparam int WORDS_PER_ROW  = IMG_W / 32;
+    localparam int TOTAL_WORDS    = (IMG_W * IMG_H) / 32;
     localparam int MIN_CHAR_W     = 3;
     localparam int MIN_GAP        = 5;
-    localparam int MIN_COL_PIXELS = 3;  // noise threshold per column
-    localparam int MIN_ROW_PIXELS = 3;  // reject isolated specks in bbox row scan
+    localparam int MIN_COL_PIXELS = 3;
+    localparam int MIN_ROW_PIXELS = 3;
+    localparam int ROW_MIN        = 20;
+    localparam int ROW_MAX        = 220;
+    localparam int ROW_MIN_BASE   = ROW_MIN * WORDS_PER_ROW;
+    // Optional edge crop for segmentation. Set to zero in the stable QVGA path.
+    localparam int SCAN_LEFT_COL      = IMG_CROP_LEFT;
+    localparam int SCAN_RIGHT_COL     = IMG_W - IMG_CROP_RIGHT;
+    localparam int SCAN_RIGHT_LAST    = SCAN_RIGHT_COL - 1;
+    localparam logic [$clog2(IMG_W)-1:0] SCAN_LEFT_COL_U   = SCAN_LEFT_COL;
+    localparam logic [$clog2(IMG_W)-1:0] SCAN_RIGHT_LAST_U = SCAN_RIGHT_LAST;
 
-    // Restrict vertical range for column scan (reject top/bottom noise)
-    localparam int ROW_MIN = 20;
-    localparam int ROW_MAX = 220;
-
-    // -- FSM --------------------------------------------------------------
-    typedef enum logic [2:0] {
+    typedef enum logic [3:0] {
         S_IDLE,
-        S_COL_SCAN,
-        S_FIND_COLS,
+        S_COL_START,
+        S_COL_READ,
+        S_COL_FINISH,
+        S_COL_FLUSH,
+        S_COL_DONE,
         S_RS_INIT,
         S_RS_READ,
         S_RS_DRAIN,
@@ -58,22 +58,30 @@ module segment
 
     state_t state, state_next;
 
-    // -- Column scan registers --------------------------------------------
-    logic [13:0] scan_addr, scan_addr_next;
-    logic        scan_valid;
-    logic [13:0] scan_addr_d;
+    logic [$clog2(IMG_W)-1:0] scan_col, scan_col_next;
+    logic [$clog2(IMG_H)-1:0] scan_row, scan_row_next;
+    logic [13:0]              scan_row_base, scan_row_base_next;
+    logic [1:0]               col_count, col_count_next;
+    logic                     col_valid, col_valid_next;
+    logic                     occ_prev2, occ_prev2_next;
+    logic                     occ_prev1, occ_prev1_next;
 
-    // Per-column ink pixel count (8 bits each, max 240)
-    logic [7:0] col_count     [0:IMG_W-1];
-    logic [7:0] col_count_upd [0:IMG_W-1];  // updated values this cycle
-    logic       col_count_we;                // write-enable for update
+    logic [1:0] col_count_accum;
+    logic       current_col_occ;
+    logic [4:0] scan_bit;
+    logic [$clog2(WORDS_PER_ROW)-1:0] scan_word;
 
-    // Row of the delayed BRAM word (for row range filtering)
-    wire [7:0] scan_row      = scan_addr_d / WORDS_PER_ROW;
-    wire       scan_row_ok   = (scan_row >= ROW_MIN) && (scan_row <= ROW_MAX);
-    wire [$clog2(IMG_W)-1:0] base_col = (scan_addr_d % WORDS_PER_ROW) * 32;
+    assign scan_bit  = scan_col[4:0];
+    assign scan_word = scan_col >> 5;
 
-    // -- Find cols registers ----------------------------------------------
+    always_comb begin
+        col_count_accum = col_count;
+        if (col_valid && bin_rdata[scan_bit] && (col_count != 2'd3))
+            col_count_accum = col_count + 2'd1;
+    end
+
+    assign current_col_occ = (col_count_accum >= MIN_COL_PIXELS[1:0]);
+
     logic [$clog2(IMG_W)-1:0] col_idx, col_idx_next;
     logic                     in_run, in_run_next;
     logic [$clog2(IMG_W)-1:0] run_start;
@@ -81,80 +89,60 @@ module segment
 
     logic [9:0] char_x_min [0:MAX_CHARS-1];
     logic [9:0] char_x_max [0:MAX_CHARS-1];
-    logic [$clog2(MAX_CHARS)-1:0] char_count, char_count_next;
+    logic [$clog2(MAX_CHARS+1)-1:0] char_count, char_count_next;
 
-    // Helper: record a character (set in comb, used in ff)
+    logic        support_valid;
+    logic        col_supported;
+    logic [9:0]  support_x;
     logic        record_char;
     logic [9:0]  record_x_min, record_x_max;
 
-    // Column occupied test
-    wire [7:0] col_count_cur  = (col_idx < IMG_W) ? col_count[col_idx] : 8'd0;
-    wire [7:0] col_count_prev = (col_idx == 0 || col_idx > IMG_W) ? 8'd0 : col_count[col_idx - 1];
-    wire [7:0] col_count_next = (col_idx >= IMG_W - 1) ? 8'd0 : col_count[col_idx + 1];
-    wire col_occupied = (col_count_cur >= MIN_COL_PIXELS);
-    wire col_prev_occupied = (col_count_prev >= MIN_COL_PIXELS);
-    wire col_next_occupied = (col_count_next >= MIN_COL_PIXELS);
-    wire col_supported = col_occupied && (col_prev_occupied || col_next_occupied);
-
-    // -- Row scan registers -----------------------------------------------
     logic [$clog2(MAX_CHARS)-1:0] char_idx, char_idx_next;
-    logic [$clog2(IMG_H)-1:0]    row_idx, row_idx_next;
+    logic [$clog2(IMG_H)-1:0]     row_idx, row_idx_next;
 
     logic [$clog2(WORDS_PER_ROW)-1:0] word_in_row, word_in_row_next;
     logic [$clog2(WORDS_PER_ROW)-1:0] rs_first_word, rs_last_word;
     logic [$clog2(WORDS_PER_ROW)-1:0] rs_word_d;
-    logic        rs_valid;
-    logic        rs_row_has_pixel, rs_row_has_pixel_next;
+    logic [13:0] rs_row_base, rs_row_base_next;
+    logic        rs_valid, rs_valid_next;
     logic [7:0]  rs_row_pixel_count, rs_row_pixel_count_next;
 
     logic [$clog2(IMG_H)-1:0] cur_y_min, cur_y_max;
     logic        found_y_min;
 
-    // -- Row scan: check if BRAM word has any pixel in [x_min, x_max] -----
-    logic rs_word_hit;
     logic [5:0] rs_word_pixel_count;
+    logic [$clog2(IMG_W)-1:0] rs_base_col;
+    assign rs_base_col = {rs_word_d, 5'b0};
+
     always_comb begin
-        rs_word_hit = 1'b0;
         rs_word_pixel_count = '0;
         for (int b = 0; b < 32; b++) begin
-            if ((rs_word_d * 32 + b) >= char_x_min[char_idx] &&
-                (rs_word_d * 32 + b) <= char_x_max[char_idx] &&
+            if ((rs_base_col + b) >= char_x_min[char_idx] &&
+                (rs_base_col + b) <= char_x_max[char_idx] &&
                 bin_rdata[b]) begin
-                rs_word_hit = rs_word_hit | bin_rdata[b];
                 rs_word_pixel_count = rs_word_pixel_count + 6'd1;
             end
         end
     end
 
-    // -- Column count update logic (combinational) ------------------------
     always_comb begin
-        for (int i = 0; i < IMG_W; i++)
-            col_count_upd[i] = col_count[i];
-
-        col_count_we = 1'b0;
-
-        if (scan_valid && scan_row_ok) begin
-            col_count_we = 1'b1;
-            for (int b = 0; b < 32; b++) begin
-                if ((base_col + b) < IMG_W && bin_rdata[b])
-                    col_count_upd[base_col + b] = col_count[base_col + b] + 8'd1;
-            end
-        end
-    end
-
-    // -- Combinational next-state logic -----------------------------------
-    always_comb begin
-        // defaults
-        state_next            = state;
-        scan_addr_next        = scan_addr;
-        col_idx_next          = col_idx;
-        in_run_next           = in_run;
-        gap_count_next        = gap_count;
-        char_count_next       = char_count;
-        char_idx_next         = char_idx;
-        row_idx_next          = row_idx;
-        word_in_row_next      = word_in_row;
-        rs_row_has_pixel_next = rs_row_has_pixel;
+        state_next              = state;
+        scan_col_next           = scan_col;
+        scan_row_next           = scan_row;
+        scan_row_base_next      = scan_row_base;
+        col_count_next          = col_count_accum;
+        col_valid_next          = (state == S_COL_READ);
+        occ_prev2_next          = occ_prev2;
+        occ_prev1_next          = occ_prev1;
+        col_idx_next            = col_idx;
+        in_run_next             = in_run;
+        gap_count_next          = gap_count;
+        char_count_next         = char_count;
+        char_idx_next           = char_idx;
+        row_idx_next            = row_idx;
+        word_in_row_next        = word_in_row;
+        rs_row_base_next        = rs_row_base;
+        rs_valid_next           = (state == S_RS_READ);
         rs_row_pixel_count_next = rs_row_pixel_count;
 
         bbox_we    = 1'b0;
@@ -162,226 +150,252 @@ module segment
         bbox_wdata = '0;
         bin_raddr  = '0;
 
-        record_char  = 1'b0;
-        record_x_min = '0;
-        record_x_max = '0;
+        support_valid = 1'b0;
+        col_supported = 1'b0;
+        support_x     = '0;
+        record_char   = 1'b0;
+        record_x_min  = '0;
+        record_x_max  = '0;
 
-        unique case (state)
-            // =============================================================
+        case (state)
             S_IDLE: begin
+                col_valid_next = 1'b0;
+                rs_valid_next  = 1'b0;
                 if (start)
-                    state_next = S_COL_SCAN;
+                    state_next = S_COL_START;
             end
 
-            // =============================================================
-            S_COL_SCAN: begin
-                bin_raddr = scan_addr;
-
-                if (scan_addr < TOTAL_WORDS - 1)
-                    scan_addr_next = scan_addr + 1;
-                else if (scan_valid && (scan_addr_d == TOTAL_WORDS - 1))
-                    state_next = S_FIND_COLS;
+            S_COL_START: begin
+                scan_row_next      = ROW_MIN[$clog2(IMG_H)-1:0];
+                scan_row_base_next = ROW_MIN_BASE[13:0];
+                col_count_next     = '0;
+                col_valid_next     = 1'b0;
+                state_next         = S_COL_READ;
             end
 
-            // =============================================================
-            S_FIND_COLS: begin
-                if (col_idx < IMG_W) begin
-                    if (col_supported) begin
-                        gap_count_next = 0;
-                        if (!in_run)
-                            in_run_next = 1'b1;
-                    end else if (in_run) begin
-                        gap_count_next = gap_count + 1;
-                        if (gap_count + 1 >= MIN_GAP) begin
-                            record_x_min = run_start;
-                            record_x_max = col_idx - gap_count - 1;
-                            if ((col_idx - gap_count - run_start) >= MIN_CHAR_W
-                                && char_count < MAX_CHARS)
-                                record_char = 1'b1;
-                            in_run_next    = 1'b0;
-                            gap_count_next = 0;
-                        end
-                    end
-                    col_idx_next = col_idx + 1;
+            S_COL_READ: begin
+                bin_raddr = scan_row_base + scan_word;
+                if (scan_row < ROW_MAX) begin
+                    scan_row_next      = scan_row + 1'b1;
+                    scan_row_base_next = scan_row_base + WORDS_PER_ROW;
                 end else begin
-                    // close trailing run at right edge
-                    if (in_run) begin
-                        record_x_min = run_start;
-                        record_x_max = IMG_W - 1 - gap_count;
-                        if ((IMG_W - gap_count - run_start) >= MIN_CHAR_W
-                            && char_count < MAX_CHARS)
-                            record_char = 1'b1;
-                        in_run_next = 1'b0;
-                    end
-
-                    if (char_count > 0 || record_char)
-                        state_next = S_RS_INIT;
-                    else
-                        state_next = S_DONE;
+                    state_next = S_COL_FINISH;
                 end
             end
 
-            // =============================================================
+            S_COL_FINISH: begin
+                col_valid_next = 1'b0;
+
+                if (scan_col != SCAN_LEFT_COL_U) begin
+                    support_valid = 1'b1;
+                    support_x     = {1'b0, scan_col} - 10'd1;
+                    col_supported = occ_prev1 && (occ_prev2 || current_col_occ);
+                end
+
+                occ_prev2_next = occ_prev1;
+                occ_prev1_next = current_col_occ;
+
+                if (scan_col == SCAN_RIGHT_LAST_U) begin
+                    state_next = S_COL_DONE;
+                end else begin
+                    scan_col_next = scan_col + 1'b1;
+                    state_next    = S_COL_START;
+                end
+            end
+
+            S_COL_FLUSH: begin
+                support_valid = 1'b1;
+                support_x     = IMG_W - 1;
+                col_supported = occ_prev1 && occ_prev2;
+                state_next    = S_COL_DONE;
+            end
+
+            S_COL_DONE: begin
+                if (in_run) begin
+                    record_x_min = run_start;
+                    record_x_max = SCAN_RIGHT_LAST_U - gap_count;
+                    if (({1'b0, SCAN_RIGHT_LAST_U} + 10'd1 - gap_count - run_start) >= MIN_CHAR_W &&
+                        char_count < MAX_CHARS)
+                        record_char = 1'b1;
+                    in_run_next = 1'b0;
+                end
+
+                if (char_count > 0 || record_char)
+                    state_next = S_RS_INIT;
+                else
+                    state_next = S_DONE;
+            end
+
             S_RS_INIT: begin
-                row_idx_next          = '0;
-                word_in_row_next      = char_x_min[char_idx][9:5];
-                rs_row_has_pixel_next = 1'b0;
-                rs_row_pixel_count_next = '0;
-                state_next            = S_RS_READ;
+                row_idx_next              = '0;
+                word_in_row_next          = char_x_min[char_idx][9:5];
+                rs_row_base_next          = '0;
+                rs_row_pixel_count_next   = '0;
+                rs_valid_next             = 1'b0;
+                state_next                = S_RS_READ;
             end
 
-            // =============================================================
             S_RS_READ: begin
-                bin_raddr = row_idx * WORDS_PER_ROW + word_in_row;
+                bin_raddr = rs_row_base + word_in_row;
 
-                if (rs_valid) begin
-                    rs_row_has_pixel_next = rs_row_has_pixel | rs_word_hit;
-                    rs_row_pixel_count_next = rs_row_pixel_count
-                                            + {2'b0, rs_word_pixel_count};
-                end
+                if (rs_valid)
+                    rs_row_pixel_count_next = rs_row_pixel_count + {2'b0, rs_word_pixel_count};
 
                 if (word_in_row < rs_last_word)
-                    word_in_row_next = word_in_row + 1;
+                    word_in_row_next = word_in_row + 1'b1;
                 else
                     state_next = S_RS_DRAIN;
             end
 
-            // =============================================================
             S_RS_DRAIN: begin
-                if (rs_valid) begin
-                    rs_row_has_pixel_next = rs_row_has_pixel | rs_word_hit;
-                    rs_row_pixel_count_next = rs_row_pixel_count
-                                            + {2'b0, rs_word_pixel_count};
-                end
+                if (rs_valid)
+                    rs_row_pixel_count_next = rs_row_pixel_count + {2'b0, rs_word_pixel_count};
 
                 if (row_idx < IMG_H - 1) begin
-                    row_idx_next     = row_idx + 1;
-                    word_in_row_next = rs_first_word;
-                    state_next       = S_RS_READ;
+                    row_idx_next            = row_idx + 1'b1;
+                    rs_row_base_next        = rs_row_base + WORDS_PER_ROW;
+                    word_in_row_next        = rs_first_word;
+                    state_next              = S_RS_READ;
                 end else begin
                     state_next = S_RS_WRITE;
                 end
             end
 
-            // =============================================================
             S_RS_WRITE: begin
                 bbox_we    = 1'b1;
                 bbox_waddr = char_idx;
                 bbox_wdata = {char_x_min[char_idx], char_x_max[char_idx],
                               cur_y_min, cur_y_max};
 
-                if (char_idx < char_count - 1) begin
-                    char_idx_next = char_idx + 1;
+                if ({1'b0, char_idx} < char_count - 1'b1) begin
+                    char_idx_next = char_idx + 1'b1;
                     state_next    = S_RS_INIT;
                 end else begin
                     state_next = S_DONE;
                 end
             end
 
-            // =============================================================
             S_DONE: begin
                 state_next = S_IDLE;
             end
+
+            default: begin
+                state_next = S_IDLE;
+            end
         endcase
+
+        if (support_valid) begin
+            if (col_supported) begin
+                gap_count_next = '0;
+                if (!in_run)
+                    in_run_next = 1'b1;
+            end else if (in_run) begin
+                gap_count_next = gap_count + 1'b1;
+                if (gap_count + 1'b1 >= MIN_GAP) begin
+                    record_x_min = run_start;
+                    record_x_max = support_x - gap_count - 1'b1;
+                    if ((support_x - gap_count - run_start) >= MIN_CHAR_W &&
+                        char_count < MAX_CHARS)
+                        record_char = 1'b1;
+                    in_run_next    = 1'b0;
+                    gap_count_next = '0;
+                end
+            end
+        end
     end
 
-    // -- Sequential logic -------------------------------------------------
     always_ff @(posedge clk) begin
         if (reset) begin
-            state            <= S_IDLE;
-            scan_addr        <= '0;
-            scan_valid       <= 1'b0;
-            scan_addr_d      <= '0;
-            col_idx          <= '0;
-            in_run           <= 1'b0;
-            gap_count        <= '0;
-            char_count       <= '0;
-            char_idx         <= '0;
-            row_idx          <= '0;
-            word_in_row      <= '0;
-            rs_first_word    <= '0;
-            rs_last_word     <= '0;
-            rs_valid         <= 1'b0;
-            rs_word_d        <= '0;
-            rs_row_has_pixel <= 1'b0;
+            state              <= S_IDLE;
+            scan_col           <= '0;
+            scan_row           <= '0;
+            scan_row_base      <= '0;
+            col_count          <= '0;
+            col_valid          <= 1'b0;
+            occ_prev2          <= 1'b0;
+            occ_prev1          <= 1'b0;
+            col_idx            <= '0;
+            in_run             <= 1'b0;
+            gap_count          <= '0;
+            char_count         <= '0;
+            char_idx           <= '0;
+            row_idx            <= '0;
+            word_in_row        <= '0;
+            rs_first_word      <= '0;
+            rs_last_word       <= '0;
+            rs_word_d          <= '0;
+            rs_row_base        <= '0;
+            rs_valid           <= 1'b0;
             rs_row_pixel_count <= '0;
-            cur_y_min        <= '0;
-            cur_y_max        <= '0;
-            found_y_min      <= 1'b0;
-            run_start        <= '0;
-            num_chars        <= '0;
-            done             <= 1'b0;
-
-            for (int i = 0; i < IMG_W; i++)
-                col_count[i] <= 8'd0;
+            cur_y_min          <= '0;
+            cur_y_max          <= '0;
+            found_y_min        <= 1'b0;
+            run_start          <= '0;
+            num_chars          <= '0;
+            done               <= 1'b0;
         end else begin
-            state            <= state_next;
-            scan_addr        <= scan_addr_next;
-            col_idx          <= col_idx_next;
-            in_run           <= in_run_next;
-            gap_count        <= gap_count_next;
-            char_count       <= char_count_next;
-            char_idx         <= char_idx_next;
-            row_idx          <= row_idx_next;
-            word_in_row      <= word_in_row_next;
-            rs_row_has_pixel <= rs_row_has_pixel_next;
+            state              <= state_next;
+            scan_col           <= scan_col_next;
+            scan_row           <= scan_row_next;
+            scan_row_base      <= scan_row_base_next;
+            col_count          <= col_count_next;
+            col_valid          <= col_valid_next;
+            occ_prev2          <= occ_prev2_next;
+            occ_prev1          <= occ_prev1_next;
+            col_idx            <= col_idx_next;
+            in_run             <= in_run_next;
+            gap_count          <= gap_count_next;
+            char_count         <= char_count_next;
+            char_idx           <= char_idx_next;
+            row_idx            <= row_idx_next;
+            word_in_row        <= word_in_row_next;
+            rs_row_base        <= rs_row_base_next;
+            rs_valid           <= rs_valid_next;
+            rs_word_d          <= word_in_row;
             rs_row_pixel_count <= rs_row_pixel_count_next;
 
-            // BRAM latency tracking
-            scan_valid  <= (state == S_COL_SCAN);
-            scan_addr_d <= scan_addr;
-            rs_valid    <= (state == S_RS_READ);
-            rs_word_d   <= word_in_row;
-
-            // -- Column count update --
-            if (col_count_we) begin
-                for (int i = 0; i < IMG_W; i++)
-                    col_count[i] <= col_count_upd[i];
-            end
-
-            // -- On start: clear state --
             if (state == S_IDLE && start) begin
-                scan_addr        <= '0;
-                scan_valid       <= 1'b0;
-                char_count       <= '0;
-                char_idx         <= '0;
-                col_idx          <= '0;
-                in_run           <= 1'b0;
-                gap_count        <= '0;
-                run_start        <= '0;
-                row_idx          <= '0;
-                word_in_row      <= '0;
-                rs_first_word    <= '0;
-                rs_last_word     <= '0;
-                rs_valid         <= 1'b0;
-                rs_word_d        <= '0;
-                rs_row_has_pixel <= 1'b0;
+                scan_col           <= SCAN_LEFT_COL_U;
+                scan_row           <= '0;
+                scan_row_base      <= '0;
+                col_count          <= '0;
+                col_valid          <= 1'b0;
+                occ_prev2          <= 1'b0;
+                occ_prev1          <= 1'b0;
+                col_idx            <= '0;
+                in_run             <= 1'b0;
+                gap_count          <= '0;
+                char_count         <= '0;
+                char_idx           <= '0;
+                row_idx            <= '0;
+                word_in_row        <= '0;
+                rs_first_word      <= '0;
+                rs_last_word       <= '0;
+                rs_word_d          <= '0;
+                rs_row_base        <= '0;
+                rs_valid           <= 1'b0;
                 rs_row_pixel_count <= '0;
-                cur_y_min        <= '0;
-                cur_y_max        <= '0;
-                found_y_min      <= 1'b0;
-                done             <= 1'b0;
-
-                for (int i = 0; i < IMG_W; i++)
-                    col_count[i] <= 8'd0;
+                cur_y_min          <= '0;
+                cur_y_max          <= '0;
+                found_y_min        <= 1'b0;
+                run_start          <= '0;
+                num_chars          <= '0;
+                done               <= 1'b0;
             end
 
-            // -- FIND_COLS: latch run_start --
-            if (state == S_FIND_COLS && col_idx < IMG_W && col_supported && !in_run)
-                run_start <= col_idx;
+            if (support_valid && col_supported && !in_run)
+                run_start <= support_x;
 
-            // -- FIND_COLS: record character --
             if (record_char && char_count < MAX_CHARS) begin
-                char_x_min[char_count] <= record_x_min;
-                char_x_max[char_count] <= record_x_max;
-                char_count             <= char_count + 1;
+                char_x_min[char_count[$clog2(MAX_CHARS)-1:0]] <= record_x_min;
+                char_x_max[char_count[$clog2(MAX_CHARS)-1:0]] <= record_x_max;
+                char_count <= char_count + 1'b1;
             end
 
-            // -- RS_INIT: latch word bounds, clear y tracking --
             if (state_next == S_RS_INIT) begin
-                cur_y_min   <= '0;
-                cur_y_max   <= '0;
-                found_y_min <= 1'b0;
+                cur_y_min          <= '0;
+                cur_y_max          <= '0;
+                found_y_min        <= 1'b0;
                 rs_row_pixel_count <= '0;
             end
 
@@ -390,7 +404,6 @@ module segment
                 rs_last_word  <= char_x_max[char_idx][9:5];
             end
 
-            // -- RS_DRAIN: update y bounds then clear for next row --
             if (state == S_RS_DRAIN) begin
                 if (rs_row_pixel_count_next >= MIN_ROW_PIXELS) begin
                     if (!found_y_min) begin
@@ -399,16 +412,13 @@ module segment
                     end
                     cur_y_max <= row_idx;
                 end
-                if (row_idx < IMG_H - 1) begin
-                    rs_row_has_pixel <= 1'b0;
+                if (row_idx < IMG_H - 1)
                     rs_row_pixel_count <= '0;
-                end
             end
 
-            // -- Outputs --
             done <= (state_next == S_DONE);
             if (record_char && char_count < MAX_CHARS)
-                num_chars <= char_count + 1;
+                num_chars <= char_count + 1'b1;
             else
                 num_chars <= char_count;
         end

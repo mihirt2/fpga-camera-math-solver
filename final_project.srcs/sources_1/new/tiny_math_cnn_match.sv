@@ -62,26 +62,29 @@ module tiny_math_cnn_match
     localparam int FC1_IN      = C3_OUT * 4 * 2;
     localparam int FC2_IN      = FC1_OUT;
     localparam int FC2_OUT     = NUM_CLASSES;
+    localparam int POOL1_COUNT = C1_OUT * 16 * 8;
+    localparam int POOL2_COUNT = C2_OUT * 8 * 4;
+    localparam int POOL3_COUNT = C3_OUT * 4 * 2;
     localparam int FC1_W_COUNT = FC1_OUT * FC1_IN;
     localparam int FC2_W_COUNT = FC2_OUT * FC2_IN;
 
     typedef logic signed [ACT_W-1:0] act_t;
     typedef logic signed [ACC_W-1:0] acc_t;
 
-    logic signed [15:0] conv1_w [0:C1_W_COUNT-1];
-    logic signed [15:0] conv2_w [0:C2_W_COUNT-1];
-    logic signed [15:0] conv3_w [0:C3_W_COUNT-1];
-    logic signed [15:0] fc1_w   [0:FC1_W_COUNT-1];
-    logic signed [15:0] fc1_b   [0:FC1_OUT-1];
-    logic signed [15:0] fc2_w   [0:FC2_W_COUNT-1];
-    logic signed [15:0] fc2_b   [0:FC2_OUT-1];
-    logic [CHAR_CODE_WIDTH-1:0] class_code [0:NUM_CLASSES-1];
+    (* rom_style = "block" *) logic signed [15:0] conv1_w [0:C1_W_COUNT-1];
+    (* rom_style = "block" *) logic signed [15:0] conv2_w [0:C2_W_COUNT-1];
+    (* rom_style = "block" *) logic signed [15:0] conv3_w [0:C3_W_COUNT-1];
+    (* rom_style = "block" *) logic signed [15:0] fc1_w   [0:FC1_W_COUNT-1];
+    (* rom_style = "distributed" *) logic signed [15:0] fc1_b [0:FC1_OUT-1];
+    (* rom_style = "block" *) logic signed [15:0] fc2_w   [0:FC2_W_COUNT-1];
+    (* rom_style = "distributed" *) logic signed [15:0] fc2_b [0:FC2_OUT-1];
+    (* rom_style = "distributed" *) logic [CHAR_CODE_WIDTH-1:0] class_code [0:NUM_CLASSES-1];
 
-    act_t pool1 [0:C1_OUT-1][0:15][0:7];
-    act_t pool2 [0:C2_OUT-1][0:7][0:3];
-    act_t pool3 [0:C3_OUT-1][0:3][0:1];
-    act_t fc1_act [0:FC1_OUT-1];
-    act_t logits [0:FC2_OUT-1];
+    (* ram_style = "block" *) act_t pool1 [0:POOL1_COUNT-1];
+    (* ram_style = "block" *) act_t pool2 [0:POOL2_COUNT-1];
+    (* ram_style = "block" *) act_t pool3 [0:POOL3_COUNT-1];
+    (* ram_style = "distributed" *) act_t fc1_act [0:FC1_OUT-1];
+    (* ram_style = "distributed" *) act_t logits [0:FC2_OUT-1];
 
     initial begin
         for (int i = 0; i < C1_W_COUNT; i++)  conv1_w[i] = '0;
@@ -148,36 +151,21 @@ module tiny_math_cnn_match
         end
     endfunction
 
-    function automatic act_t pool1_pixel(input int ch, input int y, input int x);
+    function automatic int pool1_addr(input int ch, input int y, input int x);
         begin
-            if (ch < 0 || ch >= C1_OUT || y < 0 || y >= 16 || x < 0 || x >= 8)
-                pool1_pixel = '0;
-            else
-                pool1_pixel = pool1[ch][y][x];
+            pool1_addr = (ch * 16 + y) * 8 + x;
         end
     endfunction
 
-    function automatic act_t pool2_pixel(input int ch, input int y, input int x);
+    function automatic int pool2_addr(input int ch, input int y, input int x);
         begin
-            if (ch < 0 || ch >= C2_OUT || y < 0 || y >= 8 || x < 0 || x >= 4)
-                pool2_pixel = '0;
-            else
-                pool2_pixel = pool2[ch][y][x];
+            pool2_addr = (ch * 8 + y) * 4 + x;
         end
     endfunction
 
-    function automatic act_t max4(
-        input act_t a,
-        input act_t b,
-        input act_t c,
-        input act_t d
-    );
-        act_t ab;
-        act_t cd;
+    function automatic int pool3_addr(input int ch, input int y, input int x);
         begin
-            ab = (a > b) ? a : b;
-            cd = (c > d) ? c : d;
-            max4 = (ab > cd) ? ab : cd;
+            pool3_addr = (ch * 4 + y) * 2 + x;
         end
     endfunction
 
@@ -224,31 +212,28 @@ module tiny_math_cnn_match
 
     acc_t mac;
     act_t conv_value;
+    act_t act_q;
+    logic signed [15:0] weight_q;
     logic [4:0] best_class;
     act_t best_logit;
     act_t second_logit;
+    logic mac_phase;
 
     int src_y;
     int src_x;
     int weight_idx;
-    act_t current_act;
-    logic signed [15:0] current_weight;
     acc_t product;
 
     always_comb begin
         src_y = 0;
         src_x = 0;
         weight_idx = 0;
-        current_act = '0;
-        current_weight = '0;
 
-        unique case (state)
+        case (state)
             S_CONV1: begin
                 src_y = int'(y_idx) + int'(ky_idx) - 1;
                 src_x = int'(x_idx) + int'(kx_idx) - 1;
                 weight_idx = (int'(out_ch) * 3 + int'(ky_idx)) * 3 + int'(kx_idx);
-                current_act = input_pixel_q8_8(src_y, src_x);
-                current_weight = conv1_w[weight_idx];
             end
 
             S_CONV2: begin
@@ -256,8 +241,6 @@ module tiny_math_cnn_match
                 src_x = int'(x_idx) + int'(kx_idx) - 1;
                 weight_idx = (((int'(out_ch) * C1_OUT + int'(in_ch)) * 3)
                             + int'(ky_idx)) * 3 + int'(kx_idx);
-                current_act = pool1_pixel(int'(in_ch), src_y, src_x);
-                current_weight = conv2_w[weight_idx];
             end
 
             S_CONV3: begin
@@ -265,29 +248,21 @@ module tiny_math_cnn_match
                 src_x = int'(x_idx) + int'(kx_idx) - 1;
                 weight_idx = (((int'(out_ch) * C2_OUT + int'(in_ch)) * 3)
                             + int'(ky_idx)) * 3 + int'(kx_idx);
-                current_act = pool2_pixel(int'(in_ch), src_y, src_x);
-                current_weight = conv3_w[weight_idx];
             end
 
             S_FC1: begin
                 weight_idx = int'(out_ch) * FC1_IN + int'(flat_idx);
-                current_weight = fc1_w[weight_idx];
-                current_act = pool3[flat_idx[7:3]][flat_idx[2:1]][flat_idx[0]];
             end
 
             S_FC2: begin
                 weight_idx = int'(class_idx) * FC2_IN + int'(flat_idx[4:0]);
-                current_weight = fc2_w[weight_idx];
-                current_act = fc1_act[flat_idx[4:0]];
             end
 
             default: begin
-                current_act = '0;
-                current_weight = '0;
             end
         endcase
 
-        product = acc_t'(current_act) * acc_t'(current_weight);
+        product = acc_t'(act_q) * acc_t'(weight_q);
     end
 
     wire last_kx = (kx_idx == 2);
@@ -311,10 +286,53 @@ module tiny_math_cnn_match
             class_idx   <= '0;
             mac         <= '0;
             conv_value  <= '0;
+            act_q       <= '0;
+            weight_q    <= '0;
             best_class  <= '0;
             best_logit  <= -16'sd32768;
             second_logit <= -16'sd32768;
+            mac_phase   <= 1'b0;
         end else begin
+            if (!mac_phase) begin
+                case (state)
+                    S_CONV1: begin
+                        act_q    <= input_pixel_q8_8(src_y, src_x);
+                        weight_q <= conv1_w[weight_idx];
+                    end
+
+                    S_CONV2: begin
+                        weight_q <= conv2_w[weight_idx];
+                        if (src_y < 0 || src_y >= 16 || src_x < 0 || src_x >= 8)
+                            act_q <= '0;
+                        else
+                            act_q <= pool1[pool1_addr(int'(in_ch), src_y, src_x)];
+                    end
+
+                    S_CONV3: begin
+                        weight_q <= conv3_w[weight_idx];
+                        if (src_y < 0 || src_y >= 8 || src_x < 0 || src_x >= 4)
+                            act_q <= '0;
+                        else
+                            act_q <= pool2[pool2_addr(int'(in_ch), src_y, src_x)];
+                    end
+
+                    S_FC1: begin
+                        act_q    <= pool3[pool3_addr(int'(flat_idx[7:3]), int'(flat_idx[2:1]), int'(flat_idx[0]))];
+                        weight_q <= fc1_w[weight_idx];
+                    end
+
+                    S_FC2: begin
+                        act_q    <= fc1_act[flat_idx[4:0]];
+                        weight_q <= fc2_w[weight_idx];
+                    end
+
+                    default: begin
+                        act_q    <= '0;
+                        weight_q <= '0;
+                    end
+                endcase
+            end
+
             case (state)
                 S_IDLE: begin
                     if (start) begin
@@ -338,33 +356,40 @@ module tiny_math_cnn_match
                         ky_idx   <= '0;
                         kx_idx   <= '0;
                         mac      <= '0;
+                        mac_phase <= 1'b0;
                         state    <= S_CONV1;
                     end
                 end
 
                 S_CONV1: begin
-                    mac <= mac + product;
-
-                    if (last_kx && last_ky) begin
-                        conv_value <= relu_shifted(mac + product);
-                        kx_idx <= '0;
-                        ky_idx <= '0;
-                        state  <= S_POOL1;
-                    end else if (last_kx) begin
-                        kx_idx <= '0;
-                        ky_idx <= ky_idx + 1'b1;
+                    if (!mac_phase) begin
+                        mac_phase <= 1'b1;
                     end else begin
-                        kx_idx <= kx_idx + 1'b1;
+                        mac_phase <= 1'b0;
+                        mac <= mac + product;
+
+                        if (last_kx && last_ky) begin
+                            conv_value <= relu_shifted(mac + product);
+                            kx_idx <= '0;
+                            ky_idx <= '0;
+                            state  <= S_POOL1;
+                        end else if (last_kx) begin
+                            kx_idx <= '0;
+                            ky_idx <= ky_idx + 1'b1;
+                        end else begin
+                            kx_idx <= kx_idx + 1'b1;
+                        end
                     end
                 end
 
                 S_POOL1: begin
                     if ((y_idx[0] == 1'b0) && (x_idx[0] == 1'b0))
-                        pool1[out_ch][y_idx[4:1]][x_idx[3:1]] <= conv_value;
-                    else if (conv_value > pool1[out_ch][y_idx[4:1]][x_idx[3:1]])
-                        pool1[out_ch][y_idx[4:1]][x_idx[3:1]] <= conv_value;
+                        pool1[pool1_addr(int'(out_ch), int'(y_idx[4:1]), int'(x_idx[3:1]))] <= conv_value;
+                    else if (conv_value > pool1[pool1_addr(int'(out_ch), int'(y_idx[4:1]), int'(x_idx[3:1]))])
+                        pool1[pool1_addr(int'(out_ch), int'(y_idx[4:1]), int'(x_idx[3:1]))] <= conv_value;
 
                     mac <= '0;
+                    mac_phase <= 1'b0;
 
                     if (x_idx < 15) begin
                         x_idx <= x_idx + 1'b1;
@@ -388,33 +413,39 @@ module tiny_math_cnn_match
                 end
 
                 S_CONV2: begin
-                    mac <= mac + product;
-
-                    if (last_kx && last_ky && in_ch == C1_OUT - 1) begin
-                        conv_value <= relu_shifted(mac + product);
-                        kx_idx <= '0;
-                        ky_idx <= '0;
-                        in_ch  <= '0;
-                        state  <= S_POOL2;
-                    end else if (last_kx && last_ky) begin
-                        kx_idx <= '0;
-                        ky_idx <= '0;
-                        in_ch  <= in_ch + 1'b1;
-                    end else if (last_kx) begin
-                        kx_idx <= '0;
-                        ky_idx <= ky_idx + 1'b1;
+                    if (!mac_phase) begin
+                        mac_phase <= 1'b1;
                     end else begin
-                        kx_idx <= kx_idx + 1'b1;
+                        mac_phase <= 1'b0;
+                        mac <= mac + product;
+
+                        if (last_kx && last_ky && in_ch == C1_OUT - 1) begin
+                            conv_value <= relu_shifted(mac + product);
+                            kx_idx <= '0;
+                            ky_idx <= '0;
+                            in_ch  <= '0;
+                            state  <= S_POOL2;
+                        end else if (last_kx && last_ky) begin
+                            kx_idx <= '0;
+                            ky_idx <= '0;
+                            in_ch  <= in_ch + 1'b1;
+                        end else if (last_kx) begin
+                            kx_idx <= '0;
+                            ky_idx <= ky_idx + 1'b1;
+                        end else begin
+                            kx_idx <= kx_idx + 1'b1;
+                        end
                     end
                 end
 
                 S_POOL2: begin
                     if ((y_idx[0] == 1'b0) && (x_idx[0] == 1'b0))
-                        pool2[out_ch][y_idx[3:1]][x_idx[2:1]] <= conv_value;
-                    else if (conv_value > pool2[out_ch][y_idx[3:1]][x_idx[2:1]])
-                        pool2[out_ch][y_idx[3:1]][x_idx[2:1]] <= conv_value;
+                        pool2[pool2_addr(int'(out_ch), int'(y_idx[3:1]), int'(x_idx[2:1]))] <= conv_value;
+                    else if (conv_value > pool2[pool2_addr(int'(out_ch), int'(y_idx[3:1]), int'(x_idx[2:1]))])
+                        pool2[pool2_addr(int'(out_ch), int'(y_idx[3:1]), int'(x_idx[2:1]))] <= conv_value;
 
                     mac <= '0;
+                    mac_phase <= 1'b0;
 
                     if (x_idx < 7) begin
                         x_idx <= x_idx + 1'b1;
@@ -438,33 +469,39 @@ module tiny_math_cnn_match
                 end
 
                 S_CONV3: begin
-                    mac <= mac + product;
-
-                    if (last_kx && last_ky && in_ch == C2_OUT - 1) begin
-                        conv_value <= relu_shifted(mac + product);
-                        kx_idx <= '0;
-                        ky_idx <= '0;
-                        in_ch  <= '0;
-                        state  <= S_POOL3;
-                    end else if (last_kx && last_ky) begin
-                        kx_idx <= '0;
-                        ky_idx <= '0;
-                        in_ch  <= in_ch + 1'b1;
-                    end else if (last_kx) begin
-                        kx_idx <= '0;
-                        ky_idx <= ky_idx + 1'b1;
+                    if (!mac_phase) begin
+                        mac_phase <= 1'b1;
                     end else begin
-                        kx_idx <= kx_idx + 1'b1;
+                        mac_phase <= 1'b0;
+                        mac <= mac + product;
+
+                        if (last_kx && last_ky && in_ch == C2_OUT - 1) begin
+                            conv_value <= relu_shifted(mac + product);
+                            kx_idx <= '0;
+                            ky_idx <= '0;
+                            in_ch  <= '0;
+                            state  <= S_POOL3;
+                        end else if (last_kx && last_ky) begin
+                            kx_idx <= '0;
+                            ky_idx <= '0;
+                            in_ch  <= in_ch + 1'b1;
+                        end else if (last_kx) begin
+                            kx_idx <= '0;
+                            ky_idx <= ky_idx + 1'b1;
+                        end else begin
+                            kx_idx <= kx_idx + 1'b1;
+                        end
                     end
                 end
 
                 S_POOL3: begin
                     if ((y_idx[0] == 1'b0) && (x_idx[0] == 1'b0))
-                        pool3[out_ch][y_idx[2:1]][x_idx[1]] <= conv_value;
-                    else if (conv_value > pool3[out_ch][y_idx[2:1]][x_idx[1]])
-                        pool3[out_ch][y_idx[2:1]][x_idx[1]] <= conv_value;
+                        pool3[pool3_addr(int'(out_ch), int'(y_idx[2:1]), int'(x_idx[1]))] <= conv_value;
+                    else if (conv_value > pool3[pool3_addr(int'(out_ch), int'(y_idx[2:1]), int'(x_idx[1]))])
+                        pool3[pool3_addr(int'(out_ch), int'(y_idx[2:1]), int'(x_idx[1]))] <= conv_value;
 
                     mac <= '0;
+                    mac_phase <= 1'b0;
 
                     if (x_idx < 3) begin
                         x_idx <= x_idx + 1'b1;
@@ -486,48 +523,58 @@ module tiny_math_cnn_match
                 end
 
                 S_FC1: begin
-                    mac <= mac + product;
-
-                    if (flat_idx == FC1_IN - 1) begin
-                        fc1_act[out_ch] <= relu_q8_8(
-                            shifted_with_bias(mac + product, fc1_b[out_ch])
-                        );
-                        mac <= '0;
-                        flat_idx <= '0;
-
-                        if (out_ch < FC1_OUT - 1) begin
-                            out_ch <= out_ch + 1'b1;
-                        end else begin
-                            class_idx <= '0;
-                            state     <= S_FC2;
-                        end
+                    if (!mac_phase) begin
+                        mac_phase <= 1'b1;
                     end else begin
-                        flat_idx <= flat_idx + 1'b1;
+                        mac_phase <= 1'b0;
+                        mac <= mac + product;
+
+                        if (flat_idx == FC1_IN - 1) begin
+                            fc1_act[out_ch] <= relu_q8_8(
+                                shifted_with_bias(mac + product, fc1_b[out_ch])
+                            );
+                            mac <= '0;
+                            flat_idx <= '0;
+
+                            if (out_ch < FC1_OUT - 1) begin
+                                out_ch <= out_ch + 1'b1;
+                            end else begin
+                                class_idx <= '0;
+                                state     <= S_FC2;
+                            end
+                        end else begin
+                            flat_idx <= flat_idx + 1'b1;
+                        end
                     end
                 end
 
                 S_FC2: begin
-                    mac <= mac + product;
-
-                    if (flat_idx == FC2_IN - 1) begin
-                        logits[class_idx] <= shifted_with_bias(
-                            mac + product,
-                            fc2_b[class_idx]
-                        );
-                        mac <= '0;
-                        flat_idx <= '0;
-
-                        if (class_idx < FC2_OUT - 1) begin
-                            class_idx <= class_idx + 1'b1;
-                        end else begin
-                            class_idx <= '0;
-                            best_class <= '0;
-                            best_logit <= -16'sd32768;
-                            second_logit <= -16'sd32768;
-                            state <= S_ARGMAX;
-                        end
+                    if (!mac_phase) begin
+                        mac_phase <= 1'b1;
                     end else begin
-                        flat_idx <= flat_idx + 1'b1;
+                        mac_phase <= 1'b0;
+                        mac <= mac + product;
+
+                        if (flat_idx == FC2_IN - 1) begin
+                            logits[class_idx] <= shifted_with_bias(
+                                mac + product,
+                                fc2_b[class_idx]
+                            );
+                            mac <= '0;
+                            flat_idx <= '0;
+
+                            if (class_idx < FC2_OUT - 1) begin
+                                class_idx <= class_idx + 1'b1;
+                            end else begin
+                                class_idx <= '0;
+                                best_class <= '0;
+                                best_logit <= -16'sd32768;
+                                second_logit <= -16'sd32768;
+                                state <= S_ARGMAX;
+                            end
+                        end else begin
+                            flat_idx <= flat_idx + 1'b1;
+                        end
                     end
                 end
 

@@ -212,11 +212,11 @@ def hw_char_code(name: str) -> int:
         "+": 10,
         "plus": 10,
         "add": 10,
-        "-": 11,
-        "minus": 11,
+        "-": 13,
+        "minus": 13,
         "x": 11,
-        "sub": 11,
-        "subtract": 11,
+        "sub": 13,
+        "subtract": 13,
         "*": 12,
         "times": 12,
         "mul": 12,
@@ -225,6 +225,12 @@ def hw_char_code(name: str) -> int:
         "eq": 13,
         "equal": 13,
         "equals": 13,
+        "^": 16,
+        "caret": 16,
+        "power": 16,
+        "pow": 16,
+        "exponent": 16,
+        "exponentiation": 16,
         "(": 14,
         "lparen": 14,
         "left_paren": 14,
@@ -242,7 +248,7 @@ def hw_char_code(name: str) -> int:
     }
     if key.isdigit() and len(key) == 1:
         return int(key)
-    return aliases.get(key, 15)
+    return aliases.get(key, 31)
 
 
 def pad_class_names(class_names: list[str], samples: list[tuple[str, int]], num_classes: int) -> list[str]:
@@ -279,7 +285,7 @@ def export_vivado(model: TinyMathCNN, class_names: list[str], out_dir: Path) -> 
     np.savetxt(out_dir / "class_code.txt", np.array(codes, dtype=np.int16), fmt="%d")
     with (out_dir / "class_code.mem").open("w", encoding="ascii", newline="\n") as f:
         for code in codes:
-            f.write(f"{code & 0xF:x}\n")
+            f.write(f"{code:x}\n")
 
 
 def train(args: argparse.Namespace) -> None:

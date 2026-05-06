@@ -49,8 +49,8 @@ always_ff @(posedge clk) begin
         24: dout <= 16'hA2_02;   // SCALING_PCLK_DELAY - default
 
         // ---------- Window (QVGA 320x240) ----------
-        25: dout <= 16'h17_16;   // HSTART - bumped from 0x13 to 0x16
-        26: dout <= 16'h18_04;   // HSTOP  - bumped from 0x01 to 0x04
+        25: dout <= 16'h17_16;   // HSTART
+        26: dout <= 16'h18_04;   // HSTOP
         27: dout <= 16'h32_80;   // HREF   - no edge offset
         28: dout <= 16'h19_02;   // VSTART
         29: dout <= 16'h1A_7A;   // VSTOP

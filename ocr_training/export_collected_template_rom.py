@@ -30,6 +30,7 @@ CLASSES = [
     ("equals", 13),
     ("open_paren", 14),
     ("close_paren", 15),
+    ("caret", 16),
 ]
 
 START = "// BEGIN GENERATED COLLECTED NORMALIZED TEMPLATE ROM"
@@ -41,8 +42,15 @@ def image_rows(path: Path) -> list[int]:
     if img.size != (IMG_W, IMG_H):
         img = img.resize((IMG_W, IMG_H), Image.Resampling.NEAREST)
 
+    arr = img.point(lambda px: 0 if px < 128 else 255)
+    ink_count = sum(1 for px in arr.getdata() if px == 0)
+    if ink_count < 8:
+        raise ValueError("blank/empty crop")
+    if ink_count > 430:
+        raise ValueError("almost all-black crop")
+
     rows: list[int] = []
-    pixels = img.load()
+    pixels = arr.load()
     for y in range(IMG_H):
         word = 0
         for x in range(IMG_W):
@@ -53,35 +61,61 @@ def image_rows(path: Path) -> list[int]:
 
 
 def class_files(label: str) -> list[Path]:
-    class_dir = ROOT / label
     files: list[Path] = []
-    for suffix in ("*.png", "*.pbm", "*.jpg", "*.jpeg"):
-        files.extend(class_dir.glob(suffix))
+    labels = [label]
+    if label == "equals":
+        labels.append("minus")
+
+    for source_label in labels:
+        class_dir = ROOT / source_label
+        for suffix in ("*.png", "*.pbm", "*.jpg", "*.jpeg"):
+            files.extend(class_dir.glob(suffix))
+
     if label in PREFER_NEWEST_LABELS:
-        return sorted(files, key=lambda p: (p.stat().st_mtime, p.name), reverse=True)[:MAX_SAMPLES]
-    return sorted(files)[:MAX_SAMPLES]
+        candidates = sorted(files, key=lambda p: (p.stat().st_mtime, p.name), reverse=True)
+    else:
+        candidates = sorted(files)
+
+    usable: list[Path] = []
+    for path in candidates:
+        try:
+            image_rows(path)
+        except ValueError as exc:
+            print(f"skip template {path}: {exc}")
+            continue
+        usable.append(path)
+        if len(usable) == MAX_SAMPLES:
+            break
+
+    return usable
 
 
 def build_module() -> tuple[str, list[tuple[str, int, int]]]:
+    depth = len(CLASSES) * MAX_SAMPLES * IMG_H
     lines: list[str] = [
         START,
         "",
         "module collected_norm_template_rom (",
         "    input  logic        clk,",
-        "    input  logic [3:0]  class_idx,",
+        "    input  logic [4:0]  class_idx,",
         "    input  logic [3:0]  sample_idx,",
         "    input  logic [4:0]  row,",
         "    output logic [15:0] bits",
         ");",
         "",
-        "    (* rom_style = \"block\" *) logic [15:0] rom [0:15][0:9][0:31];",
+        f"    localparam int ROM_DEPTH = {depth};",
+        "    logic [12:0] rom_addr;",
+        "    (* rom_style = \"block\" *) logic [15:0] rom [0:ROM_DEPTH-1];",
+        "",
+        "    assign rom_addr = ({8'b0, class_idx} << 8)",
+        "                    + ({8'b0, class_idx} << 6)",
+        "                    + ({9'b0, sample_idx} << 5)",
+        "                    + {8'b0, row};",
         "",
         "    initial begin : init_collected_norm_template_rom",
-        "        integer c, s, r;",
-        "        for (c = 0; c < 16; c = c + 1)",
-        "            for (s = 0; s < 10; s = s + 1)",
-        "                for (r = 0; r < 32; r = r + 1)",
-        "                    rom[c][s][r] = 16'h0000;",
+        "        integer addr;",
+        "        for (addr = 0; addr < ROM_DEPTH; addr = addr + 1)",
+        "            rom[addr] = 16'h0000;",
         "",
     ]
 
@@ -96,8 +130,9 @@ def build_module() -> tuple[str, list[tuple[str, int, int]]]:
             rows = image_rows(path)
             lines.append(f"        // sample {sample_idx}: {path.as_posix()}")
             for row_idx, word in enumerate(rows):
+                flat_addr = code * MAX_SAMPLES * IMG_H + sample_idx * IMG_H + row_idx
                 lines.append(
-                    f"        rom[4'd{code}][4'd{sample_idx}][5'd{row_idx}] = 16'h{word:04X};"
+                    f"        rom[13'd{flat_addr}] = 16'h{word:04X};"
                 )
             lines.append("")
 
@@ -106,7 +141,7 @@ def build_module() -> tuple[str, list[tuple[str, int, int]]]:
             "    end",
             "",
             "    always_ff @(posedge clk) begin",
-            "        bits <= rom[class_idx][sample_idx][row];",
+            "        bits <= rom[rom_addr];",
             "    end",
             "",
             "endmodule",
@@ -125,7 +160,7 @@ def main() -> None:
     if START in original and END in original:
         before = original.split(START, 1)[0]
         after = original.split(END, 1)[1]
-        updated = before.rstrip() + "\n\n" + module_text.rstrip() + "\n" + after
+        updated = before.rstrip() + "\n\n" + module_text.rstrip() + "\n" + after.lstrip("\n")
     else:
         updated = original.rstrip() + "\n\n" + module_text
 

@@ -9,8 +9,10 @@ module norm_uart_dump
     input  logic                                   clk,
     input  logic                                   reset,
     input  logic                                   start,
-    input  logic [$clog2(MAX_CHARS)-1:0]           num_chars,
+    input  logic [$clog2(MAX_CHARS+1)-1:0]         num_chars,
     input  logic [MAX_CHARS*TEMPLATE_BITS-1:0]     norm_chars_flat,
+    input  logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0]   char_codes_flat,
+    input  logic [MAX_CHARS*10-1:0]                match_dists_flat,
 
     output logic                                   tx,
     output logic                                   busy
@@ -27,6 +29,8 @@ module norm_uart_dump
     dump_state_t state;
 
     logic [5:0]                         num_latched;
+    logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] char_codes_latched;
+    logic [MAX_CHARS*10-1:0]              match_dists_latched;
     logic [$clog2(MAX_CHARS)-1:0]       char_idx;
     logic [4:0]                         row_idx;
     logic [4:0]                         byte_pos;
@@ -58,13 +62,25 @@ module norm_uart_dump
         end
     endfunction
 
+    function automatic logic [CHAR_CODE_WIDTH-1:0] selected_code;
+        selected_code = char_codes_latched[int'(char_idx) * CHAR_CODE_WIDTH +: CHAR_CODE_WIDTH];
+    endfunction
+
+    function automatic logic [9:0] selected_margin;
+        selected_margin = match_dists_latched[int'(char_idx) * 10 +: 10];
+    endfunction
+
     function automatic logic [7:0] current_byte;
         int bit_idx;
+        logic [CHAR_CODE_WIDTH-1:0] code;
+        logic [9:0] margin;
         begin
             current_byte = 8'h0A;
-            unique case (state)
+            code = selected_code();
+            margin = selected_margin();
+            case (state)
                 D_BEGIN: begin
-                    unique case (byte_pos)
+                    case (byte_pos)
                         5'd0: current_byte = "B";
                         5'd1: current_byte = "E";
                         5'd2: current_byte = "G";
@@ -78,11 +94,20 @@ module norm_uart_dump
                 end
 
                 D_CHAR_HDR: begin
-                    unique case (byte_pos)
+                    case (byte_pos)
                         5'd0: current_byte = "C";
                         5'd1: current_byte = " ";
                         5'd2: current_byte = hex_digit({3'b000, char_idx[$clog2(MAX_CHARS)-1]});
                         5'd3: current_byte = hex_digit(char_idx[3:0]);
+                        5'd4: current_byte = " ";
+                        5'd5: current_byte = "K";
+                        5'd6: current_byte = hex_digit({3'b000, code[4]});
+                        5'd7: current_byte = hex_digit(code[3:0]);
+                        5'd8: current_byte = " ";
+                        5'd9: current_byte = "M";
+                        5'd10: current_byte = hex_digit({2'b00, margin[9:8]});
+                        5'd11: current_byte = hex_digit(margin[7:4]);
+                        5'd12: current_byte = hex_digit(margin[3:0]);
                         default: current_byte = 8'h0A;
                     endcase
                 end
@@ -98,7 +123,7 @@ module norm_uart_dump
                 end
 
                 D_END: begin
-                    unique case (byte_pos)
+                    case (byte_pos)
                         5'd0: current_byte = "E";
                         5'd1: current_byte = "N";
                         5'd2: current_byte = "D";
@@ -113,7 +138,7 @@ module norm_uart_dump
 
     task automatic advance_state;
         begin
-            unique case (state)
+            case (state)
                 D_BEGIN: begin
                     if (byte_pos == 5'd8) begin
                         byte_pos <= '0;
@@ -126,7 +151,7 @@ module norm_uart_dump
                 end
 
                 D_CHAR_HDR: begin
-                    if (byte_pos == 5'd4) begin
+                    if (byte_pos == 5'd13) begin
                         byte_pos <= '0;
                         row_idx  <= '0;
                         state    <= D_ROW;
@@ -140,7 +165,7 @@ module norm_uart_dump
                         byte_pos <= '0;
                         if (row_idx == CHAR_H - 1) begin
                             row_idx <= '0;
-                            if (char_idx + 1'b1 >= num_latched[$clog2(MAX_CHARS)-1:0]) begin
+                            if ({1'b0, char_idx} + 5'd1 >= num_latched[$clog2(MAX_CHARS+1)-1:0]) begin
                                 char_idx <= '0;
                                 state    <= D_END;
                             end else begin
@@ -195,6 +220,8 @@ module norm_uart_dump
             end else if (state == D_IDLE) begin
                 if (start) begin
                     num_latched   <= {1'b0, num_chars};
+                    char_codes_latched <= char_codes_flat;
+                    match_dists_latched <= match_dists_flat;
                     char_idx      <= '0;
                     row_idx       <= '0;
                     byte_pos      <= '0;

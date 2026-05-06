@@ -16,9 +16,10 @@ ocr_training/data/normalized_chars/
     plus/
     minus/
     times/
-    equals/
+    caret/
     open_paren/
     close_paren/
+    x/
   manifest.csv
 ```
 
@@ -118,6 +119,7 @@ python ocr_training/capture_uart_norm.py --port COM5 --continuous --labels "1" -
 ```
 
 That is useful if you point the camera at only one character class, press capture repeatedly, then switch to another label.
+For exponentiation captures, use `--labels "^"` or `--labels caret`.
 
 UART text format:
 

@@ -39,11 +39,12 @@ module normalize
 
     logic [9:0] bbox_w;
     logic [9:0] bbox_h;
+    logic [7:0] bbox_y_start;
 
     logic [9:0] src_x_r;
     logic [7:0] src_y_r;
 
-    logic [18:0] linear;
+    logic [16:0] linear;
     logic [13:0] word_addr;
     logic [4:0]  bit_idx;
 
@@ -57,8 +58,52 @@ module normalize
     logic [13:0] ox_times_w;
     logic [14:0] oy_times_h;
 
-    assign linear    = {11'b0, src_y_r} * 19'd320 + {9'b0, src_x_r};
-    assign word_addr = linear[18:5];
+    localparam int MIN_THIN_BBOX_H = 8;
+    localparam int MAX_Y_ORIGIN_FOR_THIN = IMG_H - MIN_THIN_BBOX_H;
+    localparam logic [16:0] IMG_W_U = IMG_W;
+    localparam logic [7:0] BOTTOM_TRIM_ROWS = 8'd2;
+    localparam int MIN_H_FOR_BOTTOM_TRIM = 12;
+
+    logic [7:0] bbox_y_max_trimmed;
+    logic [9:0] untrimmed_bbox_h;
+    logic [9:0] raw_bbox_h;
+    logic [9:0] thin_pad;
+    logic [9:0] thin_y_candidate;
+    logic [7:0] expanded_bbox_y_min;
+    logic [9:0] expanded_bbox_h;
+
+    assign untrimmed_bbox_h = (bbox_y_max >= bbox_y_min)
+                            ? ({2'b0, bbox_y_max} - {2'b0, bbox_y_min} + 10'd1)
+                            : 10'd1;
+    assign bbox_y_max_trimmed = (untrimmed_bbox_h > MIN_H_FOR_BOTTOM_TRIM &&
+                                 bbox_y_max >= (bbox_y_min + BOTTOM_TRIM_ROWS))
+                              ? (bbox_y_max - BOTTOM_TRIM_ROWS)
+                              : bbox_y_max;
+    assign raw_bbox_h = (bbox_y_max_trimmed >= bbox_y_min)
+                      ? ({2'b0, bbox_y_max_trimmed} - {2'b0, bbox_y_min} + 10'd1)
+                      : 10'd1;
+    assign thin_pad = (raw_bbox_h < MIN_THIN_BBOX_H)
+                    ? ((MIN_THIN_BBOX_H - raw_bbox_h) >> 1)
+                    : 10'd0;
+    assign thin_y_candidate = ({2'b0, bbox_y_min} > thin_pad)
+                            ? ({2'b0, bbox_y_min} - thin_pad)
+                            : 10'd0;
+
+    always_comb begin
+        if (raw_bbox_h < MIN_THIN_BBOX_H) begin
+            expanded_bbox_h = MIN_THIN_BBOX_H;
+            if (thin_y_candidate > MAX_Y_ORIGIN_FOR_THIN)
+                expanded_bbox_y_min = 8'(MAX_Y_ORIGIN_FOR_THIN);
+            else
+                expanded_bbox_y_min = thin_y_candidate[7:0];
+        end else begin
+            expanded_bbox_h     = raw_bbox_h;
+            expanded_bbox_y_min = bbox_y_min;
+        end
+    end
+
+    assign linear    = ({9'b0, src_y_r} * IMG_W_U) + {7'b0, src_x_r};
+    assign word_addr = linear[16:5];
     assign bit_idx   = linear[4:0];
 
     assign pixel_val = bin_rdata[bit_idx_d];
@@ -77,7 +122,7 @@ module normalize
         norm_waddr = '0;
         norm_wdata = '0;
 
-        unique case (state)
+        case (state)
             N_IDLE: begin
                 bin_raddr = '0;
                 if (start)
@@ -143,6 +188,7 @@ module normalize
             row_reg   <= '0;
             bbox_w    <= '0;
             bbox_h    <= '0;
+            bbox_y_start <= '0;
             src_x_r   <= '0;
             src_y_r   <= '0;
             bit_idx_d <= '0;
@@ -161,14 +207,13 @@ module normalize
                         ? (bbox_x_max - bbox_x_min + 10'd1)
                         : 10'd1;
 
-                bbox_h <= (bbox_y_max >= bbox_y_min)
-                        ? ({2'b0, bbox_y_max} - {2'b0, bbox_y_min} + 10'd1)
-                        : 10'd1;
+                bbox_h       <= expanded_bbox_h;
+                bbox_y_start <= expanded_bbox_y_min;
             end
 
             if (state == N_ADDR) begin
                 src_x_r <= bbox_x_min + ox_times_w[13:4];
-                src_y_r <= bbox_y_min + oy_times_h[12:5];
+                src_y_r <= bbox_y_start + oy_times_h[12:5];
             end
 
             if (state == N_READ) begin

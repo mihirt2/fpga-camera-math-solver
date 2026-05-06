@@ -4,8 +4,8 @@
 //
 // Collected-template IoU matcher.
 // Each class uses up to the first 10 normalized crops captured from hardware.
-// For each sample we take the best IoU over a 3x3 shift window, then pool those
-// sample scores for the class and pick the class with the highest pooled IoU.
+// For each sample we take the best IoU over a 3x3 shift window, then keep the
+// best sample score for the class and pick the class with the highest IoU.
 //==============================================================================
 
 module template_match
@@ -21,17 +21,23 @@ module template_match
     output logic                       done
 );
 
-    localparam int NUM_CLASSES    = 16;
+    localparam int NUM_CLASSES    = 17;
     localparam int MAX_SAMPLES    = 10;
     localparam int NUM_SHIFTS     = 9;
     localparam int MIN_INK_PIXELS = 8;
-    localparam int REJECT_CODE    = 15;
+    localparam int MAX_INK_PIXELS = 430;
+    localparam int TIMES_MIN_INK_PIXELS = 250;
+    localparam int REJECT_CODE    = 31;
 
-    function automatic logic [3:0] sample_count(input logic [3:0] class_idx);
+    function automatic logic class_enabled(input logic [4:0] class_idx);
         case (class_idx)
-            4'd5:    return 4'd6;
-            default: return 4'd10;
+            5'd13:   return 1'b0; // equals disabled for now; it is too close to 1/2
+            default: return 1'b1;
         endcase
+    endfunction
+
+    function automatic logic [3:0] sample_count(input logic [4:0] class_idx);
+        return 4'd10;
     endfunction
 
     function automatic logic signed [1:0] shift_dx(input logic [3:0] idx);
@@ -85,7 +91,7 @@ module template_match
     endfunction
 
     // -- Collected template ROM -----------------------------------------
-    logic [3:0]  class_idx;
+    logic [4:0]  class_idx;
     logic [3:0]  sample_idx;
     logic [3:0]  shift_idx;
     logic [4:0]  row_cnt;
@@ -183,8 +189,17 @@ module template_match
     logic [12:0] eval_class_union;
     logic [12:0] eval_class_miss;
     logic [9:0]  eval_class_miss_clamped;
-    assign eval_class_inter = class_inter + {3'b0, chosen_sample_inter};
-    assign eval_class_union = class_union + {3'b0, chosen_sample_union};
+    always_comb begin
+        if (iou_better({3'b0, chosen_sample_inter}, {3'b0, chosen_sample_union},
+                       class_inter, class_union)) begin
+            eval_class_inter = {3'b0, chosen_sample_inter};
+            eval_class_union = {3'b0, chosen_sample_union};
+        end else begin
+            eval_class_inter = class_inter;
+            eval_class_union = class_union;
+        end
+    end
+
     assign eval_class_miss  = eval_class_union - eval_class_inter;
     assign eval_class_miss_clamped = (eval_class_miss > 13'd1023)
                                    ? 10'h3FF
@@ -252,7 +267,8 @@ module template_match
                     if (ink_row < CHAR_H) begin
                         ink_total <= ink_total + {5'b0, popcount16(ink_chunk)};
                         ink_row   <= ink_row + 1;
-                    end else if (ink_total < MIN_INK_PIXELS) begin
+                    end else if ((ink_total < MIN_INK_PIXELS) ||
+                                 (ink_total > MAX_INK_PIXELS)) begin
                         state <= S_DONE;
                     end else begin
                         state <= S_COMPARE;
@@ -301,8 +317,10 @@ module template_match
                         sample_idx <= sample_idx + 1;
                         state      <= S_COMPARE;
                     end else begin
-                        if (iou_better(eval_class_inter, eval_class_union,
-                                       global_best_inter, global_best_union)) begin
+                        if (class_enabled(class_idx)
+                                && ((class_idx != 5'd12) || (ink_total >= TIMES_MIN_INK_PIXELS))
+                                && iou_better(eval_class_inter, eval_class_union,
+                                              global_best_inter, global_best_union)) begin
                             global_best_inter <= eval_class_inter;
                             global_best_union <= eval_class_union;
                             best_code_r       <= class_idx;

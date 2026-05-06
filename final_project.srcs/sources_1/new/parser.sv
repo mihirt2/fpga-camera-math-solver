@@ -25,11 +25,13 @@ module parser #(
 //   13   -> 'x'
 //   14   -> '('
 //   15   -> ')'
+//   16   -> '^'
 //
 
     localparam logic [CHAR_CODE_WIDTH-1:0] OP_ADD = 10;
     localparam logic [CHAR_CODE_WIDTH-1:0] OP_SUB = 11;
     localparam logic [CHAR_CODE_WIDTH-1:0] OP_MUL = 12;
+    localparam logic [CHAR_CODE_WIDTH-1:0] OP_POW = 16;
     localparam logic [$clog2(MAX_CHARS+1)-1:0] STACK_DEPTH = $clog2(MAX_CHARS+1)'(MAX_CHARS);
 
     typedef enum logic [3:0] {
@@ -38,6 +40,7 @@ module parser #(
         WAIT_SHUNT,
         EVAL_TOKEN,
         APPLY_OPERATOR,
+        POWER_MULT,
         FINISH_OK,
         FINISH_ERR
     } state_t;
@@ -62,9 +65,38 @@ module parser #(
     polynomial_t                       add_result;
     polynomial_t                       sub_result;
     polynomial_t                       mul_result;
+    coeff_t                            power_remaining;
 
     function automatic logic is_operator(input logic [CHAR_CODE_WIDTH-1:0] token);
-        return ((token == OP_ADD) || (token == OP_SUB) || (token == OP_MUL));
+        return ((token == OP_ADD) || (token == OP_SUB) ||
+                (token == OP_MUL) || (token == OP_POW));
+    endfunction
+
+    function automatic logic is_constant_poly(input polynomial_t value);
+        logic is_const;
+        is_const = 1'b1;
+        for (int idx = 1; idx <= MAX_DEGREE; idx++) begin
+            if (value[idx] != '0)
+                is_const = 1'b0;
+        end
+        return is_const;
+    endfunction
+
+    function automatic logic power_is_supported(
+        input polynomial_t base,
+        input polynomial_t exponent
+    );
+        int base_degree;
+        base_degree = 0;
+        for (int idx = 1; idx <= MAX_DEGREE; idx++) begin
+            if (base[idx] != '0)
+                base_degree = idx;
+        end
+
+        return is_constant_poly(exponent) &&
+               (exponent[0] >= 0) &&
+               (exponent[0] <= MAX_DEGREE) &&
+               ((base_degree * int'(exponent[0])) <= MAX_DEGREE);
     endfunction
 
     shunting_yard #(
@@ -117,6 +149,7 @@ module parser #(
             current_op  <= '0;
             eval_idx    <= '0;
             eval_sp     <= '0;
+            power_remaining <= '0;
 
             for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
                 poly[i]     <= '0;
@@ -139,6 +172,7 @@ module parser #(
                     current_op  <= '0;
                     eval_idx    <= '0;
                     eval_sp     <= '0;
+                    power_remaining <= '0;
 
                     if (start) begin
                         shunt_start <= 1'b1;
@@ -232,19 +266,56 @@ module parser #(
                 end
 
                 APPLY_OPERATOR: begin
-                    for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
-                        if (current_op == OP_ADD) begin
-                            eval_stack[eval_sp - 2][i] <= add_result[i];
-                        end else if (current_op == OP_SUB) begin
-                            eval_stack[eval_sp - 2][i] <= sub_result[i];
+                    if (current_op == OP_POW) begin
+                        if (!power_is_supported(lhs_poly, rhs_poly)) begin
+                            done  <= 1'b1;
+                            valid <= 1'b0;
+                            error <= 1'b1;
+                            state <= FINISH_ERR;
                         end else begin
-                            eval_stack[eval_sp - 2][i] <= mul_result[i];
-                        end
-                    end
+                            power_remaining <= rhs_poly[0];
 
-                    eval_sp  <= eval_sp - 1'b1;
-                    eval_idx <= eval_idx + 1'b1;
-                    state    <= EVAL_TOKEN;
+                            for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
+                                rhs_poly[i] <= lhs_poly[i];
+                                lhs_poly[i] <= '0;
+                            end
+
+                            lhs_poly[0] <= coeff_t'(1);
+                            state       <= POWER_MULT;
+                        end
+                    end else begin
+                        for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
+                            if (current_op == OP_ADD) begin
+                                eval_stack[eval_sp - 2][i] <= add_result[i];
+                            end else if (current_op == OP_SUB) begin
+                                eval_stack[eval_sp - 2][i] <= sub_result[i];
+                            end else begin
+                                eval_stack[eval_sp - 2][i] <= mul_result[i];
+                            end
+                        end
+
+                        eval_sp  <= eval_sp - 1'b1;
+                        eval_idx <= eval_idx + 1'b1;
+                        state    <= EVAL_TOKEN;
+                    end
+                end
+
+                POWER_MULT: begin
+                    if (power_remaining == '0) begin
+                        for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
+                            eval_stack[eval_sp - 2][i] <= lhs_poly[i];
+                        end
+
+                        eval_sp  <= eval_sp - 1'b1;
+                        eval_idx <= eval_idx + 1'b1;
+                        state    <= EVAL_TOKEN;
+                    end else begin
+                        for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
+                            lhs_poly[i] <= mul_result[i];
+                        end
+
+                        power_remaining <= power_remaining - 1'b1;
+                    end
                 end
 
                 FINISH_OK: begin
