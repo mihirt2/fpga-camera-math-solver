@@ -271,6 +271,58 @@ module tb_solver;
         end
     endtask
 
+    task automatic run_case_x_power_2;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_X;
+            char_codes[1] = TOK_POW;
+            char_codes[2] = 8'd2;
+            num_chars = 3;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected x^2 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected x^2 case to be non-constant");
+            end
+            if (num_solutions != 1) begin
+                $fatal(1, "Expected 1 real root for x^2, got %0d", num_solutions);
+            end
+            expect_coefficients(0, 0, 1, 0, 0, 0);
+            expect_root_close(0, 0, q16(1) / 200);
+            $display("PASS: x^2 -> coefficients [0,0,1,0,0,0]");
+        end
+    endtask
+
+    task automatic run_case_parenthesized_x_power_2;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_LPAREN;
+            char_codes[1] = TOK_X;
+            char_codes[2] = TOK_POW;
+            char_codes[3] = 8'd2;
+            char_codes[4] = TOK_RPAREN;
+            num_chars = 5;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected (x^2) case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected (x^2) case to be non-constant");
+            end
+            if (num_solutions != 1) begin
+                $fatal(1, "Expected 1 real root for (x^2), got %0d", num_solutions);
+            end
+            expect_coefficients(0, 0, 1, 0, 0, 0);
+            expect_root_close(0, 0, q16(1) / 200);
+            $display("PASS: (x^2) -> coefficients [0,0,1,0,0,0]");
+        end
+    endtask
+
     task automatic run_case_x_power_3_minus_1;
         begin
             clear_inputs();
@@ -495,6 +547,31 @@ module tb_solver;
         end
     endtask
 
+    task automatic run_case_multi_digit_folded_coefficient;
+        begin
+            clear_inputs();
+            char_codes[0] = 8'd1;
+            char_codes[1] = 8'd0;
+            char_codes[2] = TOK_X;
+            num_chars = 3;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected 10x case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected 10x case to be non-constant");
+            end
+            if (num_solutions != 1) begin
+                $fatal(1, "Expected 1 root for 10x, got %0d", num_solutions);
+            end
+            expect_coefficients(0, 10, 0, 0, 0, 0);
+            expect_root_close(0, 0, 16);
+            $display("PASS: 10x -> root at %0f", $itor(solutions[0]) / 65536.0);
+        end
+    endtask
+
     task automatic run_case_multi_digit_coefficient;
         begin
             clear_inputs();
@@ -523,6 +600,32 @@ module tb_solver;
         end
     endtask
 
+    task automatic run_case_folded_coefficient_plus_constant;
+        begin
+            clear_inputs();
+            char_codes[0] = 8'd3;
+            char_codes[1] = TOK_X;
+            char_codes[2] = TOK_ADD;
+            char_codes[3] = 8'd1;
+            num_chars = 4;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected 3x+1 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected 3x+1 case to be non-constant");
+            end
+            if (num_solutions != 1) begin
+                $fatal(1, "Expected 1 root for 3x+1, got %0d", num_solutions);
+            end
+            expect_coefficients(1, 3, 0, 0, 0, 0);
+            expect_root_q16_close(0, -(q16(1) / 3), q16(1) / 100);
+            $display("PASS: 3x+1 -> root at %0f", $itor(solutions[0]) / 65536.0);
+        end
+    endtask
+
     task automatic run_case_explicit_multiply_with_multi_digit_constant;
         begin
             clear_inputs();
@@ -545,6 +648,30 @@ module tb_solver;
             end
             expect_root_close(0, 0, 16);
             $display("PASS: 12*x -> root at %0f", $itor(solutions[0]) / 65536.0);
+        end
+    endtask
+
+    task automatic run_case_constant_multiply;
+        begin
+            clear_inputs();
+            char_codes[0] = 8'd3;
+            char_codes[1] = TOK_MUL;
+            char_codes[2] = 8'd5;
+            num_chars = 3;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected 3*5 case to be valid");
+            end
+            if (!is_const) begin
+                $fatal(1, "Expected 3*5 case to be constant");
+            end
+            if (value != q16(15)) begin
+                $fatal(1, "Expected constant value 15, got %0f", $itor(value) / 65536.0);
+            end
+            expect_coefficients(15, 0, 0, 0, 0, 0);
+            $display("PASS: 3*5 -> value %0f", $itor(value) / 65536.0);
         end
     endtask
 
@@ -573,6 +700,124 @@ module tb_solver;
             end
             expect_root_q16_close(0, q16(1) >>> 1, q16(1) / 15);
             $display("PASS: (14x)-7 -> root at %0f", $itor(solutions[0]) / 65536.0);
+        end
+    endtask
+
+    task automatic run_case_parenthesized_constant_implicit_multiply;
+        begin
+            clear_inputs();
+            char_codes[0] = 8'd3;
+            char_codes[1] = TOK_LPAREN;
+            char_codes[2] = 8'd5;
+            char_codes[3] = TOK_ADD;
+            char_codes[4] = 8'd4;
+            char_codes[5] = TOK_RPAREN;
+            num_chars = 6;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected 3(5+4) case to be valid");
+            end
+            if (!is_const) begin
+                $fatal(1, "Expected 3(5+4) case to be constant");
+            end
+            if (value != q16(27)) begin
+                $fatal(1, "Expected constant value 27, got %0f", $itor(value) / 65536.0);
+            end
+            expect_coefficients(27, 0, 0, 0, 0, 0);
+            $display("PASS: 3(5+4) -> value %0f", $itor(value) / 65536.0);
+        end
+    endtask
+
+    task automatic run_case_parenthesized_polynomial_implicit_multiply;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_LPAREN;
+            char_codes[1] = TOK_X;
+            char_codes[2] = TOK_ADD;
+            char_codes[3] = 8'd1;
+            char_codes[4] = TOK_RPAREN;
+            char_codes[5] = TOK_LPAREN;
+            char_codes[6] = TOK_X;
+            char_codes[7] = TOK_SUB;
+            char_codes[8] = 8'd1;
+            char_codes[9] = TOK_RPAREN;
+            num_chars = 10;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected (x+1)(x-1) case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected (x+1)(x-1) case to be non-constant");
+            end
+            expect_coefficients(-1, 0, 1, 0, 0, 0);
+            expect_root_close(0, -1, q16(1) / 200);
+            expect_root_close(1, 1, q16(1) / 200);
+            $display(
+                "PASS: (x+1)(x-1) -> roots at %0f and %0f",
+                $itor(solutions[0]) / 65536.0,
+                $itor(solutions[1]) / 65536.0
+            );
+        end
+    endtask
+
+    task automatic run_case_power_of_parenthesized_polynomial;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_LPAREN;
+            char_codes[1] = TOK_X;
+            char_codes[2] = TOK_ADD;
+            char_codes[3] = 8'd1;
+            char_codes[4] = TOK_RPAREN;
+            char_codes[5] = TOK_POW;
+            char_codes[6] = 8'd2;
+            num_chars = 7;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected (x+1)^2 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected (x+1)^2 case to be non-constant");
+            end
+            expect_coefficients(1, 2, 1, 0, 0, 0);
+            expect_root_close(0, -1, q16(1) / 200);
+            $display("PASS: (x+1)^2 -> repeated root near %0f", $itor(solutions[0]) / 65536.0);
+        end
+    endtask
+
+    task automatic run_case_folded_then_parenthesized_implicit_multiply;
+        begin
+            clear_inputs();
+            char_codes[0] = 8'd2;
+            char_codes[1] = TOK_X;
+            char_codes[2] = TOK_LPAREN;
+            char_codes[3] = TOK_X;
+            char_codes[4] = TOK_ADD;
+            char_codes[5] = 8'd1;
+            char_codes[6] = TOK_RPAREN;
+            num_chars = 7;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected 2x(x+1) case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected 2x(x+1) case to be non-constant");
+            end
+            expect_coefficients(0, 2, 2, 0, 0, 0);
+            expect_root_close(0, -1, q16(1) / 200);
+            expect_root_close(1, 0, q16(1) / 200);
+            $display(
+                "PASS: 2x(x+1) -> roots at %0f and %0f",
+                $itor(solutions[0]) / 65536.0,
+                $itor(solutions[1]) / 65536.0
+            );
         end
     endtask
 
@@ -666,6 +911,12 @@ module tb_solver;
         run_case_x_power_2_minus_1();
         @(posedge clk);
 
+        run_case_x_power_2();
+        @(posedge clk);
+
+        run_case_parenthesized_x_power_2();
+        @(posedge clk);
+
         run_case_x_power_3_minus_1();
         @(posedge clk);
 
@@ -690,13 +941,34 @@ module tb_solver;
         run_case_folded_coefficient();
         @(posedge clk);
 
+        run_case_multi_digit_folded_coefficient();
+        @(posedge clk);
+
         run_case_multi_digit_coefficient();
+        @(posedge clk);
+
+        run_case_folded_coefficient_plus_constant();
         @(posedge clk);
 
         run_case_explicit_multiply_with_multi_digit_constant();
         @(posedge clk);
 
+        run_case_constant_multiply();
+        @(posedge clk);
+
         run_case_parenthesized_folded_operand();
+        @(posedge clk);
+
+        run_case_parenthesized_constant_implicit_multiply();
+        @(posedge clk);
+
+        run_case_parenthesized_polynomial_implicit_multiply();
+        @(posedge clk);
+
+        run_case_power_of_parenthesized_polynomial();
+        @(posedge clk);
+
+        run_case_folded_then_parenthesized_implicit_multiply();
         @(posedge clk);
 
         run_case_invalid();

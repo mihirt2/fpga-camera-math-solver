@@ -52,7 +52,13 @@ module ocr_parser_top
     output logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] dbg_char_codes_flat,
     output logic [MAX_CHARS*10-1:0] dbg_match_dists_flat,
     output logic [CHAR_CODE_WIDTH-1:0] dbg_selected_char_code,
-    output logic [9:0] dbg_selected_match_dist
+    output logic [9:0] dbg_selected_match_dist,
+    output logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] dbg_solver_char_codes_flat,
+    output logic [$clog2(MAX_CHARS+1)-1:0] dbg_solver_num_chars,
+    output logic dbg_parse_done,
+    output logic dbg_parse_wait_timeout,
+    output logic dbg_solver_valid,
+    output logic dbg_solver_valid_latched
 );
 
     //==========================================================================
@@ -600,11 +606,17 @@ module ocr_parser_top
         for (int i = 0; i < MAX_CHARS; i++) begin
             dbg_char_codes_flat[i*CHAR_CODE_WIDTH +: CHAR_CODE_WIDTH] = char_codes[i];
             dbg_match_dists_flat[i*10 +: 10] = match_dist_history[i];
+            dbg_solver_char_codes_flat[i*CHAR_CODE_WIDTH +: CHAR_CODE_WIDTH] = solver_char_codes[i];
         end
     end
 
     assign dbg_selected_char_code  = char_codes[dbg_char_sel];
     assign dbg_selected_match_dist = match_dist_history[dbg_char_sel];
+    assign dbg_solver_num_chars = solver_num_chars;
+    assign dbg_parse_done = parse_done;
+    assign dbg_parse_wait_timeout = parse_wait_timeout;
+    assign dbg_solver_valid = solver_valid;
+    assign dbg_solver_valid_latched = solver_valid_latched;
 
     //==========================================================================
     // STAGE 5: SOLVE
@@ -635,7 +647,7 @@ module ocr_parser_top
         end
 
         for (int i = 0; i < MAX_CHARS; i++) begin
-            if (i < int'(num_chars)) begin
+            if ((i < int'(num_chars)) && (char_codes[i] != OCR_REJECT_CODE)) begin
                 case (char_codes[i])
                     5'd10:   solver_char_codes[compact_idx] = 5'd10; // '+'
                     5'd11:   solver_char_codes[compact_idx] = 5'd13; // 'x'

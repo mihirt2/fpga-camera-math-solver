@@ -26,109 +26,62 @@ module solver_to_ascii_full_decimal #(
 );
 
     localparam int POS_W = $clog2(DISPLAY_CHARS + 1);
-    localparam int COEFF_IDX_W = $clog2(MAX_COEFFS + 1);
-    localparam logic [POS_W-1:0] DISPLAY_LIMIT = POS_W'(DISPLAY_CHARS);
-    localparam logic [POS_W-1:0] STATUS_EQ_LIMIT =
-        (DISPLAY_CHARS > 8) ? POS_W'(DISPLAY_CHARS - 8) : '0;
-    localparam logic [POS_W-1:0] STATUS_MSG_START =
-        (DISPLAY_CHARS > 7) ? POS_W'(DISPLAY_CHARS - 7) : '0;
+    localparam int SOL_IDX_W = $clog2(MAX_SOLUTIONS + 1);
 
-    typedef enum logic [3:0] {
+    typedef enum logic [4:0] {
         S_IDLE,
         S_CLEAR,
-        S_EQUATION,
-        S_EQUATION_EQUALS,
         S_STATUS,
-        S_MSG,
-        S_COEFF_OPEN,
-        S_COEFF_LOAD,
-        S_COEFF_SIGN,
-        S_COEFF_DIGIT_INIT,
-        S_COEFF_DIGIT_SUB,
-        S_COEFF_DIGIT_EMIT,
-        S_COEFF_AFTER,
+        S_NO_ROOT_N,
+        S_NO_ROOT_O,
+        S_NO_ROOT_SPACE,
+        S_NO_ROOT_R,
+        S_NO_ROOT_O2,
+        S_NO_ROOT_O3,
+        S_NO_ROOT_T,
+        S_NUMBER_INIT,
+        S_NUMBER_TENS,
+        S_NUMBER_ONES,
+        S_NUMBER_WRITE_TENS,
+        S_NUMBER_WRITE_ONES,
+        S_NUMBER_WRITE_DOT,
+        S_NUMBER_WRITE_FRAC,
+        S_NUMBER_WRITE_FRAC2,
+        S_AFTER_NUMBER,
         S_FINISH
     } state_t;
 
-    localparam logic [7:0] STATUS_I = 8'h01;
-    localparam logic [7:0] STATUS_N = 8'h02;
-    localparam logic [7:0] STATUS_V = 8'h03;
-    localparam logic [7:0] STATUS_A = 8'h04;
-    localparam logic [7:0] STATUS_L = 8'h05;
-    localparam logic [7:0] STATUS_D = 8'h06;
-
     state_t state;
 
-    logic [POS_W-1:0]                    pos;
-    logic [POS_W-1:0]                    clear_idx;
-    logic [$clog2(MAX_CHARS+1)-1:0]      eq_idx;
-    logic [3:0]                          msg_idx;
-    logic [COEFF_IDX_W-1:0]              coeff_idx;
-    logic                                coeff_negative;
-    logic [COEFF_WIDTH-1:0]              coeff_abs;
-    logic [COEFF_WIDTH-1:0]              coeff_rem;
-    logic [COEFF_WIDTH-1:0]              coeff_div;
-    logic [2:0]                          digit_idx;
-    logic [3:0]                          digit;
-    logic                                digit_started;
+    logic [POS_W-1:0] pos;
+    logic [POS_W-1:0] clear_idx;
+    logic [SOL_IDX_W-1:0] number_idx;
+    logic signed [31:0] number_q;
+    logic [13:0] number_rem;
+    logic [3:0] tens_digit;
+    logic [3:0] ones_digit;
+    logic [3:0] frac_tens_digit;
+    logic number_negative;
 
+    logic [31:0] number_abs;
+    logic [31:0] scaled_hundredths_full;
+    logic [13:0] scaled_hundredths;
     logic _unused_inputs;
-    assign _unused_inputs = is_const ^ num_solutions[0] ^ value[0] ^ solutions[0][0];
 
-    function automatic logic [7:0] token_to_ascii(input logic [CHAR_CODE_WIDTH-1:0] token);
-        if (token == {CHAR_CODE_WIDTH{1'b1}}) begin
-            token_to_ascii = "?";
-        end else if (token <= 9) begin
-            token_to_ascii = 8'h30 + {4'd0, token[3:0]};
-        end else if (token == 16) begin
-            token_to_ascii = "^";
-        end else begin
-            case (token[3:0])
-                4'd10:   token_to_ascii = "+";
-                4'd11:   token_to_ascii = "-";
-                4'd12:   token_to_ascii = "*";
-                4'd13:   token_to_ascii = "X";
-                4'd14:   token_to_ascii = "(";
-                4'd15:   token_to_ascii = ")";
-                default: token_to_ascii = "?";
-            endcase
-        end
-    endfunction
+    assign _unused_inputs = equation_chars[0][0] ^ equation_len[0] ^ coefficients[0][0];
 
-    function automatic logic [COEFF_WIDTH-1:0] coeff_abs_value(
-        input logic signed [COEFF_WIDTH-1:0] value_in
-    );
-        if (value_in < 0)
-            coeff_abs_value = 0 - value_in;
-        else
-            coeff_abs_value = value_in;
-    endfunction
-
-    function automatic logic [COEFF_WIDTH-1:0] coeff_divisor(input logic [2:0] idx);
-        case (idx)
-            3'd0:    coeff_divisor = COEFF_WIDTH'(10000);
-            3'd1:    coeff_divisor = COEFF_WIDTH'(1000);
-            3'd2:    coeff_divisor = COEFF_WIDTH'(100);
-            3'd3:    coeff_divisor = COEFF_WIDTH'(10);
-            default: coeff_divisor = COEFF_WIDTH'(1);
-        endcase
-    endfunction
-
-    function automatic logic [7:0] invalid_char(input logic [3:0] idx);
-        case (idx)
-            4'd0:    invalid_char = STATUS_I;
-            4'd1:    invalid_char = STATUS_N;
-            4'd2:    invalid_char = STATUS_V;
-            4'd3:    invalid_char = STATUS_A;
-            4'd4:    invalid_char = STATUS_L;
-            4'd5:    invalid_char = STATUS_I;
-            4'd6:    invalid_char = STATUS_D;
-            default: invalid_char = 8'h00;
-        endcase
-    endfunction
+    always_comb begin
+        number_abs = number_q[31] ? (~number_q + 32'd1) : number_q;
+        scaled_hundredths_full = ((number_abs << 6)
+                                + (number_abs << 5)
+                                + (number_abs << 2)
+                                + 32'd32768) >> 16;
+        scaled_hundredths = (scaled_hundredths_full > 32'd9999) ? 14'd9999
+                                                                : scaled_hundredths_full[13:0];
+    end
 
     task automatic append_char(input logic [7:0] ch);
-        if (pos < DISPLAY_LIMIT) begin
+        if (pos < POS_W'(DISPLAY_CHARS)) begin
             result_chars[pos] <= ch;
             pos <= pos + 1'b1;
         end
@@ -138,21 +91,18 @@ module solver_to_ascii_full_decimal #(
 
     always_ff @(posedge clk) begin
         if (reset) begin
-            state            <= S_IDLE;
-            result_len       <= '0;
-            result_valid     <= 1'b0;
-            pos              <= '0;
-            clear_idx        <= '0;
-            eq_idx           <= '0;
-            msg_idx          <= '0;
-            coeff_idx        <= '0;
-            coeff_negative   <= 1'b0;
-            coeff_abs        <= '0;
-            coeff_rem        <= '0;
-            coeff_div        <= '0;
-            digit_idx        <= '0;
-            digit            <= '0;
-            digit_started    <= 1'b0;
+            state           <= S_IDLE;
+            result_len      <= '0;
+            result_valid    <= 1'b0;
+            pos             <= '0;
+            clear_idx       <= '0;
+            number_idx      <= '0;
+            number_q        <= '0;
+            number_rem      <= '0;
+            tens_digit      <= '0;
+            ones_digit      <= '0;
+            frac_tens_digit <= '0;
+            number_negative <= 1'b0;
 
             for (i = 0; i < DISPLAY_CHARS; i = i + 1)
                 result_chars[i] <= 8'h20;
@@ -164,9 +114,7 @@ module solver_to_ascii_full_decimal #(
                     if (start) begin
                         pos        <= '0;
                         clear_idx  <= '0;
-                        eq_idx     <= '0;
-                        msg_idx    <= '0;
-                        coeff_idx  <= '0;
+                        number_idx <= '0;
                         result_len <= '0;
                         state      <= S_CLEAR;
                     end
@@ -174,105 +122,133 @@ module solver_to_ascii_full_decimal #(
 
                 S_CLEAR: begin
                     result_chars[clear_idx] <= 8'h20;
-                    if (clear_idx == DISPLAY_LIMIT - 1'b1)
-                        state <= S_EQUATION;
+                    if (clear_idx == POS_W'(DISPLAY_CHARS - 1))
+                        state <= S_STATUS;
                     else
                         clear_idx <= clear_idx + 1'b1;
                 end
 
-                S_EQUATION: begin
-                    if ((eq_idx < equation_len) &&
-                        (solver_valid || (pos < STATUS_EQ_LIMIT))) begin
-                        append_char(token_to_ascii(equation_chars[eq_idx]));
-                        eq_idx <= eq_idx + 1'b1;
-                    end else begin
-                        state <= S_EQUATION_EQUALS;
-                    end
-                end
-
-                S_EQUATION_EQUALS: begin
-                    if (equation_len != '0 && solver_valid)
-                        append_char("=");
-                    state <= S_STATUS;
-                end
-
                 S_STATUS: begin
                     if (!solver_valid) begin
-                        msg_idx <= '0;
-                        pos     <= STATUS_MSG_START;
-                        state   <= S_MSG;
-                    end else begin
-                        state <= S_COEFF_OPEN;
-                    end
-                end
-
-                S_MSG: begin
-                    if (invalid_char(msg_idx) != 8'h00) begin
-                        append_char(invalid_char(msg_idx));
-                        msg_idx <= msg_idx + 1'b1;
-                    end else begin
                         state <= S_FINISH;
+                    end else if (is_const) begin
+                        number_q   <= value;
+                        number_idx <= '0;
+                        state      <= S_NUMBER_INIT;
+                    end else if (num_solutions == 0) begin
+                        state <= S_NO_ROOT_N;
+                    end else begin
+                        number_q   <= solutions[0];
+                        number_idx <= '0;
+                        state      <= S_NUMBER_INIT;
                     end
                 end
 
-                S_COEFF_OPEN: begin
-                    append_char("[");
-                    coeff_idx <= '0;
-                    state     <= S_COEFF_LOAD;
+                S_NO_ROOT_N: begin
+                    append_char("N");
+                    state <= S_NO_ROOT_O;
                 end
 
-                S_COEFF_LOAD: begin
-                    coeff_negative <= (coefficients[coeff_idx] < 0);
-                    coeff_abs      <= coeff_abs_value(coefficients[coeff_idx]);
-                    digit_idx      <= '0;
-                    digit_started  <= 1'b0;
-                    state          <= S_COEFF_SIGN;
+                S_NO_ROOT_O: begin
+                    append_char("O");
+                    state <= S_NO_ROOT_SPACE;
                 end
 
-                S_COEFF_SIGN: begin
-                    if (coeff_negative)
+                S_NO_ROOT_SPACE: begin
+                    append_char(" ");
+                    state <= S_NO_ROOT_R;
+                end
+
+                S_NO_ROOT_R: begin
+                    append_char("R");
+                    state <= S_NO_ROOT_O2;
+                end
+
+                S_NO_ROOT_O2: begin
+                    append_char("O");
+                    state <= S_NO_ROOT_O3;
+                end
+
+                S_NO_ROOT_O3: begin
+                    append_char("O");
+                    state <= S_NO_ROOT_T;
+                end
+
+                S_NO_ROOT_T: begin
+                    append_char("T");
+                    state <= S_FINISH;
+                end
+
+                S_NUMBER_INIT: begin
+                    number_negative <= number_q[31];
+                    number_rem      <= scaled_hundredths;
+                    tens_digit      <= '0;
+                    ones_digit      <= '0;
+                    frac_tens_digit <= '0;
+
+                    if (number_q[31])
                         append_char("-");
-                    coeff_rem <= coeff_abs;
-                    state     <= S_COEFF_DIGIT_INIT;
+
+                    state <= S_NUMBER_TENS;
                 end
 
-                S_COEFF_DIGIT_INIT: begin
-                    coeff_div <= coeff_divisor(digit_idx);
-                    digit     <= '0;
-                    state     <= S_COEFF_DIGIT_SUB;
-                end
-
-                S_COEFF_DIGIT_SUB: begin
-                    if (coeff_rem >= coeff_div) begin
-                        coeff_rem <= coeff_rem - coeff_div;
-                        digit     <= digit + 1'b1;
+                S_NUMBER_TENS: begin
+                    if (number_rem >= 14'd1000) begin
+                        number_rem <= number_rem - 14'd1000;
+                        tens_digit <= tens_digit + 1'b1;
                     end else begin
-                        state <= S_COEFF_DIGIT_EMIT;
+                        state <= S_NUMBER_ONES;
                     end
                 end
 
-                S_COEFF_DIGIT_EMIT: begin
-                    if (digit_started || (digit != 0) || (digit_idx == 3'd4)) begin
-                        append_char(8'h30 + {4'd0, digit});
-                        digit_started <= 1'b1;
-                    end
-
-                    if (digit_idx == 3'd4) begin
-                        state <= S_COEFF_AFTER;
+                S_NUMBER_ONES: begin
+                    if (number_rem >= 14'd100) begin
+                        number_rem <= number_rem - 14'd100;
+                        ones_digit <= ones_digit + 1'b1;
                     end else begin
-                        digit_idx <= digit_idx + 1'b1;
-                        state     <= S_COEFF_DIGIT_INIT;
+                        state <= S_NUMBER_WRITE_TENS;
                     end
                 end
 
-                S_COEFF_AFTER: begin
-                    if (int'(coeff_idx) == (MAX_COEFFS - 1)) begin
-                        append_char("]");
-                        state <= S_FINISH;
+                S_NUMBER_WRITE_TENS: begin
+                    if (tens_digit != 0)
+                        append_char(8'h30 + {4'd0, tens_digit});
+                    state <= S_NUMBER_WRITE_ONES;
+                end
+
+                S_NUMBER_WRITE_ONES: begin
+                    append_char(8'h30 + {4'd0, ones_digit});
+                    state <= S_NUMBER_WRITE_DOT;
+                end
+
+                S_NUMBER_WRITE_DOT: begin
+                    append_char(".");
+                    state <= S_NUMBER_WRITE_FRAC;
+                end
+
+                S_NUMBER_WRITE_FRAC: begin
+                    if (number_rem >= 14'd10) begin
+                        number_rem      <= number_rem - 14'd10;
+                        frac_tens_digit <= frac_tens_digit + 1'b1;
                     end else begin
+                        append_char(8'h30 + {4'd0, frac_tens_digit});
+                        state <= S_NUMBER_WRITE_FRAC2;
+                    end
+                end
+
+                S_NUMBER_WRITE_FRAC2: begin
+                    append_char(8'h30 + {4'd0, number_rem[3:0]});
+                    state <= S_AFTER_NUMBER;
+                end
+
+                S_AFTER_NUMBER: begin
+                    if (!is_const && (number_idx + 1'b1 < num_solutions)) begin
                         append_char(",");
-                        coeff_idx <= coeff_idx + 1'b1;
-                        state     <= S_COEFF_LOAD;
+                        number_idx <= number_idx + 1'b1;
+                        number_q   <= solutions[number_idx + 1'b1];
+                        state      <= S_NUMBER_INIT;
+                    end else begin
+                        state <= S_FINISH;
                     end
                 end
 

@@ -38,11 +38,14 @@ module tb_ocr_parser_top
     logic reset;
     logic trigger;
 
-    logic [17:0] cam_rd_addr;
+    logic [16:0] cam_rd_addr;
     logic [7:0]  cam_rd_data;
     logic        cam_rd_en;
     logic        adaptive;
     logic [7:0]  threshold;
+    logic        external_dump_start;
+    logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] external_char_codes_flat;
+    logic        external_char_codes_valid;
 
     logic [7:0] result_chars [0:DISPLAY_CHARS-1];
     logic [$clog2(DISPLAY_CHARS+1)-1:0] result_len;
@@ -54,12 +57,19 @@ module tb_ocr_parser_top
     logic [35:0]                  dbg_bboxes [0:MAX_CHARS-1];
     logic [$clog2(MAX_CHARS+1)-1:0] dbg_num_chars;
 
-    logic [13:0] bin_dbg_raddr;
-    logic [31:0] bin_dbg_rdata;
-
-    logic [4:0]               dbg_char_sel;
+    logic [$clog2(MAX_CHARS)-1:0] dbg_char_sel;
     logic [TEMPLATE_BITS-1:0] dbg_normalized_char;
     logic [MAX_CHARS*TEMPLATE_BITS-1:0] dbg_norm_chars_flat;
+    logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] dbg_char_codes_flat;
+    logic [MAX_CHARS*10-1:0] dbg_match_dists_flat;
+    logic [CHAR_CODE_WIDTH-1:0] dbg_selected_char_code;
+    logic [9:0] dbg_selected_match_dist;
+    logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] dbg_solver_char_codes_flat;
+    logic [$clog2(MAX_CHARS+1)-1:0] dbg_solver_num_chars;
+    logic dbg_parse_done;
+    logic dbg_parse_wait_timeout;
+    logic dbg_solver_valid;
+    logic dbg_solver_valid_latched;
 
     logic [7:0] cam_mem [0:IMG_W*IMG_H-1];
 
@@ -100,6 +110,9 @@ module tb_ocr_parser_top
         .cam_rd_en           (cam_rd_en),
         .adaptive            (adaptive),
         .threshold           (threshold),
+        .external_dump_start (external_dump_start),
+        .external_char_codes_flat(external_char_codes_flat),
+        .external_char_codes_valid(external_char_codes_valid),
 
         .result_chars        (result_chars),
         .result_len          (result_len),
@@ -111,12 +124,19 @@ module tb_ocr_parser_top
         .dbg_bboxes          (dbg_bboxes),
         .dbg_num_chars       (dbg_num_chars),
 
-        .bin_dbg_raddr       (bin_dbg_raddr),
-        .bin_dbg_rdata       (bin_dbg_rdata),
-
         .dbg_char_sel        (dbg_char_sel),
         .dbg_normalized_char (dbg_normalized_char),
-        .dbg_norm_chars_flat (dbg_norm_chars_flat)
+        .dbg_norm_chars_flat (dbg_norm_chars_flat),
+        .dbg_char_codes_flat (dbg_char_codes_flat),
+        .dbg_match_dists_flat(dbg_match_dists_flat),
+        .dbg_selected_char_code(dbg_selected_char_code),
+        .dbg_selected_match_dist(dbg_selected_match_dist),
+        .dbg_solver_char_codes_flat(dbg_solver_char_codes_flat),
+        .dbg_solver_num_chars(dbg_solver_num_chars),
+        .dbg_parse_done      (dbg_parse_done),
+        .dbg_parse_wait_timeout(dbg_parse_wait_timeout),
+        .dbg_solver_valid    (dbg_solver_valid),
+        .dbg_solver_valid_latched(dbg_solver_valid_latched)
     );
 
     initial begin
@@ -475,27 +495,12 @@ module tb_ocr_parser_top
     task automatic print_result();
         logic expected_ok;
         begin
-            expected_ok = (result_len == 6'd20)
-                       && (result_chars[0] == 8'h31)
-                       && (result_chars[1] == 8'h35)
-                       && (result_chars[2] == 8'h2B)
-                       && (result_chars[3] == 8'h36)
-                       && (result_chars[4] == 8'h37)
-                       && (result_chars[5] == 8'h3D)
-                       && (result_chars[6] == 8'h5B)
-                       && (result_chars[7] == 8'h38)
-                       && (result_chars[8] == 8'h32)
-                       && (result_chars[9] == 8'h2C)
-                       && (result_chars[10] == 8'h30)
-                       && (result_chars[11] == 8'h2C)
-                       && (result_chars[12] == 8'h30)
-                       && (result_chars[13] == 8'h2C)
-                       && (result_chars[14] == 8'h30)
-                       && (result_chars[15] == 8'h2C)
-                       && (result_chars[16] == 8'h30)
-                       && (result_chars[17] == 8'h2C)
-                       && (result_chars[18] == 8'h30)
-                       && (result_chars[19] == 8'h5D);
+            expected_ok = (result_len == 6'd5)
+                       && (result_chars[0] == 8'h38)
+                       && (result_chars[1] == 8'h32)
+                       && (result_chars[2] == 8'h2E)
+                       && (result_chars[3] == 8'h30)
+                       && (result_chars[4] == 8'h30);
 
             $display("");
             $write("Formatted result_len=%0d text=\"", result_len);
@@ -511,11 +516,11 @@ module tb_ocr_parser_top
             $fwrite(dump_fd, "\"\n");
 
             if (expected_ok) begin
-                $display("PASS: expected result 15+67=[82,0,0,0,0,0]");
-                $fdisplay(dump_fd, "PASS: expected result 15+67=[82,0,0,0,0,0]");
+                $display("PASS: expected result 82.00");
+                $fdisplay(dump_fd, "PASS: expected result 82.00");
             end else begin
-                $warning("Expected 15+67=[82,0,0,0,0,0]; inspect bboxes, normalized chars, and matched char_codes above.");
-                $fdisplay(dump_fd, "WARNING: expected result 15+67=[82,0,0,0,0,0]");
+                $warning("Expected 82.00; inspect bboxes, normalized chars, and matched char_codes above.");
+                $fdisplay(dump_fd, "WARNING: expected result 82.00");
             end
         end
     endtask
@@ -601,7 +606,8 @@ module tb_ocr_parser_top
         trigger      = 1'b0;
         adaptive     = 1'b0;
         threshold    = 8'd128;
-        bin_dbg_raddr = '0;
+        external_char_codes_flat = '0;
+        external_char_codes_valid = 1'b0;
         dbg_char_sel = '0;
         font_char    = '0;
         font_row     = '0;

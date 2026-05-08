@@ -52,6 +52,12 @@ input logic [MAX_CHARS*36-1:0]    ocr_bboxes_flat,
 input logic [$clog2(MAX_CHARS+1)-1:0] ocr_num_chars,
 input logic [DISPLAY_CHARS*8-1:0] ocr_result_chars_flat,
 input logic [$clog2(DISPLAY_CHARS+1)-1:0] ocr_result_len,
+input logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] dbg_solver_char_codes_flat,
+input logic [$clog2(MAX_CHARS+1)-1:0] dbg_solver_num_chars,
+input logic dbg_parse_done,
+input logic dbg_parse_wait_timeout,
+input logic dbg_solver_valid,
+input logic dbg_solver_valid_latched,
 
 input logic [TEMPLATE_BITS-1:0]         dbg_normalized_char,
 input logic [MAX_CHARS*TEMPLATE_BITS-1:0] dbg_norm_chars_flat
@@ -64,6 +70,10 @@ localparam int CAM_VIEW_H   = IMG_H;
 localparam int TITLE_BAND_H = 48;
 localparam int TEXT_Y_START = CAM_VIEW_Y + CAM_VIEW_H - CHAR_H;  // 328
 localparam int TEXT_MAX     = CAM_VIEW_W / CHAR_W;               // 20
+localparam int DBG_TEXT_X_START = CAM_VIEW_X;
+localparam int DBG_TEXT_ROWS = 2;
+localparam int DBG_TEXT_Y_START = CAM_VIEW_Y - (DBG_TEXT_ROWS * CHAR_H);
+localparam int DBG_TEXT_LEN = TEXT_MAX;
 localparam int TITLE_X      = 220;
 localparam int TITLE_Y      = 16;
 localparam int TITLE_LEN    = 25;
@@ -619,6 +629,144 @@ always_comb begin
 end
 
 // ???????????????????????????????????????????????????????????????????????
+// SOLVER DEBUG TEXT OVERLAY (top-left, 2 rows of 16x32 glyphs)
+// ???????????????????????????????????????????????????????????????????????
+
+function automatic logic [6:0] debug_bit_char(input logic bit_value);
+begin
+    debug_bit_char = bit_value ? "1" : "0";
+end
+endfunction
+
+function automatic logic [6:0] debug_digit_char(input integer digit_value);
+begin
+    debug_digit_char = 7'(8'h30 + digit_value[7:0]);
+end
+endfunction
+
+function automatic logic [6:0] solver_token_char(input logic [CHAR_CODE_WIDTH-1:0] token_value);
+begin
+    if (token_value == {CHAR_CODE_WIDTH{1'b1}})
+        solver_token_char = "?";
+    else if (token_value <= 9)
+        solver_token_char = 7'(8'h30 + token_value[3:0]);
+    else if (token_value == 16)
+        solver_token_char = "^";
+    else begin
+        case (token_value[3:0])
+            4'd10:   solver_token_char = "+";
+            4'd11:   solver_token_char = "-";
+            4'd12:   solver_token_char = "*";
+            4'd13:   solver_token_char = "X";
+            4'd14:   solver_token_char = "(";
+            4'd15:   solver_token_char = ")";
+            default: solver_token_char = "?";
+        endcase
+    end
+end
+endfunction
+
+function automatic logic [6:0] debug_status_char(input logic [5:0] slot);
+    integer num_chars_value;
+begin
+    num_chars_value = int'(dbg_solver_num_chars);
+    case (slot)
+        6'd0:    debug_status_char = "S";
+        6'd1:    debug_status_char = "V";
+        6'd2:    debug_status_char = debug_bit_char(dbg_solver_valid);
+        6'd3:    debug_status_char = " ";
+        6'd4:    debug_status_char = "L";
+        6'd5:    debug_status_char = "V";
+        6'd6:    debug_status_char = debug_bit_char(dbg_solver_valid_latched);
+        6'd7:    debug_status_char = " ";
+        6'd8:    debug_status_char = "P";
+        6'd9:    debug_status_char = "D";
+        6'd10:   debug_status_char = debug_bit_char(dbg_parse_done);
+        6'd11:   debug_status_char = " ";
+        6'd12:   debug_status_char = "P";
+        6'd13:   debug_status_char = "T";
+        6'd14:   debug_status_char = debug_bit_char(dbg_parse_wait_timeout);
+        6'd15:   debug_status_char = " ";
+        6'd16:   debug_status_char = "N";
+        6'd17:   debug_status_char = (num_chars_value >= 10) ? debug_digit_char(num_chars_value / 10)
+                                                              : " ";
+        6'd18:   debug_status_char = debug_digit_char(num_chars_value % 10);
+        default: debug_status_char = " ";
+    endcase
+end
+endfunction
+
+function automatic logic [6:0] debug_tokens_char(input logic [5:0] slot);
+    integer token_pair_idx;
+    logic [CHAR_CODE_WIDTH-1:0] token_value;
+begin
+    if (slot == 0)
+        debug_tokens_char = "T";
+    else if (slot == 1)
+        debug_tokens_char = ":";
+    else begin
+        token_pair_idx = (int'(slot) - 2) >> 1;
+        if (token_pair_idx >= int'(dbg_solver_num_chars)) begin
+            debug_tokens_char = " ";
+        end else if (((slot - 2) & 6'd1) == 0) begin
+            token_value = dbg_solver_char_codes_flat[token_pair_idx*CHAR_CODE_WIDTH +: CHAR_CODE_WIDTH];
+            debug_tokens_char = solver_token_char(token_value);
+        end else begin
+            debug_tokens_char = (token_pair_idx + 1 < int'(dbg_solver_num_chars)) ? "," : " ";
+        end
+    end
+end
+endfunction
+
+logic [9:0]  dbg_rel_x;
+logic [9:0]  dbg_rel_y;
+logic [5:0]  dbg_slot_abs;
+logic [3:0]  dbg_char_col;
+logic [4:0]  dbg_char_row;
+logic        dbg_line_sel;
+logic        dbg_in_text;
+logic        dbg_in_bar;
+logic [6:0]  dbg_rom_char;
+logic [4:0]  dbg_rom_row;
+logic [15:0] dbg_rom_bits;
+logic        dbg_in_text_r;
+logic        dbg_in_bar_r;
+logic [3:0]  dbg_char_col_r;
+
+assign dbg_rel_x = drawX - DBG_TEXT_X_START[9:0];
+assign dbg_rel_y = drawY - DBG_TEXT_Y_START[9:0];
+assign dbg_slot_abs = dbg_rel_x[9:4];
+assign dbg_char_col = dbg_rel_x[3:0];
+assign dbg_char_row = dbg_rel_y[4:0];
+assign dbg_line_sel = dbg_rel_y[5];
+
+assign dbg_in_bar = (drawY >= DBG_TEXT_Y_START)
+                 && (drawY < (DBG_TEXT_Y_START + (DBG_TEXT_ROWS * CHAR_H)))
+                 && (drawX >= DBG_TEXT_X_START[9:0])
+                 && (drawX < (DBG_TEXT_X_START + CAM_VIEW_W));
+assign dbg_in_text = dbg_in_bar && (dbg_slot_abs < DBG_TEXT_LEN);
+assign dbg_rom_char = !dbg_in_text ? 7'h20
+                    : (dbg_line_sel ? debug_tokens_char(dbg_slot_abs)
+                                    : debug_status_char(dbg_slot_abs));
+assign dbg_rom_row = dbg_char_row;
+
+font_rom_16x32_digits u_dbg_font_rom (
+    .clk       (clk_25MHz),
+    .char_code (dbg_rom_char),
+    .row       (dbg_rom_row),
+    .bits      (dbg_rom_bits)
+);
+
+always_ff @(posedge clk_25MHz) begin
+    dbg_in_text_r  <= dbg_in_text;
+    dbg_in_bar_r   <= dbg_in_bar;
+    dbg_char_col_r <= dbg_char_col;
+end
+
+logic dbg_pixel_on;
+assign dbg_pixel_on = dbg_rom_bits[CHAR_W - 1 - dbg_char_col_r];
+
+// ???????????????????????????????????????????????????????????????????????
 // OCR TEXT OVERLAY (1-cycle pipeline using font_rom_16x32_digits)
 //
 // Draws result string at bottom of camera region (y = 208..239)
@@ -707,6 +855,16 @@ always_comb begin
         red   = 8'h08;
         green = 8'h10;
         blue  = 8'h18;
+    end
+    else if (dbg_in_text_r && dbg_pixel_on) begin
+        red   = 8'hFF;
+        green = 8'hFF;
+        blue  = 8'h00;
+    end
+    else if (dbg_in_bar_r) begin
+        red   = 8'h00;
+        green = 8'h00;
+        blue  = 8'h20;
     end
     else if (ocr_in_text_r && ocr_pixel_on) begin
         // OCR result text: white on black

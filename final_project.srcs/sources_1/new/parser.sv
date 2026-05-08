@@ -39,6 +39,7 @@ module parser #(
         START_SHUNT,
         WAIT_SHUNT,
         EVAL_TOKEN,
+        LOAD_OPERATOR,
         APPLY_OPERATOR,
         POWER_MULT,
         FINISH_OK,
@@ -255,7 +256,7 @@ module parser #(
                                 lhs_poly[i] <= eval_stack[eval_sp - 2][i];
                                 rhs_poly[i] <= eval_stack[eval_sp - 1][i];
                             end
-                            state <= APPLY_OPERATOR;
+                            state <= LOAD_OPERATOR;
                         end
                     end else begin
                         done  <= 1'b1;
@@ -263,6 +264,10 @@ module parser #(
                         error <= 1'b1;
                         state <= FINISH_ERR;
                     end
+                end
+
+                LOAD_OPERATOR: begin
+                    state <= APPLY_OPERATOR;
                 end
 
                 APPLY_OPERATOR: begin

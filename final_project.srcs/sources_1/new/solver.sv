@@ -64,6 +64,8 @@ module solver #(
     logic [9:0]                        sweep_idx;
     logic                              single_point_mode;
     logic                              in_root_region;
+    logic                              flat_root_active;
+    q16_t                              flat_root_start;
     q16_t                              candidate_root;
     logic                              near_zero_hit;
     logic                              sign_change_hit;
@@ -240,6 +242,8 @@ module solver #(
             sweep_idx        <= '0;
             single_point_mode <= 1'b0;
             in_root_region   <= 1'b0;
+            flat_root_active <= 1'b0;
+            flat_root_start  <= '0;
             candidate_root   <= '0;
             refine_lo        <= '0;
             refine_hi        <= '0;
@@ -271,6 +275,8 @@ module solver #(
                     sweep_idx         <= '0;
                     single_point_mode <= 1'b0;
                     in_root_region    <= 1'b0;
+                    flat_root_active  <= 1'b0;
+                    flat_root_start   <= '0;
                     candidate_root    <= '0;
                     refine_lo         <= '0;
                     refine_hi         <= '0;
@@ -332,6 +338,8 @@ module solver #(
                     prev_y            <= '0;
                     single_point_mode <= (root_bound_value == '0);
                     in_root_region    <= 1'b0;
+                    flat_root_active  <= 1'b0;
+                    flat_root_start   <= '0;
                     candidate_root    <= '0;
                     refine_lo         <= '0;
                     refine_hi         <= '0;
@@ -355,14 +363,19 @@ module solver #(
 
                 CHECK_SAMPLE: begin
                     if (near_zero_hit) begin
-                        if (!in_root_region) begin
-                            candidate_root <= current_x;
-                            state          <= STORE_ROOT;
+                        if (!flat_root_active && !in_root_region) begin
+                            flat_root_active <= 1'b1;
+                            flat_root_start  <= current_x;
+                            state            <= ADVANCE_SAMPLE;
                         end else begin
                             state <= ADVANCE_SAMPLE;
                         end
                     end else if (sign_change_hit) begin
-                        if (!in_root_region) begin
+                        if (flat_root_active) begin
+                            candidate_root   <= q16_t'((flat_root_start + prev_x) >>> 1);
+                            flat_root_active <= 1'b0;
+                            state            <= STORE_ROOT;
+                        end else if (!in_root_region) begin
                             refine_lo   <= prev_x;
                             refine_hi   <= current_x;
                             refine_f_lo <= prev_y;
@@ -372,8 +385,14 @@ module solver #(
                             state <= ADVANCE_SAMPLE;
                         end
                     end else begin
-                        in_root_region <= 1'b0;
-                        state          <= ADVANCE_SAMPLE;
+                        if (flat_root_active) begin
+                            candidate_root   <= q16_t'((flat_root_start + prev_x) >>> 1);
+                            flat_root_active <= 1'b0;
+                            state            <= STORE_ROOT;
+                        end else begin
+                            in_root_region <= 1'b0;
+                            state          <= ADVANCE_SAMPLE;
+                        end
                     end
                 end
 
@@ -413,7 +432,12 @@ module solver #(
                 end
 
                 ADVANCE_SAMPLE: begin
-                    if (single_point_mode || (int'(sweep_idx) == LAST_SAMPLE_IDX)) begin
+                    if (flat_root_active &&
+                        (single_point_mode || (int'(sweep_idx) == LAST_SAMPLE_IDX))) begin
+                        candidate_root   <= q16_t'((flat_root_start + current_x) >>> 1);
+                        flat_root_active <= 1'b0;
+                        state            <= STORE_ROOT;
+                    end else if (single_point_mode || (int'(sweep_idx) == LAST_SAMPLE_IDX)) begin
                         done  <= 1'b1;
                         valid <= 1'b1;
                         state <= FINISH_OK;

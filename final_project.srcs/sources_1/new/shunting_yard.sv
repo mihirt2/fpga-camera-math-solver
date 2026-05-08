@@ -48,6 +48,8 @@ module shunting_yard #(
     coeff_t                     pending_coeff;
     logic                       pending_has_x;
     logic                       expect_operand;
+    logic                       pending_op_consumes_input;
+    logic                       last_token_was_rparen;
     logic [$clog2(MAX_CHARS+1)-1:0] op_top;
     logic [$clog2(MAX_CHARS+1)-1:0] in_idx;
     logic [$clog2(MAX_CHARS+1)-1:0] out_idx;
@@ -102,6 +104,8 @@ module shunting_yard #(
             pending_coeff  <= '0;
             pending_has_x  <= 1'b0;
             expect_operand <= 1'b1;
+            pending_op_consumes_input <= 1'b0;
+            last_token_was_rparen <= 1'b0;
 
             for (i = 0; i < MAX_CHARS; i = i + 1) begin
                 op_stack[i]             <= '0;
@@ -126,6 +130,8 @@ module shunting_yard #(
                         pending_coeff  <= '0;
                         pending_has_x  <= 1'b0;
                         expect_operand <= 1'b1;
+                        pending_op_consumes_input <= 1'b0;
+                        last_token_was_rparen <= 1'b0;
 
                         for (i = 0; i < MAX_CHARS; i = i + 1) begin
                             op_stack[i]             <= '0;
@@ -151,10 +157,16 @@ module shunting_yard #(
                         end
                     end else if (is_constant(infix_chars[in_idx])) begin
                         if (!expect_operand) begin
-                            done  <= 1'b1;
-                            valid <= 1'b0;
-                            error <= 1'b1;
-                            state <= FINISH_ERR;
+                            if (last_token_was_rparen) begin
+                                pending_op               <= OP_MUL;
+                                pending_op_consumes_input <= 1'b0;
+                                state                    <= POP_FOR_OPERATOR;
+                            end else begin
+                                done  <= 1'b1;
+                                valid <= 1'b0;
+                                error <= 1'b1;
+                                state <= FINISH_ERR;
+                            end
                         end else begin
                             pending_coeff <= coeff_t'(infix_chars[in_idx]);
                             pending_has_x <= 1'b0;
@@ -163,10 +175,16 @@ module shunting_yard #(
                         end
                     end else if (infix_chars[in_idx] == VAR_X) begin
                         if (!expect_operand) begin
-                            done  <= 1'b1;
-                            valid <= 1'b0;
-                            error <= 1'b1;
-                            state <= FINISH_ERR;
+                            if (last_token_was_rparen) begin
+                                pending_op               <= OP_MUL;
+                                pending_op_consumes_input <= 1'b0;
+                                state                    <= POP_FOR_OPERATOR;
+                            end else begin
+                                done  <= 1'b1;
+                                valid <= 1'b0;
+                                error <= 1'b1;
+                                state <= FINISH_ERR;
+                            end
                         end else begin
                             pending_coeff <= coeff_t'(1);
                             pending_has_x <= 1'b1;
@@ -174,7 +192,11 @@ module shunting_yard #(
                             state         <= EMIT_OPERAND;
                         end
                     end else if (infix_chars[in_idx] == LPAREN) begin
-                        if (!expect_operand || (op_top == COUNT_LIMIT)) begin
+                        if (!expect_operand) begin
+                            pending_op               <= OP_MUL;
+                            pending_op_consumes_input <= 1'b0;
+                            state                    <= POP_FOR_OPERATOR;
+                        end else if (op_top == COUNT_LIMIT) begin
                             done  <= 1'b1;
                             valid <= 1'b0;
                             error <= 1'b1;
@@ -191,8 +213,9 @@ module shunting_yard #(
                             error <= 1'b1;
                             state <= FINISH_ERR;
                         end else begin
-                            pending_op <= infix_chars[in_idx];
-                            state      <= POP_FOR_OPERATOR;
+                            pending_op               <= infix_chars[in_idx];
+                            pending_op_consumes_input <= 1'b1;
+                            state                    <= POP_FOR_OPERATOR;
                         end
                     end else if (infix_chars[in_idx] == RPAREN) begin
                         if (expect_operand || (op_top == 0)) begin
@@ -242,6 +265,7 @@ module shunting_yard #(
                         postfix_has_x[out_idx]       <= pending_has_x;
                         out_idx                      <= out_idx + 1'b1;
                         expect_operand               <= 1'b0;
+                        last_token_was_rparen       <= 1'b0;
                         state                        <= PROCESS;
                     end
                 end
@@ -263,8 +287,11 @@ module shunting_yard #(
                     end else begin
                         op_stack[op_top] <= pending_op;
                         op_top           <= op_top + 1'b1;
-                        in_idx           <= in_idx + 1'b1;
+                        if (pending_op_consumes_input) begin
+                            in_idx <= in_idx + 1'b1;
+                        end
                         expect_operand   <= 1'b1;
+                        last_token_was_rparen <= 1'b0;
                         state            <= PROCESS;
                     end
                 end
@@ -279,6 +306,7 @@ module shunting_yard #(
                         op_top         <= op_top - 1'b1;
                         in_idx         <= in_idx + 1'b1;
                         expect_operand <= 1'b0;
+                        last_token_was_rparen <= 1'b1;
                         state          <= PROCESS;
                     end else if (!is_operator(op_stack[op_top - 1'b1]) || (out_idx == COUNT_LIMIT)) begin
                         done  <= 1'b1;

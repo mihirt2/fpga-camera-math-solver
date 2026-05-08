@@ -47,6 +47,12 @@ module top_level (
     logic [MAX_CHARS*10-1:0] dbg_match_dists_flat;
     logic [CHAR_CODE_WIDTH-1:0] dbg_selected_char_code;
     logic [9:0] dbg_selected_match_dist;
+    logic [MAX_CHARS*CHAR_CODE_WIDTH-1:0] dbg_solver_char_codes_flat;
+    logic [$clog2(MAX_CHARS+1)-1:0] dbg_solver_num_chars;
+    logic dbg_parse_done;
+    logic dbg_parse_wait_timeout;
+    logic dbg_solver_valid;
+    logic dbg_solver_valid_latched;
     logic uart_dump_start;
     logic uart_dump_busy;
     logic external_dump_start;
@@ -179,6 +185,12 @@ module top_level (
         .ocr_num_chars       (dbg_num_chars),
         .ocr_result_chars_flat(ocr_result_chars_flat),
         .ocr_result_len      (result_len),
+        .dbg_solver_char_codes_flat(dbg_solver_char_codes_flat),
+        .dbg_solver_num_chars(dbg_solver_num_chars),
+        .dbg_parse_done      (dbg_parse_done),
+        .dbg_parse_wait_timeout(dbg_parse_wait_timeout),
+        .dbg_solver_valid    (dbg_solver_valid),
+        .dbg_solver_valid_latched(dbg_solver_valid_latched),
 
         // Debug binary image
         .bin_dbg_en          (1'b0),
@@ -226,7 +238,13 @@ module top_level (
         .dbg_char_codes_flat (dbg_char_codes_flat),
         .dbg_match_dists_flat(dbg_match_dists_flat),
         .dbg_selected_char_code(dbg_selected_char_code),
-        .dbg_selected_match_dist(dbg_selected_match_dist)
+        .dbg_selected_match_dist(dbg_selected_match_dist),
+        .dbg_solver_char_codes_flat(dbg_solver_char_codes_flat),
+        .dbg_solver_num_chars(dbg_solver_num_chars),
+        .dbg_parse_done(dbg_parse_done),
+        .dbg_parse_wait_timeout(dbg_parse_wait_timeout),
+        .dbg_solver_valid(dbg_solver_valid),
+        .dbg_solver_valid_latched(dbg_solver_valid_latched)
     );
 
     assign uart_dump_start = external_dump_start && !uart_dump_busy;
