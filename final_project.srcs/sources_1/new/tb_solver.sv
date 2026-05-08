@@ -26,6 +26,7 @@ module tb_solver;
     logic [2:0] num_solutions;
     logic signed [31:0] value;
     logic signed [31:0] solutions [0:MAX_SOLUTIONS-1];
+    logic signed [15:0] coefficients [0:5];
 
     solver #(
         .MAX_CHARS(MAX_CHARS),
@@ -43,7 +44,8 @@ module tb_solver;
         .is_const(is_const),
         .num_solutions(num_solutions),
         .value(value),
-        .solutions(solutions)
+        .solutions(solutions),
+        .coefficients(coefficients)
     );
 
     always #(CLK_PERIOD / 2) clk = ~clk;
@@ -135,6 +137,29 @@ module tb_solver;
         end
     endtask
 
+    task automatic expect_coefficients(
+        input integer c0,
+        input integer c1,
+        input integer c2,
+        input integer c3,
+        input integer c4,
+        input integer c5
+    );
+        begin
+            if ((coefficients[0] != c0) || (coefficients[1] != c1) ||
+                (coefficients[2] != c2) || (coefficients[3] != c3) ||
+                (coefficients[4] != c4) || (coefficients[5] != c5)) begin
+                $fatal(
+                    1,
+                    "Coefficient mismatch: got [%0d,%0d,%0d,%0d,%0d,%0d] expected [%0d,%0d,%0d,%0d,%0d,%0d]",
+                    coefficients[0], coefficients[1], coefficients[2],
+                    coefficients[3], coefficients[4], coefficients[5],
+                    c0, c1, c2, c3, c4, c5
+                );
+            end
+        end
+    endtask
+
     task automatic run_case_x;
         begin
             clear_inputs();
@@ -152,6 +177,7 @@ module tb_solver;
             if (num_solutions != 1) begin
                 $fatal(1, "Expected 1 root for x, got %0d", num_solutions);
             end
+            expect_coefficients(0, 1, 0, 0, 0, 0);
             expect_root_close(0, 0, 16);
             $display("PASS: x -> root at %0f", $itor(solutions[0]) / 65536.0);
         end
@@ -176,6 +202,7 @@ module tb_solver;
             if (num_solutions != 1) begin
                 $fatal(1, "Expected 1 root for x-2, got %0d", num_solutions);
             end
+            expect_coefficients(-2, 1, 0, 0, 0, 0);
             expect_root_close(0, 2, q16(1) / 40);
             $display("PASS: x-2 -> root at %0f", $itor(solutions[0]) / 65536.0);
         end
@@ -233,10 +260,161 @@ module tb_solver;
             if (num_solutions != 2) begin
                 $fatal(1, "Expected 2 roots for x^2-1, got %0d", num_solutions);
             end
+            expect_coefficients(-1, 0, 1, 0, 0, 0);
             expect_root_close(0, -1, q16(1) / 200);
             expect_root_close(1, 1, q16(1) / 200);
             $display(
                 "PASS: x^2-1 -> roots at %0f and %0f",
+                $itor(solutions[0]) / 65536.0,
+                $itor(solutions[1]) / 65536.0
+            );
+        end
+    endtask
+
+    task automatic run_case_x_power_3_minus_1;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_X;
+            char_codes[1] = TOK_POW;
+            char_codes[2] = 8'd3;
+            char_codes[3] = TOK_SUB;
+            char_codes[4] = 8'd1;
+            num_chars = 5;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected x^3-1 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected x^3-1 case to be non-constant");
+            end
+            if (num_solutions != 1) begin
+                $fatal(1, "Expected 1 root for x^3-1, got %0d", num_solutions);
+            end
+            expect_root_close(0, 1, q16(1) / 200);
+            $display("PASS: x^3-1 -> root at %0f", $itor(solutions[0]) / 65536.0);
+        end
+    endtask
+
+    task automatic run_case_x_power_3_minus_x;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_X;
+            char_codes[1] = TOK_POW;
+            char_codes[2] = 8'd3;
+            char_codes[3] = TOK_SUB;
+            char_codes[4] = TOK_X;
+            num_chars = 5;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected x^3-x case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected x^3-x case to be non-constant");
+            end
+            if (num_solutions != 3) begin
+                $fatal(1, "Expected 3 roots for x^3-x, got %0d", num_solutions);
+            end
+            expect_root_close(0, -1, q16(1) / 200);
+            expect_root_close(1, 0, q16(1) / 200);
+            expect_root_close(2, 1, q16(1) / 200);
+            $display(
+                "PASS: x^3-x -> roots at %0f, %0f, %0f",
+                $itor(solutions[0]) / 65536.0,
+                $itor(solutions[1]) / 65536.0,
+                $itor(solutions[2]) / 65536.0
+            );
+        end
+    endtask
+
+    task automatic run_case_x_squared_minus_100;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_X;
+            char_codes[1] = TOK_POW;
+            char_codes[2] = 8'd2;
+            char_codes[3] = TOK_SUB;
+            char_codes[4] = 8'd1;
+            char_codes[5] = 8'd0;
+            char_codes[6] = 8'd0;
+            num_chars = 7;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected x^2-100 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected x^2-100 case to be non-constant");
+            end
+            if (num_solutions != 2) begin
+                $fatal(1, "Expected 2 roots for x^2-100, got %0d", num_solutions);
+            end
+            expect_root_close(0, -10, q16(1) / 100);
+            expect_root_close(1, 10, q16(1) / 100);
+            $display(
+                "PASS: x^2-100 -> roots at %0f and %0f",
+                $itor(solutions[0]) / 65536.0,
+                $itor(solutions[1]) / 65536.0
+            );
+        end
+    endtask
+
+    task automatic run_case_x_power_3_minus_8;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_X;
+            char_codes[1] = TOK_POW;
+            char_codes[2] = 8'd3;
+            char_codes[3] = TOK_SUB;
+            char_codes[4] = 8'd8;
+            num_chars = 5;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected x^3-8 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected x^3-8 case to be non-constant");
+            end
+            if (num_solutions != 1) begin
+                $fatal(1, "Expected 1 root for x^3-8, got %0d", num_solutions);
+            end
+            expect_root_close(0, 2, q16(1) / 100);
+            $display("PASS: x^3-8 -> root at %0f", $itor(solutions[0]) / 65536.0);
+        end
+    endtask
+
+    task automatic run_case_x_power_4_minus_16;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_X;
+            char_codes[1] = TOK_POW;
+            char_codes[2] = 8'd4;
+            char_codes[3] = TOK_SUB;
+            char_codes[4] = 8'd1;
+            char_codes[5] = 8'd6;
+            num_chars = 6;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected x^4-16 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected x^4-16 case to be non-constant");
+            end
+            if (num_solutions != 2) begin
+                $fatal(1, "Expected 2 roots for x^4-16, got %0d", num_solutions);
+            end
+            expect_root_close(0, -2, q16(1) / 100);
+            expect_root_close(1, 2, q16(1) / 100);
+            $display(
+                "PASS: x^4-16 -> roots at %0f and %0f",
                 $itor(solutions[0]) / 65536.0,
                 $itor(solutions[1]) / 65536.0
             );
@@ -267,6 +445,7 @@ module tb_solver;
             if (num_solutions != 0) begin
                 $fatal(1, "Expected 0 roots for constant 5, got %0d", num_solutions);
             end
+            expect_coefficients(5, 0, 0, 0, 0, 0);
             $display("PASS: 5 -> value %0f, is_const asserted", $itor(value) / 65536.0);
         end
     endtask
@@ -338,6 +517,7 @@ module tb_solver;
             if (num_solutions != 1) begin
                 $fatal(1, "Expected 1 root for 17x-34, got %0d", num_solutions);
             end
+            expect_coefficients(-34, 17, 0, 0, 0, 0);
             expect_root_close(0, 2, q16(1) / 20);
             $display("PASS: 17x-34 -> root at %0f", $itor(solutions[0]) / 65536.0);
         end
@@ -484,6 +664,21 @@ module tb_solver;
         @(posedge clk);
 
         run_case_x_power_2_minus_1();
+        @(posedge clk);
+
+        run_case_x_power_3_minus_1();
+        @(posedge clk);
+
+        run_case_x_power_3_minus_x();
+        @(posedge clk);
+
+        run_case_x_squared_minus_100();
+        @(posedge clk);
+
+        run_case_x_power_3_minus_8();
+        @(posedge clk);
+
+        run_case_x_power_4_minus_16();
         @(posedge clk);
 
         run_case_constant();

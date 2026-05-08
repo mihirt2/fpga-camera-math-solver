@@ -6,7 +6,7 @@ import torch
 from PIL import Image
 
 from capture_uart_norm import IMG_H, IMG_W, choose_serial_port, read_frame
-from train_norm_cnn import TinyMathCNN, build_transform, hw_char_code
+from new_train_cnn import BetterMathCNN, build_transform, hw_char_code
 
 
 DEFAULT_MODEL = Path("ocr_training/models/best_model.pt")
@@ -19,7 +19,6 @@ def rows_to_image(rows: list[str]) -> Image.Image:
             arr[y, x] = 0 if ch == "1" else 255
     return Image.fromarray(arr, mode="L")
 
-
 def minus_heuristic(rows: list[str]) -> bool:
     xs: list[int] = []
     ys: list[int] = []
@@ -28,19 +27,24 @@ def minus_heuristic(rows: list[str]) -> bool:
             if ch == "1":
                 xs.append(x)
                 ys.append(y)
-
-    if len(xs) < 6:
+    if len(xs) < 3:
         return False
-
     width = max(xs) - min(xs) + 1
     height = max(ys) - min(ys) + 1
-    return width >= 8 and height <= 8 and width >= 2 * height
-
+    if height == 0 or width < 3:
+        return False
+    aspect = width / height
+    density = len(xs) / (width * height)
+    return (
+        aspect >= 2.0
+        and height <= 6
+        and density >= 0.6
+    )
 
 def load_model(path: Path, device: torch.device):
     checkpoint = torch.load(path, map_location=device)
     class_names = checkpoint["class_names"]
-    model = TinyMathCNN(num_classes=len(class_names)).to(device)
+    model = BetterMathCNN(num_classes=len(class_names)).to(device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
     return model, class_names
@@ -77,7 +81,7 @@ def main() -> None:
     except ImportError as exc:
         raise SystemExit("Install pyserial first: pip install pyserial") from exc
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")
     model, class_names = load_model(args.model, device)
     transform = build_transform(augment=False)
 

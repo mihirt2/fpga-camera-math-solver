@@ -475,27 +475,15 @@ module tb_ocr_parser_top
     task automatic print_result();
         logic expected_ok;
         begin
-            expected_ok = (result_len == 6'd20)
+            expected_ok = (result_len == 6'd8)
                        && (result_chars[0] == 8'h31)
                        && (result_chars[1] == 8'h35)
                        && (result_chars[2] == 8'h2B)
                        && (result_chars[3] == 8'h36)
                        && (result_chars[4] == 8'h37)
                        && (result_chars[5] == 8'h3D)
-                       && (result_chars[6] == 8'h5B)
-                       && (result_chars[7] == 8'h38)
-                       && (result_chars[8] == 8'h32)
-                       && (result_chars[9] == 8'h2C)
-                       && (result_chars[10] == 8'h30)
-                       && (result_chars[11] == 8'h2C)
-                       && (result_chars[12] == 8'h30)
-                       && (result_chars[13] == 8'h2C)
-                       && (result_chars[14] == 8'h30)
-                       && (result_chars[15] == 8'h2C)
-                       && (result_chars[16] == 8'h30)
-                       && (result_chars[17] == 8'h2C)
-                       && (result_chars[18] == 8'h30)
-                       && (result_chars[19] == 8'h5D);
+                       && (result_chars[6] == 8'h38)
+                       && (result_chars[7] == 8'h32);
 
             $display("");
             $write("Formatted result_len=%0d text=\"", result_len);
@@ -511,11 +499,11 @@ module tb_ocr_parser_top
             $fwrite(dump_fd, "\"\n");
 
             if (expected_ok) begin
-                $display("PASS: expected result 15+67=[82,0,0,0,0,0]");
-                $fdisplay(dump_fd, "PASS: expected result 15+67=[82,0,0,0,0,0]");
+                $display("PASS: expected result 15+67=82");
+                $fdisplay(dump_fd, "PASS: expected result 15+67=82");
             end else begin
-                $warning("Expected 15+67=[82,0,0,0,0,0]; inspect bboxes, normalized chars, and matched char_codes above.");
-                $fdisplay(dump_fd, "WARNING: expected result 15+67=[82,0,0,0,0,0]");
+                $warning("Expected 15+67=82; inspect bboxes, normalized chars, and matched char_codes above.");
+                $fdisplay(dump_fd, "WARNING: expected result 15+67=82");
             end
         end
     endtask

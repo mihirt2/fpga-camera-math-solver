@@ -610,18 +610,19 @@ module ocr_parser_top
     // STAGE 5: SOLVE
     //==========================================================================
     logic [CHAR_CODE_WIDTH-1:0] solver_char_codes [0:MAX_CHARS-1];
-    logic [CHAR_CODE_WIDTH-1:0] display_char_codes [0:MAX_CHARS-1];
     logic [$clog2(MAX_CHARS+1)-1:0] solver_num_chars;
     logic                            solver_valid;
     logic                            solver_is_const;
     logic [2:0]                      solver_num_solutions;
     logic signed [31:0]              solver_value;
     logic signed [31:0]              solver_solutions [0:4];
+    logic signed [15:0]              solver_coefficients [0:5];
     logic                            solver_valid_latched;
     logic                            solver_is_const_latched;
     logic [2:0]                      solver_num_solutions_latched;
     logic signed [31:0]              solver_value_latched;
     logic signed [31:0]              solver_solutions_latched [0:4];
+    logic signed [15:0]              solver_coefficients_latched [0:5];
     logic                            solver_outputs_latched;
 
     always_comb begin
@@ -631,13 +632,10 @@ module ocr_parser_top
         solver_num_chars = '0;
         for (int i = 0; i < MAX_CHARS; i++) begin
             solver_char_codes[i]  = OCR_REJECT_CODE;
-            display_char_codes[i] = OCR_REJECT_CODE;
         end
 
         for (int i = 0; i < MAX_CHARS; i++) begin
             if (i < int'(num_chars)) begin
-                display_char_codes[compact_idx] = char_codes[i];
-
                 case (char_codes[i])
                     5'd10:   solver_char_codes[compact_idx] = 5'd10; // '+'
                     5'd11:   solver_char_codes[compact_idx] = 5'd13; // 'x'
@@ -673,7 +671,8 @@ module ocr_parser_top
         .is_const      (solver_is_const),
         .num_solutions (solver_num_solutions),
         .value         (solver_value),
-        .solutions     (solver_solutions)
+        .solutions     (solver_solutions),
+        .coefficients  (solver_coefficients)
     );
 
     always_ff @(posedge clk) begin
@@ -685,6 +684,8 @@ module ocr_parser_top
             solver_outputs_latched       <= 1'b0;
             for (int i = 0; i < 5; i++)
                 solver_solutions_latched[i] <= '0;
+            for (int i = 0; i < 6; i++)
+                solver_coefficients_latched[i] <= '0;
         end else if (stage != S_DONE) begin
             solver_outputs_latched <= 1'b0;
         end else if (!solver_outputs_latched) begin
@@ -695,6 +696,8 @@ module ocr_parser_top
             solver_outputs_latched       <= 1'b1;
             for (int i = 0; i < 5; i++)
                 solver_solutions_latched[i] <= solver_solutions[i];
+            for (int i = 0; i < 6; i++)
+                solver_coefficients_latched[i] <= solver_coefficients[i];
         end
     end
 
@@ -719,18 +722,21 @@ module ocr_parser_top
         .MAX_CHARS       (MAX_CHARS),
         .CHAR_CODE_WIDTH (CHAR_CODE_WIDTH),
         .MAX_SOLUTIONS   (5),
-        .DISPLAY_CHARS   (DISPLAY_CHARS)
+        .DISPLAY_CHARS   (DISPLAY_CHARS),
+        .MAX_COEFFS      (6),
+        .COEFF_WIDTH     (16)
     ) u_formatter (
         .clk           (clk),
         .reset         (reset),
         .start         (format_start),
-        .equation_chars(display_char_codes),
+        .equation_chars(solver_char_codes),
         .equation_len  (solver_num_chars),
         .solver_valid  (solver_valid_latched),
         .is_const      (solver_is_const_latched),
         .num_solutions (solver_num_solutions_latched),
         .value         (solver_value_latched),
         .solutions     (solver_solutions_latched),
+        .coefficients  (solver_coefficients_latched),
         .result_chars  (result_chars),
         .result_len    (result_len),
         .result_valid  (result_valid)

@@ -89,9 +89,9 @@ module solver_to_ascii #(
         end else begin
             case (token[3:0])
                 4'd10:   token_to_ascii = "+";
-                4'd11:   token_to_ascii = "X";
+                4'd11:   token_to_ascii = "-";
                 4'd12:   token_to_ascii = "*";
-                4'd13:   token_to_ascii = "-";
+                4'd13:   token_to_ascii = "X";
                 4'd14:   token_to_ascii = "(";
                 4'd15:   token_to_ascii = ")";
                 default: token_to_ascii = "?";
