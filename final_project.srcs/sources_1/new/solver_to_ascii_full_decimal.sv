@@ -4,21 +4,20 @@ module solver_to_ascii_full_decimal #(
     parameter int MAX_CHARS       = 10,
     parameter int CHAR_CODE_WIDTH = 8,
     parameter int MAX_SOLUTIONS   = 5,
-    parameter int DISPLAY_CHARS   = 20,
-    parameter int MAX_COEFFS      = 6,
-    parameter int COEFF_WIDTH     = 16
+    parameter int DISPLAY_CHARS   = 20
 )(
     input  logic                              clk,
     input  logic                              reset,
     input  logic                              start,
-    input  logic [CHAR_CODE_WIDTH-1:0]        equation_chars [0:MAX_CHARS-1],
-    input  logic [$clog2(MAX_CHARS+1)-1:0]    equation_len,
     input  logic                              solver_valid,
     input  logic                              is_const,
     input  logic [2:0]                        num_solutions,
     input  logic signed [31:0]                value,
-    input  logic signed [31:0]                solutions [0:MAX_SOLUTIONS-1],
-    input  logic signed [COEFF_WIDTH-1:0]     coefficients [0:MAX_COEFFS-1],
+    input  logic signed [31:0]                solution0,
+    input  logic signed [31:0]                solution1,
+    input  logic signed [31:0]                solution2,
+    input  logic signed [31:0]                solution3,
+    input  logic signed [31:0]                solution4,
 
     output logic [7:0]                        result_chars [0:DISPLAY_CHARS-1],
     output logic [$clog2(DISPLAY_CHARS+1)-1:0] result_len,
@@ -62,13 +61,19 @@ module solver_to_ascii_full_decimal #(
     logic [3:0] ones_digit;
     logic [3:0] frac_tens_digit;
     logic number_negative;
+    logic fmt_solver_valid;
+    logic fmt_is_const;
+    logic [2:0] fmt_num_solutions;
+    logic signed [31:0] fmt_value;
+    logic signed [31:0] fmt_solution0;
+    logic signed [31:0] fmt_solution1;
+    logic signed [31:0] fmt_solution2;
+    logic signed [31:0] fmt_solution3;
+    logic signed [31:0] fmt_solution4;
 
     logic [31:0] number_abs;
     logic [31:0] scaled_hundredths_full;
     logic [13:0] scaled_hundredths;
-    logic _unused_inputs;
-
-    assign _unused_inputs = equation_chars[0][0] ^ equation_len[0] ^ coefficients[0][0];
 
     always_comb begin
         number_abs = number_q[31] ? (~number_q + 32'd1) : number_q;
@@ -87,6 +92,16 @@ module solver_to_ascii_full_decimal #(
         end
     endtask
 
+    function automatic logic signed [31:0] select_solution(input logic [SOL_IDX_W-1:0] idx);
+        case (idx)
+            SOL_IDX_W'(0): select_solution = fmt_solution0;
+            SOL_IDX_W'(1): select_solution = fmt_solution1;
+            SOL_IDX_W'(2): select_solution = fmt_solution2;
+            SOL_IDX_W'(3): select_solution = fmt_solution3;
+            default:       select_solution = fmt_solution4;
+        endcase
+    endfunction
+
     integer i;
 
     always_ff @(posedge clk) begin
@@ -103,6 +118,15 @@ module solver_to_ascii_full_decimal #(
             ones_digit      <= '0;
             frac_tens_digit <= '0;
             number_negative <= 1'b0;
+            fmt_solver_valid <= 1'b0;
+            fmt_is_const     <= 1'b0;
+            fmt_num_solutions <= '0;
+            fmt_value        <= '0;
+            fmt_solution0    <= '0;
+            fmt_solution1    <= '0;
+            fmt_solution2    <= '0;
+            fmt_solution3    <= '0;
+            fmt_solution4    <= '0;
 
             for (i = 0; i < DISPLAY_CHARS; i = i + 1)
                 result_chars[i] <= 8'h20;
@@ -116,6 +140,17 @@ module solver_to_ascii_full_decimal #(
                         clear_idx  <= '0;
                         number_idx <= '0;
                         result_len <= '0;
+                        fmt_solver_valid  <= solver_valid;
+                        fmt_is_const      <= is_const;
+                        fmt_num_solutions <= (num_solutions > 3'(MAX_SOLUTIONS))
+                                           ? 3'(MAX_SOLUTIONS)
+                                           : num_solutions;
+                        fmt_value         <= value;
+                        fmt_solution0     <= solution0;
+                        fmt_solution1     <= solution1;
+                        fmt_solution2     <= solution2;
+                        fmt_solution3     <= solution3;
+                        fmt_solution4     <= solution4;
                         state      <= S_CLEAR;
                     end
                 end
@@ -129,16 +164,16 @@ module solver_to_ascii_full_decimal #(
                 end
 
                 S_STATUS: begin
-                    if (!solver_valid) begin
+                    if (!fmt_solver_valid) begin
                         state <= S_FINISH;
-                    end else if (is_const) begin
-                        number_q   <= value;
+                    end else if (fmt_is_const) begin
+                        number_q   <= fmt_value;
                         number_idx <= '0;
                         state      <= S_NUMBER_INIT;
-                    end else if (num_solutions == 0) begin
+                    end else if (fmt_num_solutions == 0) begin
                         state <= S_NO_ROOT_N;
                     end else begin
-                        number_q   <= solutions[0];
+                        number_q   <= fmt_solution0;
                         number_idx <= '0;
                         state      <= S_NUMBER_INIT;
                     end
@@ -242,10 +277,10 @@ module solver_to_ascii_full_decimal #(
                 end
 
                 S_AFTER_NUMBER: begin
-                    if (!is_const && (number_idx + 1'b1 < num_solutions)) begin
+                    if (!fmt_is_const && (number_idx + 1'b1 < fmt_num_solutions)) begin
                         append_char(",");
                         number_idx <= number_idx + 1'b1;
-                        number_q   <= solutions[number_idx + 1'b1];
+                        number_q   <= select_solution(number_idx + 1'b1);
                         state      <= S_NUMBER_INIT;
                     end else begin
                         state <= S_FINISH;

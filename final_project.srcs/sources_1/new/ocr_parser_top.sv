@@ -734,24 +734,23 @@ module ocr_parser_top
         .MAX_CHARS       (MAX_CHARS),
         .CHAR_CODE_WIDTH (CHAR_CODE_WIDTH),
         .MAX_SOLUTIONS   (5),
-        .DISPLAY_CHARS   (DISPLAY_CHARS),
-        .MAX_COEFFS      (6),
-        .COEFF_WIDTH     (16)
+        .DISPLAY_CHARS   (DISPLAY_CHARS)
     ) u_formatter (
-        .clk           (clk),
-        .reset         (reset),
-        .start         (format_start),
-        .equation_chars(solver_char_codes),
-        .equation_len  (solver_num_chars),
-        .solver_valid  (solver_valid_latched),
-        .is_const      (solver_is_const_latched),
-        .num_solutions (solver_num_solutions_latched),
-        .value         (solver_value_latched),
-        .solutions     (solver_solutions_latched),
-        .coefficients  (solver_coefficients_latched),
-        .result_chars  (result_chars),
-        .result_len    (result_len),
-        .result_valid  (result_valid)
+        .clk          (clk),
+        .reset        (reset),
+        .start        (format_start),
+        .solver_valid (solver_valid_latched),
+        .is_const     (solver_is_const_latched),
+        .num_solutions(solver_num_solutions_latched),
+        .value        (solver_value_latched),
+        .solution0    (solver_solutions_latched[0]),
+        .solution1    (solver_solutions_latched[1]),
+        .solution2    (solver_solutions_latched[2]),
+        .solution3    (solver_solutions_latched[3]),
+        .solution4    (solver_solutions_latched[4]),
+        .result_chars (result_chars),
+        .result_len   (result_len),
+        .result_valid (result_valid)
     );
 
     //==========================================================================
