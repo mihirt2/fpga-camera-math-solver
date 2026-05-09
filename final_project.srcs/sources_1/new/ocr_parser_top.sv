@@ -669,7 +669,7 @@ module ocr_parser_top
     solver #(
         .MAX_CHARS       (MAX_CHARS),
         .CHAR_CODE_WIDTH (CHAR_CODE_WIDTH),
-        .NUM_SAMPLES     (256),
+        .NUM_SAMPLES     (513),
         .MAX_SOLUTIONS   (5)
     ) u_solver (
         .clk           (clk),

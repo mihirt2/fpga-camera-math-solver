@@ -259,10 +259,11 @@ module top_level (
         .dbg_solver_valid    (dbg_solver_valid),
         .dbg_solver_valid_latched(dbg_solver_valid_latched),
 
-        // Debug binary image
-        .bin_dbg_en          (1'b0),
+        // Debug binary image: sw[8] shows live thresholded camera pixels.
+        .bin_dbg_en          (sw[8]),
         .bin_dbg_raddr       (bin_dbg_raddr_unused),
         .bin_dbg_rdata       (32'd0),
+        .bin_dbg_threshold   (threshold),
         // debug char
         .dbg_normalized_char (dbg_normalized_char),
         .dbg_norm_chars_flat (dbg_norm_chars_flat)

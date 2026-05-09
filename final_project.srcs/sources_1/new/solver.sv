@@ -4,7 +4,7 @@ import poly_pkg::*;
 module solver #(
     parameter int MAX_CHARS       = 10,
     parameter int CHAR_CODE_WIDTH = 8,
-    parameter int NUM_SAMPLES     = 256,
+    parameter int NUM_SAMPLES     = 513,
     parameter int MAX_SOLUTIONS   = 5
 )(
     input  logic                              clk,
@@ -22,10 +22,11 @@ module solver #(
     output coeff_t                            coefficients [0:MAX_DEGREE]
 );
     localparam int LAST_SAMPLE_IDX = NUM_SAMPLES - 1;
+    localparam int SWEEP_IDX_WIDTH = $clog2(NUM_SAMPLES + 1);
     localparam logic signed [63:0] ROOT_THRESHOLD = 64'sd65;
     localparam logic signed [31:0] Q16_ONE = 32'sd65536;
     localparam logic signed [31:0] Q16_MAX = 32'sh7fff_0000;
-    localparam logic signed [31:0] SWEEP_BOUND_Q16 = 32'sd2097152; // +/-32.0
+    localparam logic signed [31:0] SWEEP_BOUND_MAX_Q16 = 32'sd8388608; // +/-128.0
     localparam logic signed [63:0] EVAL_MAX = 64'sh7fff_ffff_ffff_ffff;
     localparam logic signed [63:0] EVAL_MIN = -64'sh7fff_ffff_ffff_ffff;
     localparam int BISECTION_ITERS = 16;
@@ -68,7 +69,7 @@ module solver #(
     eval_t                             prev_y;
     q16_t                              step_q;
     q16_t                              sweep_bound_q;
-    logic [9:0]                        sweep_idx;
+    logic [SWEEP_IDX_WIDTH-1:0]        sweep_idx;
     logic                              single_point_mode;
     logic                              in_root_region;
     logic                              flat_root_active;
@@ -192,6 +193,11 @@ module solver #(
     function automatic q16_t root_bound_q16(input q16_t coeffs [0:MAX_DEGREE]);
         integer idx;
         integer degree;
+        q16_t lead_abs;
+        q16_t max_lower_abs;
+        q16_t coeff_abs;
+        q16_t bound;
+        logic signed [63:0] scaled_lead;
         begin
             degree = 0;
             for (idx = 1; idx <= MAX_DEGREE; idx = idx + 1) begin
@@ -204,7 +210,35 @@ module solver #(
                 return '0;
             end
 
-            return SWEEP_BOUND_Q16;
+            lead_abs = q16_abs(coeffs[degree]);
+            max_lower_abs = '0;
+            for (idx = 0; idx < MAX_DEGREE; idx = idx + 1) begin
+                if (idx < degree) begin
+                    coeff_abs = q16_abs(coeffs[idx]);
+                    if (coeff_abs > max_lower_abs) begin
+                        max_lower_abs = coeff_abs;
+                    end
+                end
+            end
+
+            if ((lead_abs == '0) || (max_lower_abs == '0)) begin
+                return Q16_ONE;
+            end
+
+            bound = Q16_ONE;
+            for (idx = 0; idx < 7; idx = idx + 1) begin
+                scaled_lead = (64'(lead_abs) * 64'(bound)) >>> 16;
+                if ((scaled_lead < max_lower_abs) &&
+                    (bound < SWEEP_BOUND_MAX_Q16)) begin
+                    bound = q16_t'(bound <<< 1);
+                end
+            end
+
+            if (bound + Q16_ONE > SWEEP_BOUND_MAX_Q16) begin
+                return SWEEP_BOUND_MAX_Q16;
+            end else begin
+                return bound + Q16_ONE;
+            end
         end
     endfunction
 

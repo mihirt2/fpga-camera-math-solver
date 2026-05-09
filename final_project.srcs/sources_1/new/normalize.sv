@@ -57,6 +57,8 @@ module normalize
 
     logic [13:0] ox_times_w;
     logic [14:0] oy_times_h;
+    logic [14:0] ox_sample_num;
+    logic [15:0] oy_sample_num;
 
     localparam int MIN_THIN_BBOX_H = 8;
     localparam int MAX_Y_ORIGIN_FOR_THIN = IMG_H - MIN_THIN_BBOX_H;
@@ -110,6 +112,8 @@ module normalize
 
     assign ox_times_w = {10'b0, ox} * {4'b0, bbox_w};
     assign oy_times_h = {10'b0, oy} * {5'b0, bbox_h};
+    assign ox_sample_num = {1'b0, ox_times_w} + {6'b0, bbox_w[9:1]};
+    assign oy_sample_num = {1'b0, oy_times_h} + {7'b0, bbox_h[9:1]};
 
     always_comb begin
         state_next   = state;
@@ -212,8 +216,8 @@ module normalize
             end
 
             if (state == N_ADDR) begin
-                src_x_r <= bbox_x_min + ox_times_w[13:4];
-                src_y_r <= bbox_y_start + oy_times_h[12:5];
+                src_x_r <= bbox_x_min + ox_sample_num[13:4];
+                src_y_r <= bbox_y_start + oy_sample_num[12:5];
             end
 
             if (state == N_READ) begin

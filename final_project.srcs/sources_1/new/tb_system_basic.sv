@@ -6,7 +6,7 @@ module tb_system_basic;
     localparam int MAX_CHARS = 10;
     localparam int CHAR_CODE_WIDTH = 8;
     localparam int MAX_SOLUTIONS = 5;
-    localparam int NUM_SAMPLES = 256;
+    localparam int NUM_SAMPLES = 513;
     localparam int DISPLAY_CHARS = 20;
     localparam int CLK_PERIOD = 10;
 
@@ -254,6 +254,15 @@ module tb_system_basic;
         char_codes[2] = 8'd2;
         num_chars = 3;
         run_case("x^2");
+
+        clear_inputs();
+        char_codes[0] = TOK_X;
+        char_codes[1] = TOK_POW;
+        char_codes[2] = 8'd2;
+        char_codes[3] = TOK_ADD;
+        char_codes[4] = 8'd1;
+        num_chars = 5;
+        run_case("x^2+1");
 
         clear_inputs();
         char_codes[0] = 8'd3;

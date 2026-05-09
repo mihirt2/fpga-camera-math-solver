@@ -42,13 +42,14 @@ module solver_to_ascii #(
         S_NUMBER_WRITE_DOT,
         S_NUMBER_WRITE_FRAC,
         S_NUMBER_WRITE_FRAC2,
+        S_NUMBER_WRITE_FRAC3,
         S_AFTER_NUMBER,
         S_FINISH
     } state_t;
 
     typedef enum logic [1:0] {
         MSG_ERR,
-        MSG_NO_ROOT
+        MSG_NO_SOLUTION
     } msg_t;
 
     state_t state;
@@ -59,24 +60,28 @@ module solver_to_ascii #(
     logic [3:0] msg_idx;
     logic [1:0] number_idx;
     logic signed [31:0] number_q;
-    logic [13:0] number_rem;
+    logic [16:0] number_rem;
     logic [3:0] tens_digit;
     logic [3:0] ones_digit;
     logic [3:0] frac_tens_digit;
+    logic [3:0] frac_hundredths_digit;
     logic       number_negative;
 
     logic [31:0] number_abs;
-    logic [31:0] scaled_hundredths_full;
-    logic [13:0] scaled_hundredths;
+    logic [47:0] scaled_thousandths_full;
+    logic [16:0] scaled_thousandths;
 
     always_comb begin
         number_abs = number_q[31] ? (~number_q + 32'd1) : number_q;
-        scaled_hundredths_full = ((number_abs << 6)
-                                + (number_abs << 5)
-                                + (number_abs << 2)
-                                + 32'd32768) >> 16;
-        scaled_hundredths = (scaled_hundredths_full > 32'd9999) ? 14'd9999
-                                                                : scaled_hundredths_full[13:0];
+        scaled_thousandths_full = (((48'(number_abs) << 9)
+                                  + (48'(number_abs) << 8)
+                                  + (48'(number_abs) << 7)
+                                  + (48'(number_abs) << 6)
+                                  + (48'(number_abs) << 5)
+                                  + (48'(number_abs) << 3)
+                                  + 48'd32768) >> 16);
+        scaled_thousandths = (scaled_thousandths_full > 48'd99999) ? 17'd99999
+                                                                   : scaled_thousandths_full[16:0];
     end
 
     function automatic logic [7:0] token_to_ascii(input logic [CHAR_CODE_WIDTH-1:0] token);
@@ -119,10 +124,14 @@ module solver_to_ascii #(
                     4'd0:    msg_char = "N";
                     4'd1:    msg_char = "O";
                     4'd2:    msg_char = " ";
-                    4'd3:    msg_char = "R";
+                    4'd3:    msg_char = "S";
                     4'd4:    msg_char = "O";
-                    4'd5:    msg_char = "O";
-                    4'd6:    msg_char = "T";
+                    4'd5:    msg_char = "L";
+                    4'd6:    msg_char = "U";
+                    4'd7:    msg_char = "T";
+                    4'd8:    msg_char = "I";
+                    4'd9:    msg_char = "O";
+                    4'd10:   msg_char = "N";
                     default: msg_char = 8'h00;
                 endcase
             end
@@ -153,6 +162,7 @@ module solver_to_ascii #(
             tens_digit      <= '0;
             ones_digit      <= '0;
             frac_tens_digit <= '0;
+            frac_hundredths_digit <= '0;
             number_negative <= 1'b0;
 
             for (i = 0; i < DISPLAY_CHARS; i = i + 1)
@@ -194,7 +204,7 @@ module solver_to_ascii #(
                     end else if (is_const) begin
                         state <= S_CONST_PREFIX_VALUE;
                     end else if (num_solutions == 0) begin
-                        msg_sel <= MSG_NO_ROOT;
+                        msg_sel <= MSG_NO_SOLUTION;
                         msg_idx <= '0;
                         state   <= S_MSG;
                     end else begin
@@ -237,10 +247,11 @@ module solver_to_ascii #(
 
                 S_NUMBER_INIT: begin
                     number_negative <= number_q[31];
-                    number_rem      <= scaled_hundredths;
+                    number_rem      <= scaled_thousandths;
                     tens_digit      <= '0;
                     ones_digit      <= '0;
                     frac_tens_digit <= '0;
+                    frac_hundredths_digit <= '0;
 
                     if (number_q[31])
                         append_char("-");
@@ -249,8 +260,8 @@ module solver_to_ascii #(
                 end
 
                 S_NUMBER_TENS: begin
-                    if (number_rem >= 14'd1000) begin
-                        number_rem <= number_rem - 14'd1000;
+                    if (number_rem >= 17'd10000) begin
+                        number_rem <= number_rem - 17'd10000;
                         tens_digit <= tens_digit + 1'b1;
                     end else begin
                         state <= S_NUMBER_ONES;
@@ -258,8 +269,8 @@ module solver_to_ascii #(
                 end
 
                 S_NUMBER_ONES: begin
-                    if (number_rem >= 14'd100) begin
-                        number_rem <= number_rem - 14'd100;
+                    if (number_rem >= 17'd1000) begin
+                        number_rem <= number_rem - 17'd1000;
                         ones_digit <= ones_digit + 1'b1;
                     end else begin
                         state <= S_NUMBER_WRITE_TENS;
@@ -283,8 +294,8 @@ module solver_to_ascii #(
                 end
 
                 S_NUMBER_WRITE_FRAC: begin
-                    if (number_rem >= 14'd10) begin
-                        number_rem      <= number_rem - 14'd10;
+                    if (number_rem >= 17'd100) begin
+                        number_rem      <= number_rem - 17'd100;
                         frac_tens_digit <= frac_tens_digit + 1'b1;
                     end else begin
                         append_char(8'h30 + {4'd0, frac_tens_digit});
@@ -293,6 +304,16 @@ module solver_to_ascii #(
                 end
 
                 S_NUMBER_WRITE_FRAC2: begin
+                    if (number_rem >= 17'd10) begin
+                        number_rem <= number_rem - 17'd10;
+                        frac_hundredths_digit <= frac_hundredths_digit + 1'b1;
+                    end else begin
+                        append_char(8'h30 + {4'd0, frac_hundredths_digit});
+                        state <= S_NUMBER_WRITE_FRAC3;
+                    end
+                end
+
+                S_NUMBER_WRITE_FRAC3: begin
                     append_char(8'h30 + {4'd0, number_rem[3:0]});
                     state <= S_AFTER_NUMBER;
                 end

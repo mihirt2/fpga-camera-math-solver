@@ -33,9 +33,10 @@ module hdmi_text_controller_v1_0 #
     output logic [1 : 0] axi_rresp,
     output logic  axi_rvalid,
     input logic  axi_rready,
-    input  logic        bin_dbg_en,       // sw[8]: show binary instead of camera
-    output logic [13:0] bin_dbg_raddr,    // address into binary frame buffer
-    input  logic [31:0] bin_dbg_rdata,    // 32 packed pixels from binary FB
+    input  logic        bin_dbg_en,       // sw[8]: show thresholded binary view
+    output logic [13:0] bin_dbg_raddr,    // legacy binary FB debug address
+    input  logic [31:0] bin_dbg_rdata,    // legacy binary FB debug data
+    input  logic [7:0]  bin_dbg_threshold,
     
     // Camera frame buffer write port
     input logic        cam_pclk,
@@ -193,6 +194,8 @@ logic [7:0]  cam_src_y;
     // Extract the single pixel from the 32-bit word
     logic bin_dbg_pixel;
     assign bin_dbg_pixel = bin_dbg_rdata[bin_dbg_bit_r];
+    logic live_bin_dbg_pixel;
+    assign live_bin_dbg_pixel = (cam_pixel < bin_dbg_threshold);
 assign in_cam_region = (drawX >= CAM_VIEW_X[9:0])
                     && (drawX < (CAM_VIEW_X + CAM_VIEW_W))
                     && (drawY >= CAM_VIEW_Y[9:0])
@@ -790,7 +793,7 @@ logic        ocr_in_bar;       // pixel is in the text bar background
 assign ocr_result_len_ext = {1'b0, ocr_result_len};
 assign ocr_visible_len = (ocr_result_len_ext > TEXT_MAX_CHARS_6) ? TEXT_MAX_CHARS_6
                                                                  : ocr_result_len_ext;
-assign ocr_text_start_slot = TEXT_MAX_CHARS_6 - ocr_visible_len;
+assign ocr_text_start_slot = '0;
 assign ocr_rel_x     = drawX - CAM_VIEW_X[9:0];
 assign ocr_slot_abs  = ocr_rel_x[9:4];                // camera-relative x / 16
 assign ocr_char_slot = ocr_slot_abs - ocr_text_start_slot;
@@ -896,10 +899,10 @@ always_comb begin
         blue  = 8'h00;
     end
     else if (bin_dbg_en_r) begin
-        // binary debug view: white = ink pixel, black = background
-        red   = bin_dbg_pixel ? 8'hFF : 8'h00;
-        green = bin_dbg_pixel ? 8'hFF : 8'h00;
-        blue  = bin_dbg_pixel ? 8'hFF : 8'h00;
+        // Live binary debug view: white = ink pixel, black = background.
+        red   = live_bin_dbg_pixel ? 8'hFF : 8'h00;
+        green = live_bin_dbg_pixel ? 8'hFF : 8'h00;
+        blue  = live_bin_dbg_pixel ? 8'hFF : 8'h00;
     end
     else if (cam_mode && in_cam_active_region_r) begin
         // normal camera grayscale
