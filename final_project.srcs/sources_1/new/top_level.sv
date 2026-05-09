@@ -53,6 +53,21 @@ module top_level (
     logic dbg_parse_wait_timeout;
     logic dbg_solver_valid;
     logic dbg_solver_valid_latched;
+    logic [3:0]  stage_dbg;
+    logic        busy;
+    logic capture_meta;
+    logic capture_sync;
+    logic capture_sync_d;
+    logic capture_armed;
+    logic capture_request;
+    logic cam_frame_done_meta;
+    logic cam_frame_done_sync;
+    logic cam_frame_done_sync_d;
+    logic ocr_trigger;
+    logic freeze_camera_frame;
+    logic freeze_camera_frame_pclk_meta;
+    logic freeze_camera_frame_pclk;
+    logic cam_we_to_framebuffer;
     logic uart_dump_start;
     logic uart_dump_busy;
     logic external_dump_start;
@@ -102,6 +117,60 @@ module top_level (
         .frame_done  (cam_frame_done)
     );
 
+    always_ff @(posedge clk_100MHz) begin
+        if (reset_ah) begin
+            capture_meta          <= 1'b0;
+            capture_sync          <= 1'b0;
+            capture_sync_d        <= 1'b0;
+            capture_armed         <= 1'b1;
+            capture_request       <= 1'b0;
+            cam_frame_done_meta   <= 1'b0;
+            cam_frame_done_sync   <= 1'b0;
+            cam_frame_done_sync_d <= 1'b0;
+            ocr_trigger           <= 1'b0;
+            freeze_camera_frame   <= 1'b0;
+        end else begin
+            capture_meta          <= capture;
+            capture_sync          <= capture_meta;
+            capture_sync_d        <= capture_sync;
+            cam_frame_done_meta   <= cam_frame_done;
+            cam_frame_done_sync   <= cam_frame_done_meta;
+            cam_frame_done_sync_d <= cam_frame_done_sync;
+            ocr_trigger           <= 1'b0;
+
+            if (!capture_sync)
+                capture_armed <= 1'b1;
+            else if (capture_sync && !capture_sync_d && capture_armed) begin
+                capture_request <= 1'b1;
+                capture_armed   <= 1'b0;
+            end
+
+            if (capture_request &&
+                cam_frame_done_sync && !cam_frame_done_sync_d &&
+                !busy) begin
+                ocr_trigger         <= 1'b1;
+                capture_request     <= 1'b0;
+                freeze_camera_frame <= 1'b1;
+            end else if (freeze_camera_frame && busy && (stage_dbg != 4'd1)) begin
+                freeze_camera_frame <= 1'b0;
+            end else if (!busy && !ocr_trigger) begin
+                freeze_camera_frame <= 1'b0;
+            end
+        end
+    end
+
+    always_ff @(posedge cam_pclk_0) begin
+        if (reset_ah) begin
+            freeze_camera_frame_pclk_meta <= 1'b0;
+            freeze_camera_frame_pclk      <= 1'b0;
+        end else begin
+            freeze_camera_frame_pclk_meta <= freeze_camera_frame;
+            freeze_camera_frame_pclk      <= freeze_camera_frame_pclk_meta;
+        end
+    end
+
+    assign cam_we_to_framebuffer = cam_we_sig && !freeze_camera_frame_pclk;
+
     // =========================================================================
     // HDMI CONTROLLER
     // =========================================================================
@@ -114,8 +183,6 @@ module top_level (
     logic [7:0]  result_chars [0:DISPLAY_CHARS-1];
     logic [$clog2(DISPLAY_CHARS+1)-1:0] result_len;
     logic        result_valid;
-    logic [3:0]  stage_dbg;
-    logic        busy;
 
     // -- Debug bbox signals ---------------------------------------------------
     logic [35:0]                   dbg_bboxes [0:MAX_CHARS-1];
@@ -173,7 +240,7 @@ module top_level (
         .cam_pclk            (cam_pclk_0),
         .cam_wr_addr         (cam_wr_addr),
         .cam_wr_data         (cam_wr_data),
-        .cam_we              (cam_we_sig),
+        .cam_we              (cam_we_to_framebuffer),
 
         // OCR read port into camera frame buffer
         .ocr_rd_addr         (cam_rd_addr),
@@ -211,7 +278,7 @@ module top_level (
     ) u_ocr (
         .clk           (clk_100MHz),
         .reset         (reset_ah),
-        .trigger       (capture),
+        .trigger       (ocr_trigger),
 
         .cam_rd_addr   (cam_rd_addr),
         .cam_rd_data   (cam_rd_data),
@@ -289,7 +356,8 @@ module top_level (
             2'd1: led = {11'd0, dbg_num_chars};
             2'd2: led = {1'b0, dbg_selected_char_code, dbg_selected_match_dist};
             2'd3: led = {cam_init_done, cam_frame_done, busy, result_valid,
-             uart_dump_busy, norm_any_pixel, 2'd0, threshold};
+             uart_dump_busy, norm_any_pixel, capture_request,
+             freeze_camera_frame, threshold};
         endcase
     end
 

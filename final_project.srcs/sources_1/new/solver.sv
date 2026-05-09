@@ -25,6 +25,7 @@ module solver #(
     localparam logic signed [63:0] ROOT_THRESHOLD = 64'sd65;
     localparam logic signed [31:0] Q16_ONE = 32'sd65536;
     localparam logic signed [31:0] Q16_MAX = 32'sh7fff_0000;
+    localparam logic signed [31:0] SWEEP_BOUND_Q16 = 32'sd2097152; // +/-32.0
     localparam logic signed [63:0] EVAL_MAX = 64'sh7fff_ffff_ffff_ffff;
     localparam logic signed [63:0] EVAL_MIN = -64'sh7fff_ffff_ffff_ffff;
     localparam int BISECTION_ITERS = 16;
@@ -33,10 +34,16 @@ module solver #(
     typedef logic signed [63:0] eval_t;
     typedef logic signed [95:0] wide_eval_t;
 
-    typedef enum logic [3:0] {
+    typedef enum logic [4:0] {
         IDLE,
         START_PARSE,
         WAIT_PARSE,
+        SOLVE_EXACT,
+        EXACT_SQRT_STEP,
+        EXACT_SQRT_DONE,
+        EXACT_DIV_INIT,
+        EXACT_DIV_STEP,
+        EXACT_DIV_DONE,
         INIT_SWEEP,
         CHECK_SAMPLE,
         REFINE_STEP,
@@ -70,6 +77,30 @@ module solver #(
     logic                              near_zero_hit;
     logic                              sign_change_hit;
     logic                              root_hit;
+    logic [2:0]                        polynomial_degree;
+    eval_t                             exact_quad_disc;
+    eval_t                             exact_quad_denom;
+    eval_t                             exact_quad_mid_num;
+    logic [63:0]                       exact_quad_sqrt_input;
+    logic [31:0]                       exact_quad_sqrt_q16;
+    q16_t                              exact_quad_root_a;
+    q16_t                              exact_quad_root_b;
+    logic [63:0]                       sqrt_num;
+    logic [63:0]                       sqrt_result;
+    logic [63:0]                       sqrt_bit_value;
+    logic [5:0]                        sqrt_iter;
+    eval_t                             div_numerator;
+    eval_t                             div_denominator;
+    logic                              div_negative;
+    logic [63:0]                       div_abs_num;
+    logic [63:0]                       div_abs_den;
+    logic [63:0]                       div_remainder;
+    logic [63:0]                       div_quotient;
+    logic [5:0]                        div_bit_idx;
+    logic [6:0]                        div_steps_left;
+    logic [1:0]                        div_result_target;
+    logic [63:0]                       div_shifted_remainder;
+    q16_t                              div_result_q16;
     q16_t                              refine_lo;
     q16_t                              refine_hi;
     eval_t                             refine_f_lo;
@@ -95,6 +126,14 @@ module solver #(
             return -value;
         end else begin
             return value;
+        end
+    endfunction
+
+    function automatic logic [63:0] eval_abs_u64(input eval_t value);
+        if (value < 0) begin
+            return $unsigned(-value);
+        end else begin
+            return $unsigned(value);
         end
     endfunction
 
@@ -151,10 +190,6 @@ module solver #(
     endfunction
 
     function automatic q16_t root_bound_q16(input q16_t coeffs [0:MAX_DEGREE]);
-        q16_t lead_abs;
-        q16_t max_lower_abs;
-        q16_t coeff_abs;
-        logic signed [63:0] ratio_q16;
         integer idx;
         integer degree;
         begin
@@ -169,27 +204,7 @@ module solver #(
                 return '0;
             end
 
-            lead_abs = q16_abs(coeffs[degree]);
-            max_lower_abs = '0;
-            for (idx = 0; idx <= MAX_DEGREE; idx = idx + 1) begin
-                if (idx < degree) begin
-                    coeff_abs = q16_abs(coeffs[idx]);
-                    if (coeff_abs > max_lower_abs) begin
-                        max_lower_abs = coeff_abs;
-                    end
-                end
-            end
-
-            if (lead_abs == '0) begin
-                return Q16_ONE;
-            end
-
-            ratio_q16 = (64'(max_lower_abs) <<< 16) / lead_abs;
-            if (ratio_q16 + Q16_ONE > Q16_MAX) begin
-                return Q16_MAX;
-            end else begin
-                return q16_t'(ratio_q16 + Q16_ONE);
-            end
+            return SWEEP_BOUND_Q16;
         end
     endfunction
 
@@ -223,6 +238,30 @@ module solver #(
         sign_change_hit = (sweep_idx != 0) &&
                           signs_differ(prev_y, current_y);
         root_hit = near_zero_hit || sign_change_hit;
+
+        exact_quad_disc = (eval_t'(coefficients[1]) * eval_t'(coefficients[1])) -
+                          (64'sd4 * eval_t'(coefficients[2]) *
+                           eval_t'(coefficients[0]));
+        exact_quad_denom = eval_t'(coefficients[2]) * 64'sd2;
+        exact_quad_mid_num = -(eval_t'(coefficients[1]) <<< 16);
+        if (exact_quad_disc <= 64'sd0) begin
+            exact_quad_sqrt_input = '0;
+        end else if (exact_quad_disc[63:32] != 32'd0) begin
+            exact_quad_sqrt_input = {64{1'b1}};
+        end else begin
+            exact_quad_sqrt_input = {exact_quad_disc[31:0], 32'd0};
+        end
+
+        div_shifted_remainder = {div_remainder[62:0], div_abs_num[div_bit_idx]};
+        if (div_denominator == 64'sd0) begin
+            div_result_q16 = '0;
+        end else if (div_quotient > 64'd2147483647) begin
+            div_result_q16 = div_negative ? -32'sh7fff_ffff : 32'sh7fff_ffff;
+        end else if (div_negative) begin
+            div_result_q16 = -q16_t'(div_quotient[31:0]);
+        end else begin
+            div_result_q16 = q16_t'(div_quotient[31:0]);
+        end
     end
 
     always_ff @(posedge clk) begin
@@ -245,10 +284,28 @@ module solver #(
             flat_root_active <= 1'b0;
             flat_root_start  <= '0;
             candidate_root   <= '0;
+            polynomial_degree <= '0;
             refine_lo        <= '0;
             refine_hi        <= '0;
             refine_f_lo      <= '0;
             refine_iter      <= '0;
+            exact_quad_sqrt_q16 <= '0;
+            exact_quad_root_a <= '0;
+            exact_quad_root_b <= '0;
+            sqrt_num <= '0;
+            sqrt_result <= '0;
+            sqrt_bit_value <= '0;
+            sqrt_iter <= '0;
+            div_numerator <= '0;
+            div_denominator <= '0;
+            div_negative <= 1'b0;
+            div_abs_num <= '0;
+            div_abs_den <= '0;
+            div_remainder <= '0;
+            div_quotient <= '0;
+            div_bit_idx <= '0;
+            div_steps_left <= '0;
+            div_result_target <= '0;
 
             for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
                 coeffs_q[i] <= '0;
@@ -278,10 +335,28 @@ module solver #(
                     flat_root_active  <= 1'b0;
                     flat_root_start   <= '0;
                     candidate_root    <= '0;
+                    polynomial_degree <= '0;
                     refine_lo         <= '0;
                     refine_hi         <= '0;
                     refine_f_lo       <= '0;
                     refine_iter       <= '0;
+                    exact_quad_sqrt_q16 <= '0;
+                    exact_quad_root_a <= '0;
+                    exact_quad_root_b <= '0;
+                    sqrt_num <= '0;
+                    sqrt_result <= '0;
+                    sqrt_bit_value <= '0;
+                    sqrt_iter <= '0;
+                    div_numerator <= '0;
+                    div_denominator <= '0;
+                    div_negative <= 1'b0;
+                    div_abs_num <= '0;
+                    div_abs_den <= '0;
+                    div_remainder <= '0;
+                    div_quotient <= '0;
+                    div_bit_idx <= '0;
+                    div_steps_left <= '0;
+                    div_result_target <= '0;
 
                     for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
                         coeffs_q[i] <= '0;
@@ -308,24 +383,159 @@ module solver #(
                         if (parser_valid && !parser_error) begin
                             value    <= int_to_q16(parsed_poly[0]);
                             is_const <= 1'b1;
+                            polynomial_degree <= '0;
                             for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
                                 coeffs_q[i] <= int_to_q16(parsed_poly[i]);
                                 coefficients[i] <= parsed_poly[i];
                                 if ((i != 0) && (parsed_poly[i] != '0)) begin
                                     is_const <= 1'b0;
+                                    polynomial_degree <= 3'(i);
                                 end
                             end
-                            state <= INIT_SWEEP;
+                            state <= SOLVE_EXACT;
                         end else begin
                             done  <= 1'b1;
                             valid <= 1'b0;
                             is_const <= 1'b0;
                             value <= '0;
+                            polynomial_degree <= '0;
                             for (i = 0; i <= MAX_DEGREE; i = i + 1) begin
                                 coefficients[i] <= '0;
                             end
                             state <= FINISH_ERR;
                         end
+                    end
+                end
+
+                SOLVE_EXACT: begin
+                    num_solutions <= '0;
+                    for (i = 0; i < MAX_SOLUTIONS; i = i + 1) begin
+                        solutions[i] <= '0;
+                    end
+
+                    if (polynomial_degree == 0) begin
+                        done  <= 1'b1;
+                        valid <= 1'b1;
+                        state <= FINISH_OK;
+                    end else if (polynomial_degree == 1) begin
+                        div_numerator     <= -(eval_t'(coefficients[0]) <<< 16);
+                        div_denominator   <= eval_t'(coefficients[1]);
+                        div_result_target <= 2'd0;
+                        state             <= EXACT_DIV_INIT;
+                    end else if (polynomial_degree == 2) begin
+                        if (exact_quad_disc < 64'sd0) begin
+                            num_solutions <= '0;
+                            done          <= 1'b1;
+                            valid         <= 1'b1;
+                            state         <= FINISH_OK;
+                        end else if (exact_quad_disc == 64'sd0) begin
+                            div_numerator     <= exact_quad_mid_num;
+                            div_denominator   <= exact_quad_denom;
+                            div_result_target <= 2'd1;
+                            state             <= EXACT_DIV_INIT;
+                        end else begin
+                            sqrt_num       <= exact_quad_sqrt_input;
+                            sqrt_result    <= '0;
+                            sqrt_bit_value <= 64'h4000_0000_0000_0000;
+                            sqrt_iter      <= '0;
+                            state          <= EXACT_SQRT_STEP;
+                        end
+                    end else begin
+                        state <= INIT_SWEEP;
+                    end
+                end
+
+                EXACT_SQRT_STEP: begin
+                    if (sqrt_num >= sqrt_result + sqrt_bit_value) begin
+                        sqrt_num    <= sqrt_num - (sqrt_result + sqrt_bit_value);
+                        sqrt_result <= (sqrt_result >> 1) + sqrt_bit_value;
+                    end else begin
+                        sqrt_result <= sqrt_result >> 1;
+                    end
+
+                    sqrt_bit_value <= sqrt_bit_value >> 2;
+                    if (sqrt_iter == 6'd31) begin
+                        state <= EXACT_SQRT_DONE;
+                    end else begin
+                        sqrt_iter <= sqrt_iter + 1'b1;
+                    end
+                end
+
+                EXACT_SQRT_DONE: begin
+                    exact_quad_sqrt_q16 <= sqrt_result[31:0];
+                    div_numerator       <= exact_quad_mid_num -
+                                           eval_t'({32'd0, sqrt_result[31:0]});
+                    div_denominator     <= exact_quad_denom;
+                    div_result_target   <= 2'd2;
+                    state               <= EXACT_DIV_INIT;
+                end
+
+                EXACT_DIV_INIT: begin
+                    div_negative   <= div_numerator[63] ^ div_denominator[63];
+                    div_abs_num    <= eval_abs_u64(div_numerator);
+                    div_abs_den    <= eval_abs_u64(div_denominator);
+                    div_remainder  <= '0;
+                    div_quotient   <= '0;
+                    div_bit_idx    <= 6'd63;
+                    div_steps_left <= 7'd64;
+                    state          <= EXACT_DIV_STEP;
+                end
+
+                EXACT_DIV_STEP: begin
+                    if (div_abs_den == 64'd0) begin
+                        state <= EXACT_DIV_DONE;
+                    end else if (div_steps_left == 7'd0) begin
+                        state <= EXACT_DIV_DONE;
+                    end else begin
+                        if (div_shifted_remainder >= div_abs_den) begin
+                            div_remainder <= div_shifted_remainder - div_abs_den;
+                            div_quotient[div_bit_idx] <= 1'b1;
+                        end else begin
+                            div_remainder <= div_shifted_remainder;
+                        end
+
+                        div_steps_left <= div_steps_left - 1'b1;
+                        if (div_steps_left == 7'd1) begin
+                            state <= EXACT_DIV_DONE;
+                        end else begin
+                            div_bit_idx <= div_bit_idx - 1'b1;
+                        end
+                    end
+                end
+
+                EXACT_DIV_DONE: begin
+                    if (div_result_target == 2'd0) begin
+                        solutions[0]  <= div_result_q16;
+                        num_solutions <= 3'd1;
+                        done          <= 1'b1;
+                        valid         <= 1'b1;
+                        state         <= FINISH_OK;
+                    end else if (div_result_target == 2'd1) begin
+                        solutions[0]  <= div_result_q16;
+                        num_solutions <= 3'd1;
+                        done          <= 1'b1;
+                        valid         <= 1'b1;
+                        state         <= FINISH_OK;
+                    end else if (div_result_target == 2'd2) begin
+                        exact_quad_root_a <= div_result_q16;
+                        div_numerator     <= exact_quad_mid_num +
+                                             eval_t'({32'd0, exact_quad_sqrt_q16});
+                        div_denominator   <= exact_quad_denom;
+                        div_result_target <= 2'd3;
+                        state             <= EXACT_DIV_INIT;
+                    end else begin
+                        exact_quad_root_b <= div_result_q16;
+                        if (exact_quad_root_a <= div_result_q16) begin
+                            solutions[0] <= exact_quad_root_a;
+                            solutions[1] <= div_result_q16;
+                        end else begin
+                            solutions[0] <= div_result_q16;
+                            solutions[1] <= exact_quad_root_a;
+                        end
+                        num_solutions <= 3'd2;
+                        done          <= 1'b1;
+                        valid         <= 1'b1;
+                        state         <= FINISH_OK;
                     end
                 end
 
@@ -423,7 +633,8 @@ module solver #(
                 end
 
                 STORE_ROOT: begin
-                    if (int'(num_solutions) < MAX_SOLUTIONS) begin
+                    if ((int'(num_solutions) < MAX_SOLUTIONS) &&
+                        (num_solutions < polynomial_degree)) begin
                         solutions[num_solutions] <= candidate_root;
                         num_solutions            <= num_solutions + 1'b1;
                     end

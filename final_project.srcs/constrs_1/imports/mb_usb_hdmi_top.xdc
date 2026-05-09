@@ -32,7 +32,10 @@ set_property -dict { PACKAGE_PIN K16 IOSTANDARD LVCMOS33 } [get_ports {cam_d_0[5
 set_property -dict { PACKAGE_PIN H17 IOSTANDARD LVCMOS33 } [get_ports {cam_d_0[6]}]
 set_property -dict { PACKAGE_PIN H16 IOSTANDARD LVCMOS33 } [get_ports {cam_d_0[7]}]
 
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets cam_pclk_0_IBUF]
+set cam_pclk_ibuf_nets [get_nets -quiet cam_pclk_0_IBUF]
+if {[llength $cam_pclk_ibuf_nets] > 0} {
+    set_property CLOCK_DEDICATED_ROUTE FALSE $cam_pclk_ibuf_nets
+}
 create_clock -period 41.667 -name cam_pclk [get_ports cam_pclk_0]
 set_false_path -from [get_clocks cam_pclk] -to [get_clocks *]
 set_false_path -from [get_clocks *] -to [get_clocks cam_pclk]

@@ -553,6 +553,21 @@ module ocr_parser_top
     logic [CHAR_CODE_WIDTH-1:0] char_codes [0:MAX_CHARS-1];
     logic [9:0] match_dist_history [0:MAX_CHARS-1];
     logic preclassified_slot [0:MAX_CHARS-1];
+    logic [CHAR_CODE_WIDTH-1:0] solver_char_codes [0:MAX_CHARS-1];
+    logic [$clog2(MAX_CHARS+1)-1:0] solver_num_chars;
+    logic                            solver_valid;
+    logic                            solver_is_const;
+    logic [2:0]                      solver_num_solutions;
+    logic signed [31:0]              solver_value;
+    logic signed [31:0]              solver_solutions [0:4];
+    logic signed [15:0]              solver_coefficients [0:5];
+    logic                            solver_valid_latched;
+    logic                            solver_is_const_latched;
+    logic [2:0]                      solver_num_solutions_latched;
+    logic signed [31:0]              solver_value_latched;
+    logic signed [31:0]              solver_solutions_latched [0:4];
+    logic signed [15:0]              solver_coefficients_latched [0:5];
+    logic                            solver_outputs_latched;
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -621,22 +636,6 @@ module ocr_parser_top
     //==========================================================================
     // STAGE 5: SOLVE
     //==========================================================================
-    logic [CHAR_CODE_WIDTH-1:0] solver_char_codes [0:MAX_CHARS-1];
-    logic [$clog2(MAX_CHARS+1)-1:0] solver_num_chars;
-    logic                            solver_valid;
-    logic                            solver_is_const;
-    logic [2:0]                      solver_num_solutions;
-    logic signed [31:0]              solver_value;
-    logic signed [31:0]              solver_solutions [0:4];
-    logic signed [15:0]              solver_coefficients [0:5];
-    logic                            solver_valid_latched;
-    logic                            solver_is_const_latched;
-    logic [2:0]                      solver_num_solutions_latched;
-    logic signed [31:0]              solver_value_latched;
-    logic signed [31:0]              solver_solutions_latched [0:4];
-    logic signed [15:0]              solver_coefficients_latched [0:5];
-    logic                            solver_outputs_latched;
-
     always_comb begin
         int compact_idx;
 

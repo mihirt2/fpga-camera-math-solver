@@ -49,6 +49,7 @@ module shunting_yard #(
     logic                       pending_has_x;
     logic                       expect_operand;
     logic                       pending_op_consumes_input;
+    logic                       pending_insert_mul_after_emit;
     logic                       last_token_was_rparen;
     logic [$clog2(MAX_CHARS+1)-1:0] op_top;
     logic [$clog2(MAX_CHARS+1)-1:0] in_idx;
@@ -105,6 +106,7 @@ module shunting_yard #(
             pending_has_x  <= 1'b0;
             expect_operand <= 1'b1;
             pending_op_consumes_input <= 1'b0;
+            pending_insert_mul_after_emit <= 1'b0;
             last_token_was_rparen <= 1'b0;
 
             for (i = 0; i < MAX_CHARS; i = i + 1) begin
@@ -131,6 +133,7 @@ module shunting_yard #(
                         pending_has_x  <= 1'b0;
                         expect_operand <= 1'b1;
                         pending_op_consumes_input <= 1'b0;
+                        pending_insert_mul_after_emit <= 1'b0;
                         last_token_was_rparen <= 1'b0;
 
                         for (i = 0; i < MAX_CHARS; i = i + 1) begin
@@ -241,9 +244,8 @@ module shunting_yard #(
                                              coeff_t'(infix_chars[in_idx]);
                             in_idx        <= in_idx + 1'b1;
                         end else if (infix_chars[in_idx] == VAR_X) begin
-                            pending_has_x <= 1'b1;
-                            in_idx        <= in_idx + 1'b1;
-                            state         <= EMIT_OPERAND;
+                            pending_insert_mul_after_emit <= 1'b1;
+                            state                         <= EMIT_OPERAND;
                         end else begin
                             state <= EMIT_OPERAND;
                         end
@@ -264,9 +266,18 @@ module shunting_yard #(
                         postfix_coeffs[out_idx]      <= pending_coeff;
                         postfix_has_x[out_idx]       <= pending_has_x;
                         out_idx                      <= out_idx + 1'b1;
-                        expect_operand               <= 1'b0;
-                        last_token_was_rparen       <= 1'b0;
-                        state                        <= PROCESS;
+                        last_token_was_rparen        <= 1'b0;
+
+                        if (pending_insert_mul_after_emit) begin
+                            pending_op                    <= OP_MUL;
+                            pending_op_consumes_input     <= 1'b0;
+                            pending_insert_mul_after_emit <= 1'b0;
+                            expect_operand                <= 1'b0;
+                            state                         <= POP_FOR_OPERATOR;
+                        end else begin
+                            expect_operand                <= 1'b0;
+                            state                         <= PROCESS;
+                        end
                     end
                 end
 

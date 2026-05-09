@@ -9,7 +9,7 @@ from capture_uart_norm import IMG_H, IMG_W, choose_serial_port, read_frame
 from new_train_cnn import BetterMathCNN, build_transform, hw_char_code
 
 
-DEFAULT_MODEL = Path("ocr_training/models/best_model.pt")
+DEFAULT_MODEL = Path("ocr_training/models/new_model.pt")
 
 
 def rows_to_image(rows: list[str]) -> Image.Image:

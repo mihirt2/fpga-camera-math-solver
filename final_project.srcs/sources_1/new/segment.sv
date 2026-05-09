@@ -32,6 +32,9 @@ module segment
     localparam int MIN_GAP        = 5;
     localparam int MIN_COL_PIXELS = 3;
     localparam int MIN_ROW_PIXELS = 3;
+    localparam int MIN_BBOX_H     = 8;
+    localparam int MIN_MINUS_W    = 8;
+    localparam int MAX_MINUS_H    = 18;
     localparam int ROW_MIN        = 20;
     localparam int ROW_MAX        = 220;
     localparam int ROW_MIN_BASE   = ROW_MIN * WORDS_PER_ROW;
@@ -98,6 +101,7 @@ module segment
     logic [9:0]  record_x_min, record_x_max;
 
     logic [$clog2(MAX_CHARS)-1:0] char_idx, char_idx_next;
+    logic [$clog2(MAX_CHARS+1)-1:0] valid_char_count;
     logic [$clog2(IMG_H)-1:0]     row_idx, row_idx_next;
 
     logic [$clog2(WORDS_PER_ROW)-1:0] word_in_row, word_in_row_next;
@@ -109,10 +113,26 @@ module segment
 
     logic [$clog2(IMG_H)-1:0] cur_y_min, cur_y_max;
     logic        found_y_min;
+    logic [9:0]  cur_bbox_w;
+    logic [7:0]  cur_bbox_h;
+    logic        cur_bbox_is_minus;
+    logic        cur_bbox_is_valid;
 
     logic [5:0] rs_word_pixel_count;
     logic [$clog2(IMG_W)-1:0] rs_base_col;
     assign rs_base_col = {rs_word_d, 5'b0};
+
+    assign cur_bbox_w = (char_x_max[char_idx] >= char_x_min[char_idx])
+                      ? (char_x_max[char_idx] - char_x_min[char_idx] + 10'd1)
+                      : 10'd0;
+    assign cur_bbox_h = (cur_y_max >= cur_y_min)
+                      ? (cur_y_max[7:0] - cur_y_min[7:0] + 8'd1)
+                      : 8'd0;
+    assign cur_bbox_is_minus = (cur_bbox_w >= MIN_MINUS_W)
+                            && (cur_bbox_h <= MAX_MINUS_H)
+                            && (cur_bbox_w >= ({2'b0, cur_bbox_h} * 10'd3));
+    assign cur_bbox_is_valid = found_y_min
+                            && (cur_bbox_is_minus || (cur_bbox_h >= MIN_BBOX_H));
 
     always_comb begin
         rs_word_pixel_count = '0;
@@ -262,10 +282,10 @@ module segment
             end
 
             S_RS_WRITE: begin
-                bbox_we    = 1'b1;
-                bbox_waddr = char_idx;
+                bbox_we    = cur_bbox_is_valid;
+                bbox_waddr = valid_char_count[$clog2(MAX_CHARS)-1:0];
                 bbox_wdata = {char_x_min[char_idx], char_x_max[char_idx],
-                              cur_y_min, cur_y_max};
+                              cur_y_min[7:0], cur_y_max[7:0]};
 
                 if ({1'b0, char_idx} < char_count - 1'b1) begin
                     char_idx_next = char_idx + 1'b1;
@@ -319,6 +339,7 @@ module segment
             gap_count          <= '0;
             char_count         <= '0;
             char_idx           <= '0;
+            valid_char_count   <= '0;
             row_idx            <= '0;
             word_in_row        <= '0;
             rs_first_word      <= '0;
@@ -367,6 +388,7 @@ module segment
                 gap_count          <= '0;
                 char_count         <= '0;
                 char_idx           <= '0;
+                valid_char_count   <= '0;
                 row_idx            <= '0;
                 word_in_row        <= '0;
                 rs_first_word      <= '0;
@@ -416,11 +438,15 @@ module segment
                     rs_row_pixel_count <= '0;
             end
 
+            if (state == S_RS_WRITE && cur_bbox_is_valid)
+                valid_char_count <= valid_char_count + 1'b1;
+
             done <= (state_next == S_DONE);
-            if (record_char && char_count < MAX_CHARS)
-                num_chars <= char_count + 1'b1;
-            else
-                num_chars <= char_count;
+            if (state_next == S_DONE)
+                num_chars <= valid_char_count
+                           + ((state == S_RS_WRITE && cur_bbox_is_valid) ? 1'b1 : 1'b0);
+            else if (state == S_IDLE && start)
+                num_chars <= '0;
         end
     end
 

@@ -145,6 +145,7 @@ module tb_solver;
         input integer c4,
         input integer c5
     );
+        integer expected_degree;
         begin
             if ((coefficients[0] != c0) || (coefficients[1] != c1) ||
                 (coefficients[2] != c2) || (coefficients[3] != c3) ||
@@ -155,6 +156,21 @@ module tb_solver;
                     coefficients[0], coefficients[1], coefficients[2],
                     coefficients[3], coefficients[4], coefficients[5],
                     c0, c1, c2, c3, c4, c5
+                );
+            end
+
+            expected_degree = 0;
+            if (c1 != 0) expected_degree = 1;
+            if (c2 != 0) expected_degree = 2;
+            if (c3 != 0) expected_degree = 3;
+            if (c4 != 0) expected_degree = 4;
+            if (c5 != 0) expected_degree = 5;
+
+            if (int'(num_solutions) > expected_degree) begin
+                $fatal(
+                    1,
+                    "Solution count %0d exceeds polynomial degree %0d for coefficients [%0d,%0d,%0d,%0d,%0d,%0d]",
+                    num_solutions, expected_degree, c0, c1, c2, c3, c4, c5
                 );
             end
         end
@@ -271,6 +287,39 @@ module tb_solver;
         end
     endtask
 
+    task automatic run_case_3x_power_2_minus_1;
+        begin
+            clear_inputs();
+            char_codes[0] = 8'd3;
+            char_codes[1] = TOK_X;
+            char_codes[2] = TOK_POW;
+            char_codes[3] = 8'd2;
+            char_codes[4] = TOK_SUB;
+            char_codes[5] = 8'd1;
+            num_chars = 6;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected 3x^2-1 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected 3x^2-1 case to be non-constant");
+            end
+            if (num_solutions != 2) begin
+                $fatal(1, "Expected 2 roots for 3x^2-1, got %0d", num_solutions);
+            end
+            expect_coefficients(-1, 0, 3, 0, 0, 0);
+            expect_root_q16_close(0, -32'sd37837, q16(1) / 1000);
+            expect_root_q16_close(1,  32'sd37837, q16(1) / 1000);
+            $display(
+                "PASS: 3x^2-1 -> exact quadratic roots at %0f and %0f",
+                $itor(solutions[0]) / 65536.0,
+                $itor(solutions[1]) / 65536.0
+            );
+        end
+    endtask
+
     task automatic run_case_x_power_2;
         begin
             clear_inputs();
@@ -293,6 +342,32 @@ module tb_solver;
             expect_coefficients(0, 0, 1, 0, 0, 0);
             expect_root_close(0, 0, q16(1) / 200);
             $display("PASS: x^2 -> coefficients [0,0,1,0,0,0]");
+        end
+    endtask
+
+    task automatic run_case_x_power_2_plus_1;
+        begin
+            clear_inputs();
+            char_codes[0] = TOK_X;
+            char_codes[1] = TOK_POW;
+            char_codes[2] = 8'd2;
+            char_codes[3] = TOK_ADD;
+            char_codes[4] = 8'd1;
+            num_chars = 5;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected x^2+1 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected x^2+1 case to be non-constant");
+            end
+            if (num_solutions != 0) begin
+                $fatal(1, "Expected 0 real roots for x^2+1, got %0d", num_solutions);
+            end
+            expect_coefficients(1, 0, 1, 0, 0, 0);
+            $display("PASS: x^2+1 -> no real roots");
         end
     endtask
 
@@ -626,6 +701,32 @@ module tb_solver;
         end
     endtask
 
+    task automatic run_case_5x_plus_3;
+        begin
+            clear_inputs();
+            char_codes[0] = 8'd5;
+            char_codes[1] = TOK_X;
+            char_codes[2] = TOK_ADD;
+            char_codes[3] = 8'd3;
+            num_chars = 4;
+            pulse_start();
+            wait_for_done();
+
+            if (!valid) begin
+                $fatal(1, "Expected 5x+3 case to be valid");
+            end
+            if (is_const) begin
+                $fatal(1, "Expected 5x+3 case to be non-constant");
+            end
+            if (num_solutions != 1) begin
+                $fatal(1, "Expected 1 root for 5x+3, got %0d", num_solutions);
+            end
+            expect_coefficients(3, 5, 0, 0, 0, 0);
+            expect_root_q16_close(0, -(q16(3) / 5), q16(1) / 100);
+            $display("PASS: 5x+3 -> root at %0f", $itor(solutions[0]) / 65536.0);
+        end
+    endtask
+
     task automatic run_case_explicit_multiply_with_multi_digit_constant;
         begin
             clear_inputs();
@@ -911,7 +1012,13 @@ module tb_solver;
         run_case_x_power_2_minus_1();
         @(posedge clk);
 
+        run_case_3x_power_2_minus_1();
+        @(posedge clk);
+
         run_case_x_power_2();
+        @(posedge clk);
+
+        run_case_x_power_2_plus_1();
         @(posedge clk);
 
         run_case_parenthesized_x_power_2();
@@ -948,6 +1055,9 @@ module tb_solver;
         @(posedge clk);
 
         run_case_folded_coefficient_plus_constant();
+        @(posedge clk);
+
+        run_case_5x_plus_3();
         @(posedge clk);
 
         run_case_explicit_multiply_with_multi_digit_constant();
